@@ -1,0 +1,17 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "cd ../.. && pnpm turbo build --filter=@atlas/api",
+  "installCommand": "cd ../.. && pnpm install",
+  "outputDirectory": ".next",
+  "functions": {
+    "src/app/api/chat/route.ts": {
+      "maxDuration": 60
+    },
+    "src/app/api/snapshot/generate/route.ts": {
+      "maxDuration": 30
+    },
+    "src/app/api/export/pdf/route.ts": {
+      "maxDuration": 30
+    }
+  }
+}
