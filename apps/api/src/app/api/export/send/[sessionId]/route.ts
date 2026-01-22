@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { renderToStaticMarkup } from 'react-dom/server';
 import { supabase } from '@/lib/db/supabase';
 import { getValidSession } from '@/lib/db/session';
-import { resend, EMAIL_CONFIG, SnapshotEmail, getPlainTextVersion } from '@/lib/email';
+import { resend, EMAIL_CONFIG, renderSnapshotEmail, getPlainTextVersion } from '@/lib/email';
 import { handleApiError, ValidationError, AppError } from '@/lib/errors';
 import type { Snapshot } from '@atlas/types';
 
@@ -44,13 +43,11 @@ export async function POST(
     const downloadUrl = `${baseUrl}/api/export/pdf/${sessionId}`;
 
     // Render email HTML
-    const emailHtml = renderToStaticMarkup(
-      SnapshotEmail({
-        snapshot: snapshot as Snapshot,
-        email: session.email,
-        downloadUrl,
-      })
-    );
+    const emailHtml = renderSnapshotEmail({
+      snapshot: snapshot as Snapshot,
+      email: session.email,
+      downloadUrl,
+    });
 
     // Get plain text version
     const emailText = getPlainTextVersion(snapshot as Snapshot, session.email);
