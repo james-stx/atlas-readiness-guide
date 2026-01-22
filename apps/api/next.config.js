@@ -1,9 +1,19 @@
+const path = require('path');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   transpilePackages: ['@atlas/types', '@atlas/config'],
   // API-only app - no static pages needed
   output: 'standalone',
+  // Ensure path aliases work in production builds
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': path.resolve(__dirname, 'src'),
+    };
+    return config;
+  },
   // Allow frontend to connect
   async headers() {
     return [
