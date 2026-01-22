@@ -1,6 +1,6 @@
 {
   "framework": "nextjs",
-  "buildCommand": "cd ../.. && pnpm turbo build --filter=@atlas/web",
-  "installCommand": "cd ../.. && pnpm install",
+  "installCommand": "cd ../.. && pnpm install --prod=false",
+  "buildCommand": "pnpm run build",
   "outputDirectory": ".next"
 }
