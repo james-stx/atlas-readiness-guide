@@ -51,11 +51,11 @@ export default function HowItWorksPage() {
             <Step
               number={2}
               title="Have a Conversation"
-              description="Chat with our AI guide, Atlas, who will ask you questions about your business across five key domains. Just answer naturally—there are no right or wrong answers."
+              description="Chat with our AI guide, Atlas, who will ask you questions about your business across five key domains. Just answer naturally. There are no right or wrong answers."
               details={[
                 "Takes about 20-30 minutes to complete",
                 "Answer in your own words or use quick-response buttons",
-                "Skip questions if you're unsure—that's valuable data too"
+                "Skip questions if you're unsure. That's valuable data too"
               ]}
             />
 
@@ -91,7 +91,7 @@ export default function HowItWorksPage() {
             <Step
               number={4}
               title="Get Your Confidence Clarity"
-              description="As you answer, Atlas classifies each input by confidence level. This isn't about judging you—it's about helping you see what's validated versus what needs more work."
+              description="As you answer, Atlas classifies each input by confidence level. This isn't about judging you. It's about helping you see what's validated versus what needs more work."
             >
               <div className="mt-6 space-y-3">
                 <ConfidenceLevel
@@ -115,7 +115,7 @@ export default function HowItWorksPage() {
             <Step
               number={5}
               title="Receive Your Snapshot"
-              description="At the end, Atlas synthesizes everything into a Readiness Snapshot—a clear summary of where you stand."
+              description="At the end, Atlas synthesizes everything into a Readiness Snapshot: a clear summary of where you stand."
               details={[
                 "Key findings across all domains",
                 "Your strengths (high confidence areas)",
@@ -152,7 +152,7 @@ export default function HowItWorksPage() {
             />
             <FAQ
               question="Is this a score or ranking?"
-              answer="No. This isn't about passing or failing. It's about gaining clarity on what you know versus what you're assuming. Every company has gaps—the goal is to see them clearly."
+              answer="No. This isn't about passing or failing. It's about gaining clarity on what you know versus what you're assuming. Every company has gaps. The goal is to see them clearly."
             />
             <FAQ
               question="What happens to my data?"
@@ -164,7 +164,7 @@ export default function HowItWorksPage() {
             />
             <FAQ
               question="Who should use this?"
-              answer="This is designed for Australian companies considering or planning U.S. market expansion—founders, CEOs, expansion leads, or anyone driving the go-to-market strategy."
+              answer="This is designed for Australian companies considering or planning U.S. market expansion: founders, CEOs, expansion leads, or anyone driving the go-to-market strategy."
             />
             <FAQ
               question="What if I don't know an answer?"
@@ -181,7 +181,7 @@ export default function HowItWorksPage() {
             Ready to Get Started?
           </h2>
           <p className="text-slate-600 mb-8">
-            It takes about 20-30 minutes. No preparation needed—just answer honestly.
+            It takes about 20-30 minutes. No preparation needed. Just answer honestly.
           </p>
           <Link
             href="/start"
