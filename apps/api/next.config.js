@@ -6,6 +6,14 @@ const nextConfig = {
   transpilePackages: ['@atlas/types', '@atlas/config'],
   // API-only app - no static pages needed
   output: 'standalone',
+  // Skip ESLint during builds (run separately in CI)
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  // Skip type checking during builds (run separately in CI)
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   // Ensure path aliases work in production builds
   webpack: (config) => {
     config.resolve.alias = {
