@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function HowItWorksPage() {
   return (
-    <main className="min-h-screen flex flex-col bg-slate-50">
+    <main className="min-h-screen flex flex-col bg-white">
       {/* Header */}
       <header className="border-b border-slate-200 bg-white">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -10,11 +10,14 @@ export default function HowItWorksPage() {
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">A</span>
             </div>
-            <span className="font-semibold text-slate-900">Atlas</span>
+            <span className="flex items-baseline gap-1.5">
+              <span className="font-semibold text-slate-900">Atlas</span>
+              <span className="text-xs text-gradient font-medium">by STX Labs</span>
+            </span>
           </Link>
           <Link
             href="/start"
-            className="text-sm font-medium text-primary hover:text-primary-600 transition-colors"
+            className="text-sm font-medium text-primary hover:text-primary-700 transition-colors"
           >
             Start Assessment
           </Link>
@@ -22,21 +25,21 @@ export default function HowItWorksPage() {
       </header>
 
       {/* Hero */}
-      <section className="bg-white border-b border-slate-200 py-16 px-6">
+      <section className="bg-white py-20 px-6">
         <div className="max-w-3xl mx-auto text-center">
-          <h1 className="text-4xl font-bold text-slate-950 mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4 tracking-tight">
             How It Works
           </h1>
-          <p className="text-lg text-slate-600">
+          <p className="text-lg text-slate-500">
             A simple, conversational approach to understanding your U.S. expansion readiness.
           </p>
         </div>
       </section>
 
       {/* Process Steps */}
-      <section className="py-16 px-6">
+      <section className="py-20 px-6 bg-slate-50">
         <div className="max-w-4xl mx-auto">
-          <div className="space-y-12">
+          <div className="space-y-14">
             <Step
               number={1}
               title="Start with Your Email"
@@ -140,9 +143,9 @@ export default function HowItWorksPage() {
       </section>
 
       {/* FAQ */}
-      <section className="bg-white border-t border-slate-200 py-16 px-6">
+      <section className="bg-white py-20 px-6">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-2xl font-bold text-slate-900 text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 text-center mb-14 tracking-tight">
             Frequently Asked Questions
           </h2>
           <div className="space-y-8">
@@ -175,19 +178,19 @@ export default function HowItWorksPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 px-6">
+      <section className="py-20 px-6 bg-primary-50">
         <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-2xl font-bold text-slate-900 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 tracking-tight">
             Ready to Get Started?
           </h2>
-          <p className="text-slate-600 mb-8">
+          <p className="text-slate-500 mb-10">
             It takes about 20-30 minutes. No preparation needed. Just answer honestly.
           </p>
           <Link
             href="/start"
-            className="inline-flex items-center justify-center px-8 py-4 bg-primary text-white font-medium rounded-lg hover:bg-primary-600 transition-colors text-lg"
+            className="inline-flex items-center justify-center px-8 py-4 bg-primary text-white font-medium rounded-lg hover:bg-primary-600 transition-all btn-glow text-lg"
           >
-            Begin Your Assessment
+            Start Your Readiness Check
           </Link>
         </div>
       </section>
@@ -195,9 +198,15 @@ export default function HowItWorksPage() {
       {/* Footer */}
       <footer className="border-t border-slate-200 bg-white py-8 px-6">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-slate-500">
-            © {new Date().getFullYear()} STX Labs. All rights reserved.
-          </p>
+          <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4">
+            <p className="text-sm text-slate-500">
+              © {new Date().getFullYear()} STX Labs. All rights reserved.
+            </p>
+            <span className="hidden md:inline text-slate-300">|</span>
+            <p className="text-sm text-slate-500">
+              Helping Australian founders expand with confidence
+            </p>
+          </div>
           <div className="flex gap-6">
             <Link
               href="/privacy"
@@ -234,17 +243,17 @@ function Step({
   return (
     <div className="flex gap-6">
       <div className="flex-shrink-0">
-        <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
+        <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary-600 rounded-2xl flex items-center justify-center shadow-sm">
           <span className="text-white font-bold text-lg">{number}</span>
         </div>
       </div>
       <div className="flex-1">
         <h3 className="text-xl font-semibold text-slate-900 mb-2">{title}</h3>
-        <p className="text-slate-600 mb-4">{description}</p>
+        <p className="text-slate-500 mb-4">{description}</p>
         {details && (
           <ul className="space-y-2">
             {details.map((detail, index) => (
-              <li key={index} className="flex items-start gap-2 text-slate-600">
+              <li key={index} className="flex items-start gap-2 text-slate-500">
                 <span className="text-primary mt-1">•</span>
                 <span>{detail}</span>
               </li>
@@ -265,9 +274,9 @@ function DomainCard({
   description: string;
 }) {
   return (
-    <div className="bg-white border border-slate-200 rounded-lg p-4">
+    <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300">
       <h4 className="font-semibold text-slate-900 mb-1">{name}</h4>
-      <p className="text-sm text-slate-600">{description}</p>
+      <p className="text-sm text-slate-500">{description}</p>
     </div>
   );
 }
@@ -282,13 +291,13 @@ function ConfidenceLevel({
   description: string;
 }) {
   const colorClasses = {
-    green: 'bg-green-100 text-green-800 border-green-200',
-    amber: 'bg-amber-100 text-amber-800 border-amber-200',
-    red: 'bg-red-100 text-red-800 border-red-200',
+    green: 'bg-green-50 text-green-800 border-green-200',
+    amber: 'bg-amber-50 text-amber-800 border-amber-200',
+    red: 'bg-red-50 text-red-800 border-red-200',
   };
 
   return (
-    <div className={`flex items-center gap-4 p-3 rounded-lg border ${colorClasses[color]}`}>
+    <div className={`flex items-center gap-4 p-4 rounded-2xl border ${colorClasses[color]}`}>
       <span className="font-medium whitespace-nowrap">{level}</span>
       <span className="text-sm opacity-80">{description}</span>
     </div>
@@ -303,9 +312,9 @@ function FAQ({
   answer: string;
 }) {
   return (
-    <div>
-      <h3 className="font-semibold text-slate-900 mb-2">{question}</h3>
-      <p className="text-slate-600">{answer}</p>
+    <div className="pb-8 border-b border-slate-100 last:border-0 last:pb-0">
+      <h3 className="font-semibold text-slate-900 mb-2 text-lg">{question}</h3>
+      <p className="text-slate-500 leading-relaxed">{answer}</p>
     </div>
   );
 }
