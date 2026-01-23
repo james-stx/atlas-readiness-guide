@@ -230,9 +230,9 @@ function AudienceCard({
   description: string;
 }) {
   return (
-    <div className="text-center p-6 bg-slate-50 rounded-xl">
-      <h3 className="font-semibold text-slate-900 mb-2">{title}</h3>
-      <p className="text-slate-600 text-sm">{description}</p>
+    <div className="text-center p-8 bg-slate-50 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+      <h3 className="font-semibold text-slate-900 mb-2 text-lg">{title}</h3>
+      <p className="text-slate-500 text-sm">{description}</p>
     </div>
   );
 }
@@ -247,12 +247,12 @@ function FeatureCard({
   description: string;
 }) {
   return (
-    <div className="text-center">
-      <div className="w-12 h-12 mx-auto mb-4 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+    <div className="text-center p-8 rounded-2xl border border-slate-100 bg-slate-50/50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+      <div className="w-14 h-14 mx-auto mb-5 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
         {icon}
       </div>
-      <h3 className="font-semibold text-slate-900 mb-2">{title}</h3>
-      <p className="text-slate-600 text-sm">{description}</p>
+      <h3 className="font-semibold text-slate-900 mb-3 text-lg">{title}</h3>
+      <p className="text-slate-500 text-sm leading-relaxed">{description}</p>
     </div>
   );
 }
@@ -265,9 +265,9 @@ function DomainCard({
   description: string;
 }) {
   return (
-    <div className="p-4 bg-white border border-slate-200 rounded-xl text-center">
-      <h3 className="font-semibold text-slate-900 mb-1">{name}</h3>
-      <p className="text-slate-500 text-xs">{description}</p>
+    <div className="p-5 bg-slate-800/50 border border-slate-700/50 rounded-2xl text-center hover:bg-slate-800 hover:border-slate-600 transition-all duration-300">
+      <h3 className="font-semibold text-white mb-1">{name}</h3>
+      <p className="text-slate-400 text-xs">{description}</p>
     </div>
   );
 }
