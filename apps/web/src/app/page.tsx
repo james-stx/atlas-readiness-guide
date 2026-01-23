@@ -6,12 +6,14 @@ export default function HomePage() {
       {/* Header */}
       <header className="border-b border-slate-200 bg-white">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-baseline gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center self-center">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">A</span>
             </div>
-            <span className="font-semibold text-slate-900">Atlas</span>
-            <span className="text-xs text-gradient font-medium">by STX Labs</span>
+            <span className="flex items-baseline gap-1.5">
+              <span className="font-semibold text-slate-900">Atlas</span>
+              <span className="text-xs text-gradient font-medium">by STX Labs</span>
+            </span>
           </div>
           <Link
             href="/start"
