@@ -48,12 +48,12 @@ export default function HomePage() {
       </section>
 
       {/* Who This Is For */}
-      <section className="bg-white border-t border-slate-200 py-16 px-6">
+      <section className="bg-white py-20 px-6">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold text-slate-900 text-center mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 text-center mb-4 tracking-tight">
             For Australian Founders Considering the U.S. Market
           </h2>
-          <p className="text-slate-600 text-center mb-12 max-w-2xl mx-auto">
+          <p className="text-lg text-slate-500 text-center mb-14 max-w-2xl mx-auto">
             Atlas is built for founders who want to base their expansion decisions
             on evidence, not instinct alone.
           </p>
@@ -75,16 +75,16 @@ export default function HomePage() {
       </section>
 
       {/* Problem Statement */}
-      <section className="py-16 px-6 bg-slate-50">
+      <section className="py-20 px-6 bg-slate-900">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-2xl font-bold text-slate-900 mb-6">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 tracking-tight">
             The Expansion Trap
           </h2>
-          <p className="text-lg text-slate-600 mb-6">
+          <p className="text-lg text-slate-300 mb-6">
             Founders routinely make U.S. expansion decisions with incomplete, uneven,
             or low-confidence information without realising it.
           </p>
-          <p className="text-slate-600">
+          <p className="text-slate-400">
             Assumptions quietly get treated as facts. &quot;Readiness&quot; becomes a
             vague feeling rather than a defensible position. By the time you realize
             what&apos;s missing, momentum is lost, or worse, misdirected.
@@ -93,9 +93,9 @@ export default function HomePage() {
       </section>
 
       {/* Features */}
-      <section className="bg-white border-t border-slate-200 py-16 px-6">
+      <section className="bg-white py-20 px-6">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold text-slate-900 text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 text-center mb-14 tracking-tight">
             What You&apos;ll Get
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
@@ -119,12 +119,12 @@ export default function HomePage() {
       </section>
 
       {/* Domains */}
-      <section className="py-16 px-6">
+      <section className="py-20 px-6 bg-slate-900">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold text-slate-900 text-center mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-4 tracking-tight">
             5 Readiness Domains
           </h2>
-          <p className="text-slate-600 text-center mb-12 max-w-2xl mx-auto">
+          <p className="text-slate-400 text-center mb-14 max-w-2xl mx-auto">
             We explore your readiness across the critical areas that determine
             U.S. expansion success.
           </p>
@@ -154,16 +154,16 @@ export default function HomePage() {
       </section>
 
       {/* Differentiator */}
-      <section className="py-16 px-6 bg-slate-50">
+      <section className="py-20 px-6 bg-white">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-2xl font-bold text-slate-900 mb-6">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6 tracking-tight">
             Clarity, Not Scores
           </h2>
-          <p className="text-lg text-slate-600 mb-6">
+          <p className="text-lg text-slate-500 mb-6">
             Atlas doesn&apos;t grade you. It doesn&apos;t pretend to have answers
             you don&apos;t.
           </p>
-          <p className="text-slate-600">
+          <p className="text-slate-500">
             Instead, it helps you see exactly what you&apos;re basing your decision
             on so you can validate what needs validating and address what needs
             addressing. The outcome is clarity, not false confidence.
@@ -172,17 +172,18 @@ export default function HomePage() {
       </section>
 
       {/* Final CTA */}
-      <section className="bg-primary py-16 px-6">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">
+      <section className="bg-slate-950 py-20 px-6 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-cyan/10" />
+        <div className="max-w-3xl mx-auto text-center relative z-10">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">
             Ready to find out where you really stand?
           </h2>
-          <p className="text-primary-100 mb-8">
+          <p className="text-slate-400 mb-10">
             30 minutes. No scores. Just clarity about your U.S. expansion readiness.
           </p>
           <Link
             href="/start"
-            className="inline-flex items-center justify-center px-8 py-4 bg-white text-primary font-medium rounded-lg hover:bg-slate-50 transition-colors"
+            className="inline-flex items-center justify-center px-8 py-4 bg-primary text-white font-medium rounded-lg hover:bg-primary-600 transition-all btn-glow"
           >
             Start Your Readiness Check
           </Link>
@@ -190,13 +191,13 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-slate-200 bg-white py-8 px-6">
+      <footer className="border-t border-slate-800 bg-slate-950 py-8 px-6">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4">
             <p className="text-sm text-slate-500">
               © {new Date().getFullYear()} STX Labs. All rights reserved.
             </p>
-            <span className="hidden md:inline text-slate-300">|</span>
+            <span className="hidden md:inline text-slate-700">|</span>
             <p className="text-sm text-slate-500">
               Helping Australian founders expand with confidence
             </p>
@@ -204,13 +205,13 @@ export default function HomePage() {
           <div className="flex gap-6">
             <Link
               href="/privacy"
-              className="text-sm text-slate-500 hover:text-slate-700"
+              className="text-sm text-slate-500 hover:text-slate-300"
             >
               Privacy Policy
             </Link>
             <Link
               href="/terms"
-              className="text-sm text-slate-500 hover:text-slate-700"
+              className="text-sm text-slate-500 hover:text-slate-300"
             >
               Terms of Service
             </Link>
