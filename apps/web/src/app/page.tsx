@@ -22,7 +22,7 @@ export default function HomePage() {
       </header>
 
       {/* Hero */}
-      <section className="flex-1 flex items-center justify-center px-6 py-28 bg-slate-950 hero-gradient relative overflow-hidden">
+      <section className="flex-1 flex items-center justify-center px-6 py-28 bg-slate-950 hero-gradient bg-grid relative overflow-hidden">
         <div className="max-w-3xl text-center relative z-10">
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight tracking-tight animate-in">
             Readiness. <span className="text-gradient">Revealed.</span>
@@ -44,6 +44,9 @@ export default function HomePage() {
               How It Works
             </Link>
           </div>
+          <p className="mt-8 text-sm text-slate-600 animate-in animate-in-delay-3">
+            AI-powered readiness assessment by STX Labs
+          </p>
         </div>
       </section>
 
@@ -119,7 +122,7 @@ export default function HomePage() {
       </section>
 
       {/* Domains */}
-      <section className="py-20 px-6 bg-slate-900">
+      <section className="py-20 px-6 bg-slate-900 bg-grid">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-4 tracking-tight">
             5 Readiness Domains
