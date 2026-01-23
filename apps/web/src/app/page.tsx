@@ -11,6 +11,7 @@ export default function HomePage() {
               <span className="text-white font-bold text-sm">A</span>
             </div>
             <span className="font-semibold text-slate-900">Atlas</span>
+            <span className="text-xs text-gradient font-medium">by STX Labs</span>
           </div>
           <Link
             href="/start"
