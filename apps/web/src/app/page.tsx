@@ -4,17 +4,17 @@ export default function HomePage() {
   return (
     <main className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="border-b border-slate-800/50 bg-slate-950">
+      <header className="border-b border-slate-200 bg-white">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">A</span>
             </div>
-            <span className="font-semibold text-white">Atlas</span>
+            <span className="font-semibold text-slate-900">Atlas</span>
           </div>
           <Link
             href="/start"
-            className="text-sm font-medium text-primary-200 hover:text-white transition-colors"
+            className="text-sm font-medium text-primary hover:text-primary-700 transition-colors"
           >
             Start Assessment
           </Link>
@@ -22,12 +22,12 @@ export default function HomePage() {
       </header>
 
       {/* Hero */}
-      <section className="flex-1 flex items-center justify-center px-6 py-28 bg-slate-950 hero-gradient bg-grid relative overflow-hidden">
+      <section className="flex-1 flex items-center justify-center px-6 py-28 bg-white relative overflow-hidden">
         <div className="max-w-3xl text-center relative z-10">
-          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight tracking-tight animate-in">
+          <h1 className="text-5xl md:text-7xl font-bold text-slate-900 mb-6 leading-tight tracking-tight animate-in">
             Readiness. <span className="text-gradient">Revealed.</span>
           </h1>
-          <p className="text-xl md:text-2xl text-slate-400 mb-10 max-w-2xl mx-auto animate-in animate-in-delay-1">
+          <p className="text-xl md:text-2xl text-slate-500 mb-10 max-w-2xl mx-auto animate-in animate-in-delay-1">
             Months of preparation, in a moment.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-in animate-in-delay-2">
@@ -39,12 +39,12 @@ export default function HomePage() {
             </Link>
             <Link
               href="/how-it-works"
-              className="inline-flex items-center justify-center px-8 py-4 border border-slate-700 text-slate-300 font-medium rounded-lg hover:bg-slate-800 hover:border-slate-600 transition-all"
+              className="inline-flex items-center justify-center px-8 py-4 border border-slate-300 text-slate-600 font-medium rounded-lg hover:bg-slate-50 hover:border-slate-400 transition-all"
             >
               How It Works
             </Link>
           </div>
-          <p className="mt-8 text-sm text-slate-600 animate-in animate-in-delay-3">
+          <p className="mt-8 text-sm text-slate-400 animate-in animate-in-delay-3">
             AI-powered readiness assessment by STX Labs
           </p>
         </div>
@@ -78,16 +78,16 @@ export default function HomePage() {
       </section>
 
       {/* Problem Statement */}
-      <section className="py-20 px-6 bg-slate-900">
+      <section className="py-20 px-6 bg-slate-50">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 tracking-tight">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6 tracking-tight">
             The Expansion Trap
           </h2>
-          <p className="text-lg text-slate-300 mb-6">
+          <p className="text-lg text-slate-600 mb-6">
             Founders routinely make U.S. expansion decisions with incomplete, uneven,
             or low-confidence information without realising it.
           </p>
-          <p className="text-slate-400">
+          <p className="text-slate-500">
             Assumptions quietly get treated as facts. &quot;Readiness&quot; becomes a
             vague feeling rather than a defensible position. By the time you realize
             what&apos;s missing, momentum is lost, or worse, misdirected.
@@ -122,12 +122,12 @@ export default function HomePage() {
       </section>
 
       {/* Domains */}
-      <section className="py-20 px-6 bg-slate-900 bg-grid">
+      <section className="py-20 px-6 bg-slate-50">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-4 tracking-tight">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 text-center mb-4 tracking-tight">
             5 Readiness Domains
           </h2>
-          <p className="text-slate-400 text-center mb-14 max-w-2xl mx-auto">
+          <p className="text-slate-500 text-center mb-14 max-w-2xl mx-auto">
             We explore your readiness across the critical areas that determine
             U.S. expansion success.
           </p>
@@ -175,13 +175,12 @@ export default function HomePage() {
       </section>
 
       {/* Final CTA */}
-      <section className="bg-slate-950 py-20 px-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-cyan/10" />
+      <section className="bg-primary-50 py-20 px-6 relative overflow-hidden">
         <div className="max-w-3xl mx-auto text-center relative z-10">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 tracking-tight">
             Ready to find out where you really stand?
           </h2>
-          <p className="text-slate-400 mb-10">
+          <p className="text-slate-500 mb-10">
             30 minutes. No scores. Just clarity about your U.S. expansion readiness.
           </p>
           <Link
@@ -194,13 +193,13 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-slate-800 bg-slate-950 py-8 px-6">
+      <footer className="border-t border-slate-200 bg-white py-8 px-6">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4">
             <p className="text-sm text-slate-500">
               © {new Date().getFullYear()} STX Labs. All rights reserved.
             </p>
-            <span className="hidden md:inline text-slate-700">|</span>
+            <span className="hidden md:inline text-slate-300">|</span>
             <p className="text-sm text-slate-500">
               Helping Australian founders expand with confidence
             </p>
@@ -208,13 +207,13 @@ export default function HomePage() {
           <div className="flex gap-6">
             <Link
               href="/privacy"
-              className="text-sm text-slate-500 hover:text-slate-300"
+              className="text-sm text-slate-500 hover:text-slate-700"
             >
               Privacy Policy
             </Link>
             <Link
               href="/terms"
-              className="text-sm text-slate-500 hover:text-slate-300"
+              className="text-sm text-slate-500 hover:text-slate-700"
             >
               Terms of Service
             </Link>
@@ -268,9 +267,9 @@ function DomainCard({
   description: string;
 }) {
   return (
-    <div className="p-5 bg-slate-800/50 border border-slate-700/50 rounded-2xl text-center hover:bg-slate-800 hover:border-slate-600 transition-all duration-300">
-      <h3 className="font-semibold text-white mb-1">{name}</h3>
-      <p className="text-slate-400 text-xs">{description}</p>
+    <div className="p-5 bg-white border border-slate-200 rounded-2xl text-center shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+      <h3 className="font-semibold text-slate-900 mb-1">{name}</h3>
+      <p className="text-slate-500 text-xs">{description}</p>
     </div>
   );
 }
