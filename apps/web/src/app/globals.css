@@ -58,6 +58,38 @@
   }
 }
 
+/* Gradient text effect */
+.text-gradient {
+  background: linear-gradient(135deg, #5754FF 0%, #4EEBF3 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* CTA glow effect */
+.btn-glow {
+  box-shadow: 0 0 20px rgba(87, 84, 255, 0.3), 0 0 40px rgba(87, 84, 255, 0.1);
+  transition: box-shadow 0.3s ease;
+}
+.btn-glow:hover {
+  box-shadow: 0 0 25px rgba(87, 84, 255, 0.5), 0 0 50px rgba(87, 84, 255, 0.2);
+}
+
+/* Hero gradient background */
+.hero-gradient {
+  background: radial-gradient(ellipse at top, rgba(87, 84, 255, 0.15) 0%, transparent 50%),
+              radial-gradient(ellipse at bottom right, rgba(78, 235, 243, 0.08) 0%, transparent 40%);
+}
+
+/* Animate on scroll utility */
+.animate-in {
+  animation: slideUp 0.6s ease-out forwards;
+  opacity: 0;
+}
+.animate-in-delay-1 { animation-delay: 0.1s; }
+.animate-in-delay-2 { animation-delay: 0.2s; }
+.animate-in-delay-3 { animation-delay: 0.3s; }
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;

@@ -4,17 +4,17 @@ export default function HomePage() {
   return (
     <main className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="border-b border-slate-200 bg-white">
+      <header className="border-b border-slate-800/50 bg-slate-950">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">A</span>
             </div>
-            <span className="font-semibold text-slate-900">Atlas</span>
+            <span className="font-semibold text-white">Atlas</span>
           </div>
           <Link
             href="/start"
-            className="text-sm font-medium text-primary hover:text-primary-600 transition-colors"
+            className="text-sm font-medium text-primary-200 hover:text-white transition-colors"
           >
             Start Assessment
           </Link>
@@ -22,24 +22,24 @@ export default function HomePage() {
       </header>
 
       {/* Hero */}
-      <section className="flex-1 flex items-center justify-center px-6 py-20 bg-gradient-to-b from-slate-50 to-white">
-        <div className="max-w-3xl text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-slate-950 mb-6 leading-tight">
-            Readiness. <span className="text-primary">Revealed.</span>
+      <section className="flex-1 flex items-center justify-center px-6 py-28 bg-slate-950 hero-gradient relative overflow-hidden">
+        <div className="max-w-3xl text-center relative z-10">
+          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight tracking-tight animate-in">
+            Readiness. <span className="text-gradient">Revealed.</span>
           </h1>
-          <p className="text-xl text-slate-600 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl md:text-2xl text-slate-400 mb-10 max-w-2xl mx-auto animate-in animate-in-delay-1">
             Months of preparation, in a moment.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-in animate-in-delay-2">
             <Link
               href="/start"
-              className="inline-flex items-center justify-center px-6 py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary-600 transition-colors"
+              className="inline-flex items-center justify-center px-8 py-4 bg-primary text-white font-medium rounded-lg hover:bg-primary-600 transition-all btn-glow"
             >
               Start Your Readiness Check
             </Link>
             <Link
               href="/how-it-works"
-              className="inline-flex items-center justify-center px-6 py-3 border border-slate-300 text-slate-700 font-medium rounded-lg hover:bg-slate-50 transition-colors"
+              className="inline-flex items-center justify-center px-8 py-4 border border-slate-700 text-slate-300 font-medium rounded-lg hover:bg-slate-800 hover:border-slate-600 transition-all"
             >
               How It Works
             </Link>
