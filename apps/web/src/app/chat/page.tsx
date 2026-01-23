@@ -77,7 +77,7 @@ export default function ChatPage() {
   // Loading state while recovering session
   if (!session) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-4" />
           <p className="text-slate-600">Loading your session...</p>
@@ -87,7 +87,7 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
+    <div className="min-h-screen flex flex-col bg-white">
       {/* Fixed progress bar */}
       <ProgressBar currentDomain={session.current_domain} />
 
