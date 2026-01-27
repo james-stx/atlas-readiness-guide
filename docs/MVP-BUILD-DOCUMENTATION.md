@@ -322,6 +322,14 @@ If a user leaves and returns:
   - PDF generation with React-PDF
   - Email sending with React templates
 
+#### Conversation Agent
+The conversation agent uses Vercel AI SDK's `streamText()` with tool support:
+- **Tool Context**: Uses closure pattern to capture `sessionId` and `currentDomain` since AI SDK doesn't pass custom context to tool execute functions
+- **recordInput**: Captures user responses, classifies confidence, saves to database, emits `input` SSE event
+- **transitionDomain**: Moves between assessment domains, emits `domain_change` SSE event
+- **Tool Execution**: Configured with `maxSteps: 5` and `fullStream` consumption to ensure tools execute and events are emitted
+- **Progress Sync**: Question IDs must match between `domains.ts` (API) and `progress.ts` (web) for accurate tracking
+
 #### Database (Supabase)
 - **Purpose**: Persistent data storage
 - **Technology**: PostgreSQL via Supabase
@@ -1106,6 +1114,18 @@ If something breaks:
 2. Check sender domain is verified in Resend
 3. Check spam folder
 
+### Progress Tracking Issues
+
+**Problem**: Progress not updating when user provides inputs
+- Check browser network tab for `input` SSE events during conversation
+- Verify tool execution is working by looking for `recordInput` calls in API logs
+- Ensure question IDs in `apps/web/src/lib/progress.ts` match those in `apps/api/src/lib/ai/prompts/domains.ts`
+
+**Problem**: Domain transition not working
+- Look for `domain_change` SSE events in network tab
+- Check that `transitionDomain` tool is being called when domain topics are covered
+- Verify `maxSteps: 5` allows sufficient tool execution in conversation flow
+
 ### Viewing Logs
 
 #### Local
@@ -1328,6 +1348,7 @@ If something breaks:
 - Added progress rings, domain pills, confidence badges, and toast notifications
 - Built comprehensive readiness panel with expandable domain accordions
 - Added slide-out progress panel with snapshot generation capabilities
+- Fixed critical bugs: enabled tool execution in conversation agent and aligned question IDs between progress tracking and API domains
 
 ---
 
