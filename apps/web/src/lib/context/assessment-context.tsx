@@ -180,9 +180,9 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
           status: session.status,
           current_domain: session.currentDomain,
           created_at: session.createdAt,
-          updated_at: session.createdAt,
+          updated_at: session.updatedAt || session.createdAt,
           expires_at: session.expiresAt,
-          metadata: {},
+          metadata: session.metadata || {},
           recovery_token_hash: null,
         } as Session,
       });
@@ -218,9 +218,9 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
           status: session.status,
           current_domain: session.currentDomain,
           created_at: session.createdAt,
-          updated_at: session.updatedAt,
+          updated_at: session.updatedAt || session.createdAt,
           expires_at: session.expiresAt,
-          metadata: {},
+          metadata: session.metadata || {},
           recovery_token_hash: null,
         } as Session,
       });
@@ -310,49 +310,60 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
 
         const decoder = new TextDecoder();
         let assistantContent = '';
+        let buffer = '';
 
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
 
-          const chunk = decoder.decode(value, { stream: true });
-          const lines = chunk.split('\n');
+          // Append to buffer to handle JSON split across chunks
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+
+          // Keep the last (potentially incomplete) line in the buffer
+          buffer = lines.pop() || '';
 
           for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              const data = line.slice(6);
-              if (data === '[DONE]') continue;
+            const trimmed = line.trim();
+            if (!trimmed || !trimmed.startsWith('data: ')) continue;
 
-              try {
-                const parsed = JSON.parse(data);
+            const data = trimmed.slice(6);
+            if (data === '[DONE]') continue;
 
-                if (parsed.type === 'text') {
-                  assistantContent += parsed.content;
+            try {
+              const parsed = JSON.parse(data);
+
+              if (parsed.type === 'text') {
+                assistantContent += parsed.content;
+                dispatch({
+                  type: 'SET_STREAMING_MESSAGE',
+                  payload: assistantContent,
+                });
+              } else if (parsed.type === 'input' && parsed.input) {
+                dispatch({ type: 'ADD_INPUT', payload: parsed.input });
+              } else if (parsed.type === 'domain_change' && parsed.domain) {
+                dispatch({
+                  type: 'UPDATE_DOMAIN',
+                  payload: parsed.domain,
+                });
+              } else if (parsed.type === 'complete') {
+                // Add final assistant message
+                const message = parsed.data?.message || parsed.message;
+                if (message) {
                   dispatch({
-                    type: 'SET_STREAMING_MESSAGE',
-                    payload: assistantContent,
+                    type: 'ADD_MESSAGE',
+                    payload: message,
                   });
-                } else if (parsed.type === 'input') {
-                  dispatch({ type: 'ADD_INPUT', payload: parsed.input });
-                } else if (parsed.type === 'domain_change') {
-                  dispatch({
-                    type: 'UPDATE_DOMAIN',
-                    payload: parsed.domain,
-                  });
-                } else if (parsed.type === 'complete') {
-                  // Add final assistant message
-                  const message = parsed.data?.message || parsed.message;
-                  if (message) {
-                    dispatch({
-                      type: 'ADD_MESSAGE',
-                      payload: message,
-                    });
-                  }
-                  dispatch({ type: 'CLEAR_STREAMING_MESSAGE' });
                 }
-              } catch {
-                // Skip invalid JSON
+                dispatch({ type: 'CLEAR_STREAMING_MESSAGE' });
+              } else if (parsed.type === 'error') {
+                dispatch({
+                  type: 'SET_ERROR',
+                  payload: parsed.content || 'A streaming error occurred',
+                });
               }
+            } catch {
+              // Incomplete JSON — will be handled once full line arrives
             }
           }
         }

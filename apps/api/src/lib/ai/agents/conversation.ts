@@ -178,7 +178,7 @@ IMPORTANT: After the user answers a question, you MUST call the recordInput tool
         fullText += part.textDelta;
         yield { type: 'text', content: part.textDelta };
       } else if (part.type === 'tool-result') {
-        if (part.toolName === 'recordInput' && part.result?.success) {
+        if (part.toolName === 'recordInput' && part.result?.success && part.result.input?.id) {
           yield { type: 'input', input: part.result.input };
         } else if (part.toolName === 'transitionDomain' && part.result?.success) {
           if (part.result.nextDomain) {
