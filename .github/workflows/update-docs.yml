@@ -1,0 +1,79 @@
+name: Update MVP Documentation
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'docs/MVP-BUILD-DOCUMENTATION.md'
+      - '.github/workflows/update-docs.yml'
+
+jobs:
+  update-docs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Get changed files
+        id: changed-files
+        run: |
+          # Get the diff between current commit and previous commit
+          CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || git diff --name-only HEAD)
+          echo "files<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGED_FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Get diff content
+        id: diff-content
+        run: |
+          # Get a summary of changes (limited to avoid token limits)
+          DIFF_SUMMARY=$(git diff HEAD~1 HEAD --stat 2>/dev/null || git diff HEAD --stat)
+          echo "summary<<EOF" >> $GITHUB_OUTPUT
+          echo "$DIFF_SUMMARY" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Update documentation
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CHANGED_FILES: ${{ steps.changed-files.outputs.files }}
+          DIFF_SUMMARY: ${{ steps.diff-content.outputs.summary }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+        run: npx tsx scripts/update-docs.ts
+
+      - name: Check for documentation changes
+        id: check-changes
+        run: |
+          if git diff --quiet docs/MVP-BUILD-DOCUMENTATION.md; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push documentation updates
+        if: steps.check-changes.outputs.has_changes == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add docs/MVP-BUILD-DOCUMENTATION.md
+          git commit -m "docs: auto-update MVP documentation [skip ci]"
+          git push
