@@ -15,42 +15,42 @@ export const DOMAINS: { key: DomainType; label: string; shortLabel: string }[] =
   { key: 'financials', label: 'Financials', shortLabel: 'F' },
 ];
 
-/** Key topics by domain - maps to question_ids from AI extraction */
+/** Key topics by domain - IDs must match question_ids in apps/api/src/lib/ai/prompts/domains.ts */
 export const DOMAIN_TOPICS: Record<DomainType, { id: string; label: string }[]> = {
   market: [
     { id: 'market_driver', label: 'Why expand to the U.S.?' },
-    { id: 'market_target', label: 'Target customer profile' },
+    { id: 'target_segment', label: 'Target customer profile' },
     { id: 'market_size', label: 'Market size estimate' },
-    { id: 'market_competition', label: 'Competitive landscape' },
-    { id: 'market_traction', label: 'Existing U.S. presence' },
+    { id: 'competition', label: 'Competitive landscape' },
+    { id: 'existing_us_customers', label: 'Existing U.S. presence' },
   ],
   product: [
     { id: 'product_description', label: 'What you\'re selling' },
-    { id: 'product_fit', label: 'Fit for U.S. market' },
-    { id: 'product_localization', label: 'Localization needs' },
-    { id: 'product_differentiator', label: 'Competitive advantage' },
+    { id: 'us_product_fit', label: 'Fit for U.S. market' },
+    { id: 'localization', label: 'Localization needs' },
+    { id: 'competitive_advantage', label: 'Competitive advantage' },
     { id: 'product_validation', label: 'Product-market fit evidence' },
   ],
   gtm: [
     { id: 'gtm_strategy', label: 'Go-to-market approach' },
-    { id: 'gtm_presence', label: 'U.S. sales presence' },
-    { id: 'gtm_pricing', label: 'Pricing strategy' },
-    { id: 'gtm_channels', label: 'Marketing channels' },
-    { id: 'gtm_cycle', label: 'Sales cycle expectations' },
+    { id: 'sales_presence', label: 'U.S. sales presence' },
+    { id: 'pricing', label: 'Pricing strategy' },
+    { id: 'marketing_channels', label: 'Marketing channels' },
+    { id: 'sales_cycle', label: 'Sales cycle expectations' },
   ],
   operations: [
-    { id: 'ops_support', label: 'Customer support coverage' },
-    { id: 'ops_legal', label: 'U.S. legal entity' },
-    { id: 'ops_compliance', label: 'Compliance & security' },
-    { id: 'ops_infrastructure', label: 'Technical infrastructure' },
-    { id: 'ops_partnerships', label: 'U.S. partnerships' },
+    { id: 'support_coverage', label: 'Customer support coverage' },
+    { id: 'legal_entity', label: 'U.S. legal entity' },
+    { id: 'data_compliance', label: 'Compliance & security' },
+    { id: 'infrastructure', label: 'Technical infrastructure' },
+    { id: 'partnerships', label: 'U.S. partnerships' },
   ],
   financials: [
-    { id: 'fin_budget', label: 'Expansion budget' },
-    { id: 'fin_runway', label: 'Runway impact' },
-    { id: 'fin_funding', label: 'Funding status' },
-    { id: 'fin_revenue', label: 'Revenue expectations' },
-    { id: 'fin_breakeven', label: 'Break-even timeline' },
+    { id: 'expansion_budget', label: 'Expansion budget' },
+    { id: 'runway', label: 'Runway impact' },
+    { id: 'funding_plans', label: 'Funding status' },
+    { id: 'revenue_timeline', label: 'Revenue expectations' },
+    { id: 'break_even', label: 'Break-even timeline' },
   ],
 };
 
