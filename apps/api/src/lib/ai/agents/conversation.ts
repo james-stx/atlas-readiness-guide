@@ -140,8 +140,8 @@ export async function* streamConversation(
       metadata: { domain: currentDomain },
     });
 
-    // Get recent conversation history
-    const recentMessages = await getRecentMessages(sessionId, 20);
+    // Keep history short to stay within rate limits (~10 msgs ≈ 500-1000 tokens)
+    const recentMessages = await getRecentMessages(sessionId, 10);
     const formattedMessages = formatMessagesForLLM(recentMessages);
 
     // Get domain context
@@ -150,22 +150,23 @@ export async function* streamConversation(
     // Create tools with session context via closure
     const tools = createConversationTools(sessionId, currentDomain);
 
-    // Create the streaming response with tools
+    // Single-step: model generates text + calls tools in one pass.
+    // Tools execute as side effects (DB saves); no follow-up model call needed.
+    // This uses 1 API call per message instead of up to 5 with maxSteps.
     const result = await streamText({
       model: anthropic(models.conversation),
       system: `${SYSTEM_PROMPT}
 
 Current Domain: ${domainConfig.name}
 Domain Description: ${domainConfig.description}
-Key topics to explore: ${domainConfig.keyQuestions.map((q) => `${q.id} (${q.question})`).join('; ')}
+Key topics: ${domainConfig.keyQuestions.map((q) => q.id).join(', ')}
 
-IMPORTANT: After the user answers a question, you MUST call the recordInput tool to capture their response before asking the next question. Use the appropriate question_id from the list above. When you've covered the key topics for this domain, call transitionDomain to move to the next one.`,
+After the user answers a question, call recordInput with the matching question_id. When the domain's key topics are covered, call transitionDomain.`,
       messages: [
         ...formattedMessages,
         { role: 'user', content: userMessage },
       ],
       tools,
-      maxSteps: 5,
       maxTokens: modelConfig.conversation.maxTokens,
       temperature: modelConfig.conversation.temperature,
     });
