@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { anthropic, models, modelConfig } from '../client';
 import { SYSTEM_PROMPT, WELCOME_MESSAGE } from '../prompts/system';
 import { getDomainConfig, getNextDomain } from '../prompts/domains';
-import { classifyConfidence } from '../confidence/classifier';
+import { quickClassify } from '../confidence/classifier';
 import { saveInput } from '@/lib/db/inputs';
 import { saveMessage, getRecentMessages, formatMessagesForLLM } from '@/lib/db/messages';
 import { updateSessionDomain, updateSessionStatus } from '@/lib/db/session';
@@ -13,6 +13,9 @@ import type { DomainType, ChatMessage } from '@atlas/types';
  * Create conversation tools with session context captured via closure.
  * The Vercel AI SDK does not pass custom context to tool execute functions,
  * so we close over sessionId and currentDomain.
+ *
+ * Tool execution must be fast to avoid blocking the SSE stream.
+ * We use only the instant regex-based classifier here (no LLM calls).
  */
 function createConversationTools(sessionId: string, currentDomain: DomainType) {
   return {
@@ -24,27 +27,33 @@ function createConversationTools(sessionId: string, currentDomain: DomainType) {
         summary: z.string().describe('Brief summary of what was captured'),
       }),
       execute: async ({ questionId, userResponse, summary }) => {
-        // Classify confidence
-        const { level, rationale, extractedData } = await classifyConfidence(
-          userResponse,
-          questionId
-        );
+        try {
+          // Use fast regex-based classification only (no API calls)
+          // to avoid blocking the SSE stream for seconds
+          const level = quickClassify(userResponse) || 'medium';
 
-        // Save to database
-        const input = await saveInput({
-          sessionId,
-          domain: currentDomain,
-          questionId,
-          userResponse,
-          extractedData,
-          confidenceLevel: level,
-          confidenceRationale: rationale,
-        });
+          // Save to database
+          const input = await saveInput({
+            sessionId,
+            domain: currentDomain,
+            questionId,
+            userResponse,
+            extractedData: { summary },
+            confidenceLevel: level,
+            confidenceRationale: 'Classified based on language patterns',
+          });
 
-        return {
-          success: true,
-          input,
-        };
+          return {
+            success: true,
+            input,
+          };
+        } catch (error) {
+          console.error('recordInput tool error:', error);
+          return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Failed to record input',
+          };
+        }
       },
     }),
 
@@ -54,30 +63,38 @@ function createConversationTools(sessionId: string, currentDomain: DomainType) {
         currentDomainSummary: z.string().describe('Brief summary of what was learned in the current domain'),
       }),
       execute: async ({ currentDomainSummary }) => {
-        const nextDomain = getNextDomain(currentDomain);
+        try {
+          const nextDomain = getNextDomain(currentDomain);
 
-        if (!nextDomain) {
-          // All domains complete - transition to synthesis
-          await updateSessionStatus(sessionId, 'synthesizing');
+          if (!nextDomain) {
+            // All domains complete - transition to synthesis
+            await updateSessionStatus(sessionId, 'synthesizing');
+            return {
+              success: true,
+              nextDomain: null,
+              isComplete: true,
+              message: 'All domains complete. Ready for synthesis.',
+            };
+          }
+
+          // Update session to next domain
+          await updateSessionDomain(sessionId, nextDomain);
+          const nextConfig = getDomainConfig(nextDomain);
+
           return {
             success: true,
-            nextDomain: null,
-            isComplete: true,
-            message: 'All domains complete. Ready for synthesis.',
+            nextDomain,
+            isComplete: false,
+            domainName: nextConfig.name,
+            openingPrompt: nextConfig.openingPrompt,
+          };
+        } catch (error) {
+          console.error('transitionDomain tool error:', error);
+          return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Failed to transition domain',
           };
         }
-
-        // Update session to next domain
-        await updateSessionDomain(sessionId, nextDomain);
-        const nextConfig = getDomainConfig(nextDomain);
-
-        return {
-          success: true,
-          nextDomain,
-          isComplete: false,
-          domainName: nextConfig.name,
-          openingPrompt: nextConfig.openingPrompt,
-        };
       },
     }),
   };
