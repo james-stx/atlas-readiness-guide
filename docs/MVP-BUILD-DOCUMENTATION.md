@@ -282,6 +282,12 @@ If a user leaves and returns:
 - **Purpose**: Transactional email delivery
 - **Features**: HTML emails with PDF download links
 
+### Documentation Automation
+
+- **Auto-documentation workflow**: GitHub Action that automatically updates MVP-BUILD-DOCUMENTATION.md when changes are pushed to main branch
+- **AI-powered analysis**: Uses Claude API to analyze code changes and generate appropriate documentation updates
+- **Change detection**: Automatically detects relevant file changes and filters out non-essential updates
+
 ### Data Flow
 
 1. **User sends message** → Web App → API
@@ -341,6 +347,8 @@ atlas-readiness-guide/
 │   └── config/                 # Shared configuration
 │       └── src/index.ts
 │
+├── scripts/update-docs.ts      # Auto-documentation update script
+├── .github/workflows/update-docs.yml # GitHub Action workflow
 ├── package.json                # Root package.json
 ├── pnpm-workspace.yaml         # Workspace configuration
 ├── turbo.json                  # Turborepo configuration
@@ -357,6 +365,8 @@ atlas-readiness-guide/
 | `apps/web/src/lib/context/assessment-context.tsx` | Global state management |
 | `apps/web/src/app/chat/page.tsx` | Chat interface page |
 | `packages/types/src/index.ts` | All TypeScript type definitions |
+| `scripts/update-docs.ts` | Auto-documentation update script that analyzes git changes and generates documentation updates using Claude API |
+| `.github/workflows/update-docs.yml` | GitHub Action workflow for automated documentation updates |
 
 ---
 
@@ -684,6 +694,9 @@ Both applications need environment variables to function. These are set differen
 |----------|-------------|-------|
 | `NEXT_PUBLIC_API_URL` | URL of the API | `https://atlas-readiness-guide-api.vercel.app` (production) or `http://localhost:3001` (local) |
 
+#### Documentation Update Workflow
+- `ANTHROPIC_API_KEY`: Required for the auto-documentation update workflow. Must be set as a GitHub repository secret to enable automatic documentation updates via Claude API.
+
 ### Setting Variables Locally
 
 Create `.env.local` files in each app directory:
@@ -891,6 +904,19 @@ git push
 ```
 
 Vercel automatically deploys within a few minutes.
+
+### Automated Documentation Updates
+
+The repository includes a GitHub Action that automatically updates documentation:
+
+1. **Trigger**: Runs on every push to the main branch
+2. **Process**: 
+   - Detects changed files in the commit
+   - Analyzes changes using Claude API
+   - Generates appropriate documentation updates
+   - Commits updated documentation back to the repository
+3. **Requirements**: Requires `ANTHROPIC_API_KEY` secret to be configured in GitHub repository settings
+4. **Manual execution**: Can also be run locally with `pnpm update-docs`
 
 ### Monitoring Deployments
 
@@ -1114,6 +1140,18 @@ git commit -m "Update dependencies"
 git push
 ```
 
+### Documentation Maintenance
+
+**Automated Updates**
+- Documentation is automatically updated via GitHub Actions when code changes are pushed
+- The workflow analyzes changes and updates relevant sections using AI
+- Manual review of auto-generated updates is recommended
+
+**Manual Updates**
+- Run `pnpm update-docs` locally to generate documentation updates
+- Ensure `ANTHROPIC_API_KEY` environment variable is set
+- The script analyzes recent changes and suggests documentation updates
+
 ### Database Maintenance
 
 Supabase handles most maintenance automatically. For manual tasks:
@@ -1163,6 +1201,15 @@ If something breaks:
 | `apps/web/src/lib/context/assessment-context.tsx` | Frontend state |
 | `apps/web/src/lib/api-client.ts` | API communication |
 | `packages/types/src/index.ts` | Shared type definitions |
+
+---
+
+## Changelog
+
+### January 2026
+- Added automated documentation update workflow
+- Integrated Claude API for intelligent documentation analysis
+- Added GitHub Actions workflow for continuous documentation maintenance
 
 ---
 
