@@ -71,9 +71,35 @@ const config: Config = {
         },
         // Semantic colors
         confidence: {
-          high: '#4EEBF3',
-          medium: '#FF6F22',
-          low: '#94A3B8',
+          high: {
+            DEFAULT: '#16A34A',
+            bg: '#DCFCE7',
+            border: '#86EFAC',
+            text: '#166534',
+          },
+          medium: {
+            DEFAULT: '#D97706',
+            bg: '#FEF3C7',
+            border: '#FCD34D',
+            text: '#92400E',
+          },
+          low: {
+            DEFAULT: '#DC2626',
+            bg: '#FEE2E2',
+            border: '#FCA5A5',
+            text: '#991B1B',
+          },
+        },
+        readiness: {
+          minimal: '#94A3B8',
+          partial: '#F59E0B',
+          good: '#22C55E',
+          excellent: '#10B981',
+        },
+        domain: {
+          'not-started': '#E2E8F0',
+          'in-progress': '#C7D2FE',
+          adequate: '#5754FF',
         },
         gap: {
           critical: '#EF4444',
@@ -92,6 +118,10 @@ const config: Config = {
         'fade-in': 'fadeIn 0.3s ease-out',
         'slide-up': 'slideUp 0.3s ease-out',
         'pulse-subtle': 'pulseSubtle 2s ease-in-out infinite',
+        'slide-in-right': 'slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+        'slide-out-right': 'slideOutRight 0.2s cubic-bezier(0.7, 0, 0.84, 0)',
+        'pill-pulse': 'pillPulse 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+        'checkmark-draw': 'checkmarkDraw 0.3s ease-out forwards',
       },
       keyframes: {
         fadeIn: {
@@ -105,6 +135,23 @@ const config: Config = {
         pulseSubtle: {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0.7' },
+        },
+        slideInRight: {
+          '0%': { opacity: '0', transform: 'translateX(100%)' },
+          '100%': { opacity: '1', transform: 'translateX(0)' },
+        },
+        slideOutRight: {
+          '0%': { opacity: '1', transform: 'translateX(0)' },
+          '100%': { opacity: '0', transform: 'translateX(50%)' },
+        },
+        pillPulse: {
+          '0%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(1.15)' },
+          '100%': { transform: 'scale(1)' },
+        },
+        checkmarkDraw: {
+          '0%': { strokeDashoffset: '16' },
+          '100%': { strokeDashoffset: '0' },
         },
       },
     },
