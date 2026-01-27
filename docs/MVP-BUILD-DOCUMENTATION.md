@@ -330,7 +330,7 @@ The conversation agent uses Vercel AI SDK's `streamText()` with tool support:
 - **Tool Context**: Uses closure pattern to capture `sessionId` and `currentDomain` since AI SDK doesn't pass custom context to tool execute functions
 - **recordInput**: Captures user responses, classifies confidence, saves to database, emits `input` SSE event
 - **transitionDomain**: Moves between assessment domains, emits `domain_change` SSE event
-- **Tool Execution**: Configured with `maxSteps: 5` and `fullStream` consumption to ensure tools execute and events are emitted
+- **Single-step Execution**: The AI conversation system uses a single-step interaction model where the AI generates text and calls tools in one pass, with tools executing as side effects (like database saves) without follow-up model calls. This ensures 1 API call per user message instead of multiple calls, significantly reducing token usage and staying within rate limits.
 - **Progress Sync**: Question IDs must match between `domains.ts` (API) and `progress.ts` (web) for accurate tracking
 
 **Tool Execution Performance**: Tool execution during conversations uses fast regex-based classification (`quickClassify()`) instead of LLM-based classification to prevent blocking the Server-Sent Events (SSE) stream. This ensures real-time text streaming continues uninterrupted during input recording and domain transitions. Full LLM classification is reserved for non-real-time operations to maintain optimal user experience.
@@ -800,6 +800,10 @@ Both applications need environment variables to function. These are set differen
 
 **Animation Durations**: Configurable timing for UI animations including toast auto-dismiss (3s), slide transitions (150-200ms), and progress bar updates (300ms).
 
+**Conversation History Limit**: Set to 10 messages to balance context retention with token usage
+
+**AI Interaction Mode**: Single-step execution to minimize API calls
+
 ### Setting Variables Locally
 
 Create `.env.local` files in each app directory:
@@ -1140,7 +1144,7 @@ If something breaks:
 **Problem**: Domain transition not working
 - Look for `domain_change` SSE events in network tab
 - Check that `transitionDomain` tool is being called when domain topics are covered
-- Verify `maxSteps: 5` allows sufficient tool execution in conversation flow
+- Verify single-step execution allows sufficient tool execution in conversation flow
 
 ### Viewing Logs
 
@@ -1215,6 +1219,14 @@ Key decisions made during development and why.
 - One-directional is sufficient
 - Better browser support
 
+### 2025 - AI Token Usage Optimization
+**Decision**: Switched from multi-step to single-step AI interactions to reduce API token usage from ~15,000 to ~2,000 tokens per message. Reduced conversation history from 20 to 10 messages and trimmed system prompts to stay within Anthropic's rate limits.
+**Why**:
+- Reduced API costs significantly
+- Stayed within rate limit constraints
+- Maintained assessment quality with optimized prompts
+- Improved response times
+
 ---
 
 ## 15. Known Limitations & Future Roadmap
@@ -1232,6 +1244,8 @@ Key decisions made during development and why.
 | No offline support | Requires internet | Add PWA features |
 
 **Classification Accuracy During Chat**: The conversation tools use simplified regex-based classification instead of full LLM classification to maintain streaming performance. This may result in less accurate confidence level assessment for user inputs captured during real-time conversations, though it ensures responsive user experience.
+
+**API Rate Limits**: The system is optimized for Anthropic's rate limits with ~2,000 tokens per message (reduced from ~15,000). Conversation history is limited to 10 messages and system prompts use minimal domain context to stay within the 10,000 input tokens/minute limit.
 
 ### Potential Future Features
 
@@ -1370,6 +1384,7 @@ If something breaks:
 - Fixed chatbot performance issue by switching from LLM-based to instant regex-based classification during tool execution
 - Added error handling to prevent stream failures and ensure uninterrupted real-time text streaming
 - Enhanced SSE streaming reliability with better error handling, TCP packet boundary buffering, and null guards for tool results
+- Optimized AI token usage by switching from multi-step to single-step interactions, reducing conversation history to 10 messages, and trimming system prompts to stay within Anthropic's rate limits
 
 ---
 
