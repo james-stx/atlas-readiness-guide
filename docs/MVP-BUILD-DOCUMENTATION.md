@@ -322,6 +322,9 @@ If a user leaves and returns:
   - PDF generation with React-PDF
   - Email sending with React templates
 
+#### Real-time Communication
+**Real-time Communication**: The SSE (Server-Sent Events) implementation includes robust error handling and buffering of incomplete chunks across TCP packet boundaries to ensure reliable streaming of AI responses and tool execution results.
+
 #### Conversation Agent
 The conversation agent uses Vercel AI SDK's `streamText()` with tool support:
 - **Tool Context**: Uses closure pattern to capture `sessionId` and `currentDomain` since AI SDK doesn't pass custom context to tool execute functions
@@ -1121,6 +1124,12 @@ If something breaks:
 - Tool execution errors are now caught and logged to prevent silent stream failures
 - Expected behavior: Text should continue streaming even during input recording and domain transitions
 
+### SSE Streaming Issues
+- SSE streams now buffer incomplete chunks across TCP packet boundaries
+- API streaming errors are surfaced to users instead of being silently dropped
+- If you experience streaming issues, check the browser console for error events that are now properly handled
+- Session state corruption from undefined tool results has been prevented with null guards
+
 ### Progress Tracking Issues
 
 **Problem**: Progress not updating when user provides inputs
@@ -1360,6 +1369,7 @@ If something breaks:
 - Fixed critical bugs: enabled tool execution in conversation agent and aligned question IDs between progress tracking and API domains
 - Fixed chatbot performance issue by switching from LLM-based to instant regex-based classification during tool execution
 - Added error handling to prevent stream failures and ensure uninterrupted real-time text streaming
+- Enhanced SSE streaming reliability with better error handling, TCP packet boundary buffering, and null guards for tool results
 
 ---
 
