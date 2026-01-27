@@ -330,6 +330,8 @@ The conversation agent uses Vercel AI SDK's `streamText()` with tool support:
 - **Tool Execution**: Configured with `maxSteps: 5` and `fullStream` consumption to ensure tools execute and events are emitted
 - **Progress Sync**: Question IDs must match between `domains.ts` (API) and `progress.ts` (web) for accurate tracking
 
+**Tool Execution Performance**: Tool execution during conversations uses fast regex-based classification (`quickClassify()`) instead of LLM-based classification to prevent blocking the Server-Sent Events (SSE) stream. This ensures real-time text streaming continues uninterrupted during input recording and domain transitions. Full LLM classification is reserved for non-real-time operations to maintain optimal user experience.
+
 #### Database (Supabase)
 - **Purpose**: Persistent data storage
 - **Technology**: PostgreSQL via Supabase
@@ -1114,6 +1116,11 @@ If something breaks:
 2. Check sender domain is verified in Resend
 3. Check spam folder
 
+#### Chatbot Streaming Issues
+- If chatbot appears to hang during tool execution: Check browser network tab for stalled SSE connections
+- Tool execution errors are now caught and logged to prevent silent stream failures
+- Expected behavior: Text should continue streaming even during input recording and domain transitions
+
 ### Progress Tracking Issues
 
 **Problem**: Progress not updating when user provides inputs
@@ -1214,6 +1221,8 @@ Key decisions made during development and why.
 | No admin dashboard | Can't view analytics | Build admin panel |
 | Basic error handling | Some errors unclear | Improve error messages |
 | No offline support | Requires internet | Add PWA features |
+
+**Classification Accuracy During Chat**: The conversation tools use simplified regex-based classification instead of full LLM classification to maintain streaming performance. This may result in less accurate confidence level assessment for user inputs captured during real-time conversations, though it ensures responsive user experience.
 
 ### Potential Future Features
 
@@ -1349,6 +1358,8 @@ If something breaks:
 - Built comprehensive readiness panel with expandable domain accordions
 - Added slide-out progress panel with snapshot generation capabilities
 - Fixed critical bugs: enabled tool execution in conversation agent and aligned question IDs between progress tracking and API domains
+- Fixed chatbot performance issue by switching from LLM-based to instant regex-based classification during tool execution
+- Added error handling to prevent stream failures and ensure uninterrupted real-time text streaming
 
 ---
 
