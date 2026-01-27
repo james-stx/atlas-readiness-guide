@@ -46,6 +46,7 @@ Australian companies considering U.S. expansion often don't know what they don't
 | **Conversational Assessment** | AI-guided chat that feels natural, not like a boring survey |
 | **5-Domain Coverage** | Market, Product, Go-to-Market, Operations, Financials |
 | **Confidence Classification** | Each input is rated as High/Medium/Low confidence |
+| **Phase 1 Progress Visibility System** | Real-time progress tracking during assessment conversations with visual progress indicators, domain-specific progress tracking, confidence-based input classification, toast notifications for captured inputs, and a comprehensive readiness panel for detailed progress review |
 | **Readiness Snapshot** | Summary document showing strengths, assumptions, and gaps |
 | **PDF Export** | Download the snapshot as a professional PDF |
 | **Email Delivery** | Send the snapshot directly to your inbox |
@@ -163,6 +164,26 @@ If a user leaves and returns:
 2. If found, prompts to continue or start fresh
 3. If continuing, restores full session state (messages, inputs, current domain)
 
+### Progress Tracking Flow
+
+1. **Real-time Progress Updates**:
+   - User sees progress ring showing overall completion percentage
+   - Domain pills display status (not started, in progress, adequate) for each business area
+   - Current active domain is visually highlighted
+   - Toast notifications appear when new inputs are captured with confidence levels
+
+2. **Progress Details Panel**:
+   - User clicks "View Details" to open slide-out readiness panel
+   - Panel shows detailed breakdown by domain with expandable accordions
+   - Each domain shows covered topics, confidence levels, and gap analysis
+   - Readiness assessment with suggestions for improvement
+   - "Generate Snapshot" button when ready for comprehensive report
+
+3. **Domain Navigation**:
+   - Users can click domain pills to jump to specific domain details in the panel
+   - Auto-scroll to selected domain within the readiness panel
+   - Visual indicators show progress and confidence for each topic area
+
 ---
 
 ## 4. UX/UI Design
@@ -216,6 +237,39 @@ If a user leaves and returns:
 - Tabbed or sectioned view of detailed findings
 - Clear visual distinction between strengths/assumptions/gaps
 - Export buttons prominently displayed
+
+### Progress Visibility Components
+
+#### Progress Header
+- **Desktop**: Full header with progress ring, domain pills, and "View Details" button
+- **Mobile**: Compact layout with percentage text and smaller domain pills
+- Responsive design with different layouts for mobile vs desktop
+
+#### Domain Pills
+- Circular indicators showing first letter of each domain (M, P, G, O, F)
+- Three states: not_started (gray), in_progress (blue), adequate (filled blue)
+- Current domain highlighted with ring and scale animation
+- Tooltips show full domain name and input count
+
+#### Confidence System
+- **High**: Filled circle icon, green color scheme
+- **Medium**: Half-filled circle icon, yellow color scheme  
+- **Low**: Empty circle icon, red color scheme
+- Confidence badges with icons and text labels
+
+#### Toast Notifications
+- Slide-in animations from right side
+- Auto-dismiss after 3 seconds (pausable on hover)
+- Show captured input topic, confidence level, and domain
+- Stack up to 3 notifications, newest on bottom
+
+#### Readiness Panel
+- Slide-out panel from right side (full-screen on mobile)
+- Progress ring and readiness assessment at top
+- Expandable domain accordions with mini progress bars
+- Topic-by-topic breakdown with confidence indicators
+- Gap analysis and improvement suggestions
+- Generate Snapshot CTA button
 
 ---
 
@@ -282,6 +336,22 @@ If a user leaves and returns:
 - **Purpose**: Transactional email delivery
 - **Features**: HTML emails with PDF download links
 
+### Progress Context System
+
+**ProgressProvider**: React context that manages:
+- Real-time progress state calculation from assessment inputs
+- Domain-specific progress tracking and status
+- Readiness panel open/close state with domain scrolling
+- Toast notification queue management
+- Progress state derived from inputs with confidence scoring
+
+**Progress State Management**:
+- Calculates overall progress percentage across all domains
+- Tracks covered topics per domain against predefined topic lists
+- Determines domain status (not_started → in_progress → adequate)
+- Generates readiness assessment (not_ready → approaching → ready)
+- Provides gap analysis and improvement suggestions
+
 ### Documentation Automation
 
 - **Auto-documentation workflow**: GitHub Action that automatically updates MVP-BUILD-DOCUMENTATION.md when changes are pushed to main branch
@@ -332,10 +402,22 @@ atlas-readiness-guide/
 │       │   │   └── snapshot/   # Snapshot view
 │       │   ├── components/     # React components
 │       │   │   ├── chat/       # Chat-specific
-│       │   │   └── ui/         # General UI
+│       │   │   ├── ui/         # General UI
+│       │   │   └── progress/   # Progress tracking components
+│       │   │       ├── confidence-badge.tsx      # Confidence level indicators with icons
+│       │   │       ├── domain-accordion.tsx      # Expandable domain progress details
+│       │   │       ├── domain-pill.tsx          # Circular domain status indicators
+│       │   │       ├── input-notification.tsx   # Toast notifications for captured inputs
+│       │   │       ├── notification-stack.tsx   # Manager for multiple toast notifications
+│       │   │       ├── progress-header.tsx      # Main progress bar with domain pills
+│       │   │       ├── progress-ring.tsx        # Circular progress indicator
+│       │   │       ├── readiness-panel.tsx      # Slide-out detailed progress panel
+│       │   │       └── index.ts                 # Progress components exports
 │       │   └── lib/            # Utilities
 │       │       ├── api-client.ts  # API communication
 │       │       ├── context/    # React context
+│       │       │   └── progress-context.tsx  # Progress state management
+│       │       ├── progress.ts     # Progress calculation utilities
 │       │       └── storage.ts  # Local storage
 │       ├── next.config.js
 │       ├── package.json
@@ -697,6 +779,14 @@ Both applications need environment variables to function. These are set differen
 #### Documentation Update Workflow
 - `ANTHROPIC_API_KEY`: Required for the auto-documentation update workflow. Must be set as a GitHub repository secret to enable automatic documentation updates via Claude API.
 
+### Progress System Configuration
+
+**Domain Topics** (`DOMAIN_TOPICS`): Predefined lists of topics for each business domain used to calculate coverage percentages.
+
+**Readiness Thresholds**: Configuration for determining when domains and overall assessment reach "adequate" status based on input count and topic coverage.
+
+**Animation Durations**: Configurable timing for UI animations including toast auto-dismiss (3s), slide transitions (150-200ms), and progress bar updates (300ms).
+
 ### Setting Variables Locally
 
 Create `.env.local` files in each app directory:
@@ -961,6 +1051,30 @@ If something breaks:
 - [ ] Close browser, reopen → can continue
 - [ ] Recovery works across devices (same browser)
 
+### Progress Tracking Testing
+
+**Progress Updates**:
+1. Start new assessment conversation
+2. Verify progress ring starts at 0%
+3. Send messages that capture business inputs
+4. Confirm toast notifications appear for each captured input
+5. Check domain pills update status as topics are covered
+6. Verify current domain highlighting follows conversation flow
+
+**Readiness Panel**:
+1. Click "View Details" to open progress panel
+2. Test domain accordion expand/collapse functionality
+3. Verify topic lists show correct coverage status
+4. Check confidence indicators match captured inputs
+5. Test "Generate Snapshot" button appears when ready
+6. Verify panel closes with X button, Escape key, or back button
+
+**Responsive Behavior**:
+1. Test progress header layout on mobile vs desktop
+2. Verify toast notifications position correctly on small screens
+3. Check readiness panel becomes full-screen on mobile
+4. Test touch interactions on domain pills and accordions
+
 ### Common Issues & Fixes
 
 #### "Failed to fetch" error on start page
@@ -1210,6 +1324,10 @@ If something breaks:
 - Added automated documentation update workflow
 - Integrated Claude API for intelligent documentation analysis
 - Added GitHub Actions workflow for continuous documentation maintenance
+- Implemented Phase 1 Progress Visibility system with real-time progress tracking UI
+- Added progress rings, domain pills, confidence badges, and toast notifications
+- Built comprehensive readiness panel with expandable domain accordions
+- Added slide-out progress panel with snapshot generation capabilities
 
 ---
 
