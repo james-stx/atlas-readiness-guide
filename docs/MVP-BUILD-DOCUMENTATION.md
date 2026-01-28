@@ -333,6 +333,8 @@ The conversation agent uses Vercel AI SDK's `streamText()` with tool support:
 - **Single-step Execution**: The AI conversation system uses a single-step interaction model where the AI generates text and calls tools in one pass, with tools executing as side effects (like database saves) without follow-up model calls. This ensures 1 API call per user message instead of multiple calls, significantly reducing token usage and staying within rate limits.
 - **Progress Sync**: Question IDs must match between `domains.ts` (API) and `progress.ts` (web) for accurate tracking
 
+**AI Conversation Flow**: The system uses the Vercel AI SDK with a maximum of 2 steps for tool execution (maxSteps:2). This allows proper tool round-trips where the AI can call tools and receive results while staying within rate limits. Without this setting, the model would call tools but never receive results, causing stream iteration failures.
+
 **Tool Execution Performance**: Tool execution during conversations uses fast regex-based classification (`quickClassify()`) instead of LLM-based classification to prevent blocking the Server-Sent Events (SSE) stream. This ensures real-time text streaming continues uninterrupted during input recording and domain transitions. Full LLM classification is reserved for non-real-time operations to maintain optimal user experience.
 
 #### Database (Supabase)
@@ -804,6 +806,10 @@ Both applications need environment variables to function. These are set differen
 
 **AI Interaction Mode**: Single-step execution to minimize API calls
 
+### Email Configuration
+
+**Build-time Environment Variables**: The Resend email client is now lazy-initialized to prevent build failures when RESEND_API_KEY is not available during the build process. The client is only instantiated when actually sending emails, not at module load time.
+
 ### Setting Variables Locally
 
 Create `.env.local` files in each app directory:
@@ -1134,6 +1140,10 @@ If something breaks:
 - If you experience streaming issues, check the browser console for error events that are now properly handled
 - Session state corruption from undefined tool results has been prevented with null guards
 
+### Tool Execution Issues
+
+**Tool Execution Issues**: If the AI chat stops responding after calling tools, verify that maxSteps is properly configured. Without maxSteps, the AI SDK may call tools but never receive results, causing non-Error objects to be thrown during stream iteration. Check the chat route error handling for proper extraction of error messages from non-Error thrown objects.
+
 ### Progress Tracking Issues
 
 **Problem**: Progress not updating when user provides inputs
@@ -1246,6 +1256,8 @@ Key decisions made during development and why.
 **Classification Accuracy During Chat**: The conversation tools use simplified regex-based classification instead of full LLM classification to maintain streaming performance. This may result in less accurate confidence level assessment for user inputs captured during real-time conversations, though it ensures responsive user experience.
 
 **API Rate Limits**: The system is optimized for Anthropic's rate limits with ~2,000 tokens per message (reduced from ~15,000). Conversation history is limited to 10 messages and system prompts use minimal domain context to stay within the 10,000 input tokens/minute limit.
+
+**Rate Limit Considerations**: Tool execution is limited to maxSteps:2 to stay within the 10k tokens/min rate limit. This was reduced from the original 5 steps after removing maxSteps entirely caused tool execution failures.
 
 ### Potential Future Features
 
@@ -1385,6 +1397,9 @@ If something breaks:
 - Added error handling to prevent stream failures and ensure uninterrupted real-time text streaming
 - Enhanced SSE streaming reliability with better error handling, TCP packet boundary buffering, and null guards for tool results
 - Optimized AI token usage by switching from multi-step to single-step interactions, reducing conversation history to 10 messages, and trimming system prompts to stay within Anthropic's rate limits
+- Restored maxSteps:2 for tool execution to enable proper tool round-trips and prevent stream failures
+- Improved error handling for non-Error objects in stream iteration
+- Lazy-initialized Resend client to prevent build-time failures when API key is unavailable
 
 ---
 
