@@ -143,6 +143,19 @@ A reference for technical terms used throughout this documentation.
 - Progress bar shows current domain
 - Users can type freely or use quick-response buttons
 
+**Chat Interaction Flow Updates:**
+
+*Message Input:*
+1. User types message with real-time character counting
+2. Visual feedback when approaching character limit (80% threshold)
+3. Send via Enter key or platform-specific shortcut (⌘+Enter/Ctrl+Enter)
+4. Character limit prevents submission when exceeded
+
+*Navigation:*
+1. Exit chat via header button triggers confirmation modal
+2. Logo click returns to home page
+3. Current domain/progress visible in simplified header format
+
 #### 3. Snapshot Generation (`/snapshot`)
 - When all domains are covered, user triggers snapshot generation
 - AI synthesizes all inputs into:
@@ -298,6 +311,27 @@ If a user leaves and returns:
 - Text input at bottom with send button
 - Loading indicators during AI responses
 
+**Chat Interface Components:**
+
+*Header Design:*
+- Simplified header showing current domain only (e.g., "2 of 5 Market")
+- Progress ring removed from header (consolidated in sidebar)
+- Exit option with confirmation modal
+- Logo link returns to home page
+
+*Message Display:*
+- Assistant messages: Compass icon in teal gradient circle avatar
+- User messages: User icon in neutral circle avatar
+- Fully rounded avatars (rounded-full)
+- Message bubbles with rounded-2xl styling
+
+*Input Controls:*
+- Character count display with visual feedback approaching limit
+- Platform-aware keyboard shortcuts (⌘ on Mac, Ctrl on Windows)
+- Dual send options: Enter key or Cmd/Ctrl+Enter
+- Auto-resizing textarea with 150px max height
+- Character limit enforcement with visual warnings
+
 #### Snapshot View
 - Executive summary at top
 - Tabbed or sectioned view of detailed findings
@@ -387,6 +421,23 @@ If a user leaves and returns:
   - Server-Sent Events (SSE) for streaming
   - PDF generation with React-PDF
   - Email sending with React templates
+
+**Chat Interface Technical Details:**
+
+*Input Handling:*
+- Platform detection for keyboard shortcut display (`navigator.userAgent` detection)
+- Character counting with configurable limits (default: 2000 chars)
+- Auto-resize textarea implementation with scroll height calculation
+- Dual keyboard event handling for Enter and Cmd/Ctrl+Enter
+
+*UI State Management:*
+- Exit confirmation modal state
+- Character count visual feedback states (normal/warning/error)
+- Platform-aware shortcut key detection and display
+
+*Icon Integration:*
+- Lucide React icons: Compass (assistant), User (user), Send, X, Menu
+- Gradient backgrounds for assistant avatar using Tailwind gradient utilities
 
 #### Real-time Communication
 **Real-time Communication**: The SSE (Server-Sent Events) implementation includes robust error handling and buffering of incomplete chunks across TCP packet boundaries to ensure reliable streaming of AI responses and tool execution results.
@@ -1526,6 +1577,7 @@ If something breaks:
 - **UI Component System**: Updated input components with 44px touch targets, enhanced focus states, and responsive hover interactions
 - **Snapshot Design Update**: Migrated snapshot, privacy, and terms pages from slate to neutral color palette with new confidence indicators using accent (teal), warm (amber), and neutral color systems, plus backdrop blur headers for visual consistency
 - **Branding Revert**: Reverted homepage header and headline to original branding - restored 'Atlas by STX Labs' with gradient in header and 'Your Readiness. Revealed.' headline with gradient styling
+- **Chat Interface Redesign**: Updated chat interface with simplified header layout (domain-only display), new avatar system (compass icon for assistant, user icon for user), enhanced input controls with character counting, platform-aware keyboard shortcuts (⌘/Ctrl+Enter), and improved visual design with fully rounded avatars and message bubbles
 
 ---
 
