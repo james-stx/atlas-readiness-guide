@@ -245,6 +245,8 @@ If a user leaves and returns:
 - Privacy and Terms pages now feature backdrop blur headers (`bg-white/80 backdrop-blur-sm`)
 - Consistent sticky positioning with border separator
 - Maintains visual hierarchy across all static pages
+- **Header Branding**: Displays 'Atlas' as main brand name with 'by STX Labs' as gradient-styled tagline
+- **Homepage Headline**: 'Your Readiness. Revealed.' with 'Revealed.' in gradient styling
 
 #### Layout Standards
 - **Container Widths**: 
@@ -1273,6 +1275,9 @@ Logs appear in the terminal running `pnpm dev`
 
 Key decisions made during development and why.
 
+### Branding Revert
+**Branding Revert** (Current commit): Reverted homepage header and headline to original branding - restored 'Atlas by STX Labs' with gradient in header and 'Your Readiness. Revealed.' headline with gradient styling
+
 ### Monorepo Structure
 **Decision**: Use a monorepo with Turborepo
 **Why**:
@@ -1520,6 +1525,7 @@ If something breaks:
 - **How It Works Page Updates**: Added timeline design, FAQ improvements, and domain card layouts
 - **UI Component System**: Updated input components with 44px touch targets, enhanced focus states, and responsive hover interactions
 - **Snapshot Design Update**: Migrated snapshot, privacy, and terms pages from slate to neutral color palette with new confidence indicators using accent (teal), warm (amber), and neutral color systems, plus backdrop blur headers for visual consistency
+- **Branding Revert**: Reverted homepage header and headline to original branding - restored 'Atlas by STX Labs' with gradient in header and 'Your Readiness. Revealed.' headline with gradient styling
 
 ---
 
