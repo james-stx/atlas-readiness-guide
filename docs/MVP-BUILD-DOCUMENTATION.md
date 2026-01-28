@@ -184,6 +184,20 @@ If a user leaves and returns:
    - Auto-scroll to selected domain within the readiness panel
    - Visual indicators show progress and confidence for each topic area
 
+### Legal Pages Access
+
+**Flow**: Accessing Privacy Policy and Terms of Service
+- Privacy Policy accessible at `/privacy`
+- Terms of Service accessible at `/terms`
+- Both pages maintain consistent header/footer with Atlas branding
+- Include navigation back to main application
+- Content covers:
+  - Data collection and processing practices
+  - AI model usage disclosure
+  - User rights under Australian Privacy Act
+  - Service limitations and disclaimers
+  - Liability limitations and jurisdiction (Victorian law)
+
 ---
 
 ## 4. UX/UI Design
@@ -414,7 +428,9 @@ atlas-readiness-guide/
 │       │   ├── app/            # Next.js pages
 │       │   │   ├── start/      # Start page
 │       │   │   ├── chat/       # Chat interface
-│       │   │   └── snapshot/   # Snapshot view
+│       │   │   ├── snapshot/   # Snapshot view
+│       │   │   ├── privacy/page.tsx    # Privacy Policy page with data handling disclosure
+│       │   │   └── terms/page.tsx      # Terms of Service page with legal disclaimers
 │       │   ├── components/     # React components
 │       │   │   ├── chat/       # Chat-specific
 │       │   │   ├── ui/         # General UI
@@ -537,6 +553,17 @@ Stores generated readiness snapshots.
 4. Assessment complete → Snapshot generated
 5. Session expires → Data retained for analysis
 ```
+
+### Legal and Compliance Considerations
+
+**Privacy Policy Disclosures**:
+- Email addresses collected for session recovery and result delivery
+- Conversation responses stored for assessment processing
+- Session metadata collected for technical operations
+- Data processed using OpenAI GPT-4 (third-party AI service)
+- User rights include access, correction, and deletion under Australian Privacy Act
+
+**Data Retention**: As disclosed in Privacy Policy, user data retained for service provision with deletion rights available upon request.
 
 ---
 
@@ -1259,6 +1286,20 @@ Key decisions made during development and why.
 
 **Rate Limit Considerations**: Tool execution is limited to maxSteps:2 to stay within the 10k tokens/min rate limit. This was reduced from the original 5 steps after removing maxSteps entirely caused tool execution failures.
 
+### Legal Compliance
+
+**Current State**:
+- Privacy Policy and Terms of Service implemented
+- Australian Privacy Act compliance measures in place
+- Victorian law jurisdiction established
+- Third-party service disclosures included
+
+**Future Considerations**:
+- Regular legal document reviews and updates
+- Potential GDPR compliance for international users
+- Cookie policy if tracking is implemented
+- Data portability features for enhanced user rights
+
 ### Potential Future Features
 
 #### Short Term
@@ -1400,6 +1441,7 @@ If something breaks:
 - Restored maxSteps:2 for tool execution to enable proper tool round-trips and prevent stream failures
 - Improved error handling for non-Error objects in stream iteration
 - Lazy-initialized Resend client to prevent build-time failures when API key is unavailable
+- Added Privacy Policy and Terms of Service pages with comprehensive legal documentation covering data handling, AI processing disclosure, user rights, service disclaimers, and liability limitations under Australian and Victorian law
 
 ---
 
