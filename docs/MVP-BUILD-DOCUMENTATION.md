@@ -164,6 +164,20 @@ If a user leaves and returns:
 2. If found, prompts to continue or start fresh
 3. If continuing, restores full session state (messages, inputs, current domain)
 
+### Assessment Start Flow Updates
+
+#### Enhanced Session Recovery
+- **Detection**: Automatic detection of stored sessions on page load
+- **Recovery UI**: Prominent teal recovery option displayed when previous session exists
+- **User Choice**: Clear options to either continue previous session or start fresh
+- **Loading States**: Dedicated loading indicators for recovery process
+
+#### Improved Onboarding Experience
+- **Visual Welcome**: Centered logo and welcoming copy ("Let's...")
+- **Email Validation**: Real-time validation with clear error messaging
+- **Expectations Setting**: Icon-enhanced expectations section on start page
+- **Navigation**: Consistent back navigation to homepage
+
 ### Progress Tracking Flow
 
 1. **Real-time Progress Updates**:
@@ -210,26 +224,47 @@ If a user leaves and returns:
 4. **Mobile-First** - Works well on phones (where many founders are)
 5. **Minimal Friction** - Email-only signup, no passwords
 
-### Visual Design
+### Design System Updates
 
 #### Color Palette
+- **Primary Colors**: Transitioned to neutral-* color palette (neutral-50, neutral-100, neutral-200, neutral-400, neutral-500, neutral-900)
+- **Accent Colors**: Teal accent color system (accent-500, accent-600) used for focus states and interactive elements
+- **Background**: Clean white backgrounds with neutral-50 for section differentiation
 
-| Color | Hex | Usage |
-|-------|-----|-------|
-| Primary (Indigo) | `#5754FF` | Buttons, links, accents |
-| Background | `#F8FAFC` | Page background |
-| Surface | `#FFFFFF` | Cards, chat bubbles |
-| Text Primary | `#0F172A` | Main text |
-| Text Secondary | `#64748B` | Supporting text |
-| Success (Green) | `#16A34A` | High confidence |
-| Warning (Amber) | `#D97706` | Medium confidence |
-| Error (Red) | `#DC2626` | Low confidence |
+#### Layout Standards
+- **Container Widths**: 
+  - `max-w-wide`: Used for header/navigation areas
+  - `max-w-content`: Used for main content areas
+  - `max-w-3xl`: Used for process/timeline sections
+- **Header Design**: Unified sticky header with blur backdrop (`bg-white/80 backdrop-blur-sm`)
+- **Footer**: Consistent footer layout across all pages
 
-#### Typography
+#### Component Design Patterns
+- **Touch Targets**: Minimum 44px height for interactive elements (inputs, buttons)
+- **Focus States**: Teal focus rings (`focus-visible:ring-accent-500`)
+- **Hover States**: Subtle border color transitions on form elements
+- **Icons**: Integrated Lucide React icons for consistent iconography
 
-- **Font Family**: System fonts (-apple-system, BlinkMacSystemFont, Segoe UI, Roboto)
-- **Headings**: Bold, larger sizes
-- **Body**: Regular weight, comfortable reading size
+### Page-Specific Design Updates
+
+#### Start Page (`/start`)
+- **Layout**: Centered single-column layout with welcoming journey-start feel
+- **Recovery Flow**: Prominent teal-colored session recovery option for returning users
+- **Form Design**: Email input with enhanced validation states and error handling
+- **Expectations Section**: Clean layout with integrated icons for better visual hierarchy
+
+#### How It Works Page (`/how-it-works`)
+- **Timeline Design**: Connected step-by-step process visualization
+- **FAQ Section**: Refined layout with improved readability
+- **Process Steps**: Enhanced visual flow with connected timeline elements
+- **Domain Cards**: Grid layout for the five assessment domains (Market, Product, Operations, Financial, Team)
+
+#### Form Components
+- **Input Component**: 
+  - Height: 44px (`h-11`) for optimal touch interaction
+  - Border: `border-neutral-200` default, `hover:border-neutral-300` on hover
+  - Focus: Teal ring (`focus-visible:ring-accent-500`) with matching border
+  - Padding: `px-4 py-2.5` for comfortable text entry
 
 ### Key Screens
 
@@ -467,6 +502,18 @@ atlas-readiness-guide/
 ├── turbo.json                  # Turborepo configuration
 └── docs/                       # Documentation
 ```
+
+### UI Component Updates
+
+#### Input Component (`/components/ui/input.tsx`)
+- **Accessibility**: Enhanced touch target sizing (44px height)
+- **Styling**: Integrated with new design system colors and focus states
+- **Responsiveness**: Improved hover and focus state transitions
+
+#### Page Components
+- **Start Page**: Complete redesign with session recovery integration
+- **How It Works**: Enhanced timeline and FAQ layouts
+- **Header/Footer**: Unified design system implementation across pages
 
 ### Key Files Explained
 
@@ -1286,20 +1333,6 @@ Key decisions made during development and why.
 
 **Rate Limit Considerations**: Tool execution is limited to maxSteps:2 to stay within the 10k tokens/min rate limit. This was reduced from the original 5 steps after removing maxSteps entirely caused tool execution failures.
 
-### Legal Compliance
-
-**Current State**:
-- Privacy Policy and Terms of Service implemented
-- Australian Privacy Act compliance measures in place
-- Victorian law jurisdiction established
-- Third-party service disclosures included
-
-**Future Considerations**:
-- Regular legal document reviews and updates
-- Potential GDPR compliance for international users
-- Cookie policy if tracking is implemented
-- Data portability features for enhanced user rights
-
 ### Potential Future Features
 
 #### Short Term
@@ -1319,6 +1352,20 @@ Key decisions made during development and why.
 - Integration with other tools
 - AI-powered recommendations
 - Benchmark comparisons
+
+### Legal Compliance
+
+**Current State**:
+- Privacy Policy and Terms of Service implemented
+- Australian Privacy Act compliance measures in place
+- Victorian law jurisdiction established
+- Third-party service disclosures included
+
+**Future Considerations**:
+- Regular legal document reviews and updates
+- Potential GDPR compliance for international users
+- Cookie policy if tracking is implemented
+- Data portability features for enhanced user rights
 
 ---
 
@@ -1442,6 +1489,10 @@ If something breaks:
 - Improved error handling for non-Error objects in stream iteration
 - Lazy-initialized Resend client to prevent build-time failures when API key is unavailable
 - Added Privacy Policy and Terms of Service pages with comprehensive legal documentation covering data handling, AI processing disclosure, user rights, service disclaimers, and liability limitations under Australian and Victorian law
+- **Major Design System Overhaul**: Implemented comprehensive design system updates with neutral color palette, teal accent system, enhanced typography, and standardized component patterns
+- **Enhanced Start Page**: Complete redesign with centered layout, session recovery integration, and improved form design with enhanced touch targets
+- **How It Works Page Updates**: Added timeline design, FAQ improvements, and domain card layouts
+- **UI Component System**: Updated input components with 44px touch targets, enhanced focus states, and responsive hover interactions
 
 ---
 
