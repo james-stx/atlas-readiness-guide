@@ -55,9 +55,19 @@ export async function POST(request: NextRequest) {
           controller.close();
         } catch (error) {
           console.error('Stream error:', error);
+          let errMsg = 'Stream error';
+          if (error instanceof Error) {
+            errMsg = error.message;
+          } else if (typeof error === 'string') {
+            errMsg = error;
+          } else if (error && typeof error === 'object') {
+            errMsg = (error as Record<string, unknown>).message as string
+              || (error as Record<string, unknown>).error as string
+              || JSON.stringify(error);
+          }
           const errorData = JSON.stringify({
             type: 'error',
-            content: error instanceof Error ? error.message : 'Stream error',
+            content: errMsg,
           });
           controller.enqueue(encoder.encode(`data: ${errorData}\n\n`));
           controller.close();

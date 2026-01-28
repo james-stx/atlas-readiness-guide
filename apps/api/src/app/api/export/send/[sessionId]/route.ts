@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/db/supabase';
 import { getValidSession } from '@/lib/db/session';
-import { resend, EMAIL_CONFIG, renderSnapshotEmail, getPlainTextVersion } from '@/lib/email';
+import { getResendClient, EMAIL_CONFIG, renderSnapshotEmail, getPlainTextVersion } from '@/lib/email';
 import { handleApiError, ValidationError, AppError } from '@/lib/errors';
 import type { Snapshot } from '@atlas/types';
 
@@ -53,7 +53,7 @@ export async function POST(
     const emailText = getPlainTextVersion(snapshot as Snapshot, session.email);
 
     // Send the email
-    const { data: emailResult, error: emailError } = await resend.emails.send({
+    const { data: emailResult, error: emailError } = await getResendClient().emails.send({
       from: EMAIL_CONFIG.from,
       to: session.email,
       replyTo: EMAIL_CONFIG.replyTo,

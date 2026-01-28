@@ -150,9 +150,9 @@ export async function* streamConversation(
     // Create tools with session context via closure
     const tools = createConversationTools(sessionId, currentDomain);
 
-    // Single-step: model generates text + calls tools in one pass.
-    // Tools execute as side effects (DB saves); no follow-up model call needed.
-    // This uses 1 API call per message instead of up to 5 with maxSteps.
+    // maxSteps: 2 allows the model to call tools AND see results in a follow-up turn.
+    // This uses at most 2 API calls per message (~6,500 tokens total),
+    // safely within the 10,000 input tokens/min rate limit at conversational pace.
     const result = await streamText({
       model: anthropic(models.conversation),
       system: `${SYSTEM_PROMPT}
@@ -167,6 +167,7 @@ After the user answers a question, call recordInput with the matching question_i
         { role: 'user', content: userMessage },
       ],
       tools,
+      maxSteps: 2,
       maxTokens: modelConfig.conversation.maxTokens,
       temperature: modelConfig.conversation.temperature,
     });
@@ -205,9 +206,23 @@ After the user answers a question, call recordInput with the matching question_i
     };
   } catch (error) {
     console.error('Conversation error:', error);
+
+    // Extract a meaningful message from any error type.
+    // The AI SDK can throw non-Error objects (API response objects, strings).
+    let message = 'An unexpected error occurred. Please try again.';
+    if (error instanceof Error) {
+      message = error.message;
+    } else if (typeof error === 'string') {
+      message = error;
+    } else if (error && typeof error === 'object') {
+      message = (error as Record<string, unknown>).message as string
+        || (error as Record<string, unknown>).error as string
+        || JSON.stringify(error);
+    }
+
     yield {
       type: 'error',
-      content: error instanceof Error ? error.message : 'An error occurred',
+      content: message,
     };
   }
 }
