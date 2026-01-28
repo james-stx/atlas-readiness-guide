@@ -2,7 +2,7 @@
 
 import { cn } from '@/lib/utils';
 import type { Gap, GapImportance } from '@atlas/types';
-import { CircleAlert } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 
 interface GapsSectionProps {
   gaps: Gap[];
@@ -50,7 +50,7 @@ export function GapsSection({ gaps, className }: GapsSectionProps) {
     <div className={cn('bg-white rounded-xl border border-neutral-200 p-6', className)}>
       <div className="flex items-center gap-2 mb-4">
         <div className="w-8 h-8 rounded-lg bg-neutral-100 flex items-center justify-center">
-          <CircleAlert className="w-4 h-4 text-neutral-600" />
+          <AlertCircle className="w-4 h-4 text-neutral-600" />
         </div>
         <div>
           <h3 className="text-lg font-semibold text-neutral-900">Gaps to Address</h3>
