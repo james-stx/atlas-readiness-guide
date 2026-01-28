@@ -9,13 +9,17 @@ interface ChatInputProps {
   disabled?: boolean;
   placeholder?: string;
   className?: string;
+  maxLength?: number;
 }
+
+const isMac = typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.userAgent);
 
 export function ChatInput({
   onSend,
   disabled = false,
   placeholder = 'Type your response...',
   className,
+  maxLength = 2000,
 }: ChatInputProps) {
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -38,11 +42,20 @@ export function ChatInput({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Submit on Enter or Cmd/Ctrl+Enter
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSubmit();
     }
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      handleSubmit();
+    }
   };
+
+  const charCount = value.length;
+  const isNearLimit = charCount > maxLength * 0.8;
+  const isOverLimit = charCount > maxLength;
 
   return (
     <div className={cn('bg-white border-t border-neutral-100 p-4', className)}>
@@ -52,7 +65,7 @@ export function ChatInput({
             <textarea
               ref={textareaRef}
               value={value}
-              onChange={(e) => setValue(e.target.value)}
+              onChange={(e) => setValue(e.target.value.slice(0, maxLength + 100))}
               onKeyDown={handleKeyDown}
               placeholder={placeholder}
               disabled={disabled}
@@ -62,14 +75,15 @@ export function ChatInput({
                 'text-sm text-neutral-900 placeholder:text-neutral-400',
                 'focus:outline-none focus:ring-2 focus:ring-accent-500/30 focus:border-accent-500 focus:bg-white',
                 'disabled:opacity-50 disabled:cursor-not-allowed',
-                'transition-all duration-200'
+                'transition-all duration-200',
+                isOverLimit && 'border-red-300 focus:border-red-400 focus:ring-red-500/30'
               )}
             />
           </div>
 
           <button
             onClick={handleSubmit}
-            disabled={disabled || !value.trim()}
+            disabled={disabled || !value.trim() || isOverLimit}
             className={cn(
               'flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center',
               'bg-neutral-900 text-white transition-all duration-150',
@@ -86,9 +100,23 @@ export function ChatInput({
           </button>
         </div>
 
-        <p className="text-xs text-neutral-400 mt-2 text-center">
-          Press Enter to send, Shift+Enter for new line
-        </p>
+        <div className="flex items-center justify-between mt-2 px-1">
+          <p className="text-xs text-neutral-400">
+            {isMac ? '⌘' : 'Ctrl'}+Enter or Enter to send
+          </p>
+          <p
+            className={cn(
+              'text-xs transition-colors',
+              isOverLimit
+                ? 'text-red-500 font-medium'
+                : isNearLimit
+                  ? 'text-warm-600'
+                  : 'text-neutral-400'
+            )}
+          >
+            {charCount.toLocaleString()}/{maxLength.toLocaleString()}
+          </p>
+        </div>
       </div>
     </div>
   );
