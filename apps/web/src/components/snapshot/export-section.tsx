@@ -62,11 +62,11 @@ export function ExportSection({ sessionId, email, className }: ExportSectionProp
   }
 
   return (
-    <div className={cn('bg-white rounded-xl border border-slate-200 p-6', className)}>
-      <h3 className="text-lg font-semibold text-slate-900 mb-2">
+    <div className={cn('bg-white rounded-xl border border-neutral-200 p-6', className)}>
+      <h3 className="text-lg font-semibold text-neutral-900 mb-2">
         Export Your Snapshot
       </h3>
-      <p className="text-sm text-slate-500 mb-4">
+      <p className="text-sm text-neutral-500 mb-4">
         Download or email your readiness snapshot to share with your team.
       </p>
 
@@ -80,7 +80,7 @@ export function ExportSection({ sessionId, email, className }: ExportSectionProp
           {downloadState === 'loading' ? (
             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
           ) : downloadState === 'done' ? (
-            <Check className="w-4 h-4 mr-2 text-green-500" />
+            <Check className="w-4 h-4 mr-2 text-accent-600" />
           ) : (
             <Download className="w-4 h-4 mr-2" />
           )}
@@ -90,7 +90,7 @@ export function ExportSection({ sessionId, email, className }: ExportSectionProp
         <Button
           onClick={handleEmailSend}
           disabled={emailState === 'loading' || emailState === 'done'}
-          className="flex-1 bg-primary hover:bg-primary/90"
+          className="flex-1"
         >
           {emailState === 'loading' ? (
             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -104,7 +104,7 @@ export function ExportSection({ sessionId, email, className }: ExportSectionProp
       </div>
 
       {emailState === 'done' && (
-        <p className="text-sm text-green-600 mt-3 text-center">
+        <p className="text-sm text-accent-600 mt-3 text-center">
           Snapshot sent to {email}
         </p>
       )}

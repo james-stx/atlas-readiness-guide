@@ -4,20 +4,17 @@ export default function PrivacyPolicyPage() {
   return (
     <main className="min-h-screen flex flex-col bg-white">
       {/* Header */}
-      <header className="border-b border-slate-200 bg-white">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">A</span>
+      <header className="sticky top-0 z-50 border-b border-neutral-100 bg-white/80 backdrop-blur-sm">
+        <div className="max-w-wide mx-auto px-6 py-4 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2.5">
+            <div className="w-8 h-8 bg-neutral-900 rounded-lg flex items-center justify-center">
+              <span className="text-white font-semibold text-sm">A</span>
             </div>
-            <span className="flex items-baseline gap-1.5">
-              <span className="font-semibold text-slate-900">Atlas</span>
-              <span className="text-xs text-gradient font-medium">by STX Labs</span>
-            </span>
+            <span className="font-semibold text-neutral-900">Atlas</span>
           </Link>
           <Link
             href="/start"
-            className="text-sm font-medium text-primary hover:text-primary-700 transition-colors"
+            className="text-sm font-medium text-neutral-900 hover:text-accent-600 transition-colors"
           >
             Start Assessment
           </Link>
@@ -27,14 +24,14 @@ export default function PrivacyPolicyPage() {
       {/* Content */}
       <section className="flex-1 py-20 px-6">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4 tracking-tight">
+          <h1 className="text-3xl md:text-4xl font-bold text-neutral-900 mb-4 tracking-tight">
             Privacy Policy
           </h1>
-          <p className="text-slate-400 mb-12">
+          <p className="text-neutral-400 mb-12">
             Last updated: January 2026
           </p>
 
-          <div className="space-y-10 text-slate-600 leading-relaxed">
+          <div className="space-y-10 text-neutral-600 leading-relaxed">
             <Section title="Overview">
               <p>
                 STX Labs Pty Ltd (&quot;STX Labs&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;)
@@ -51,16 +48,16 @@ export default function PrivacyPolicyPage() {
               <p>We collect the following information when you use Atlas:</p>
               <ul className="list-disc pl-6 space-y-2 mt-3">
                 <li>
-                  <strong className="text-slate-900">Email address</strong> — provided when you start a session, used to
+                  <strong className="text-neutral-900">Email address</strong> — provided when you start a session, used to
                   deliver your results and enable session recovery.
                 </li>
                 <li>
-                  <strong className="text-slate-900">Conversation responses</strong> — the answers you provide during the
+                  <strong className="text-neutral-900">Conversation responses</strong> — the answers you provide during the
                   readiness assessment, including business information across five domains (Market, Product,
                   Go-to-Market, Operations, Financials).
                 </li>
                 <li>
-                  <strong className="text-slate-900">Session metadata</strong> — technical data such as session identifiers,
+                  <strong className="text-neutral-900">Session metadata</strong> — technical data such as session identifiers,
                   timestamps, domain progress, and confidence classifications generated during your assessment.
                 </li>
               </ul>
@@ -116,7 +113,7 @@ export default function PrivacyPolicyPage() {
               </p>
               <p>
                 You may request deletion of your data at any time by contacting us at{' '}
-                <a href="mailto:hello@stxlabs.io" className="text-primary hover:underline">
+                <a href="mailto:hello@stxlabs.io" className="text-accent-600 hover:underline">
                   hello@stxlabs.io
                 </a>.
               </p>
@@ -129,19 +126,19 @@ export default function PrivacyPolicyPage() {
               </p>
               <ul className="list-disc pl-6 space-y-2 mt-3">
                 <li>
-                  <strong className="text-slate-900">Anthropic</strong> — AI processing for conversation and synthesis
+                  <strong className="text-neutral-900">Anthropic</strong> — AI processing for conversation and synthesis
                 </li>
                 <li>
-                  <strong className="text-slate-900">Supabase</strong> — database hosting and storage
+                  <strong className="text-neutral-900">Supabase</strong> — database hosting and storage
                 </li>
                 <li>
-                  <strong className="text-slate-900">Resend</strong> — email delivery
+                  <strong className="text-neutral-900">Resend</strong> — email delivery
                 </li>
                 <li>
-                  <strong className="text-slate-900">Vercel</strong> — application hosting
+                  <strong className="text-neutral-900">Vercel</strong> — application hosting
                 </li>
                 <li>
-                  <strong className="text-slate-900">Upstash</strong> — rate limiting
+                  <strong className="text-neutral-900">Upstash</strong> — rate limiting
                 </li>
               </ul>
               <p className="mt-3">
@@ -163,7 +160,7 @@ export default function PrivacyPolicyPage() {
               </ul>
               <p className="mt-3">
                 To exercise any of these rights, contact us at{' '}
-                <a href="mailto:hello@stxlabs.io" className="text-primary hover:underline">
+                <a href="mailto:hello@stxlabs.io" className="text-accent-600 hover:underline">
                   hello@stxlabs.io
                 </a>.
               </p>
@@ -191,9 +188,9 @@ export default function PrivacyPolicyPage() {
                 contact us:
               </p>
               <p className="mt-3">
-                <strong className="text-slate-900">STX Labs Pty Ltd</strong><br />
+                <strong className="text-neutral-900">STX Labs Pty Ltd</strong><br />
                 Email:{' '}
-                <a href="mailto:hello@stxlabs.io" className="text-primary hover:underline">
+                <a href="mailto:hello@stxlabs.io" className="text-accent-600 hover:underline">
                   hello@stxlabs.io
                 </a>
               </p>
@@ -203,24 +200,24 @@ export default function PrivacyPolicyPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-slate-200 bg-white py-8 px-6">
+      <footer className="border-t border-neutral-200 bg-white py-8 px-6">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4">
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-neutral-500">
               © {new Date().getFullYear()} STX Labs. All rights reserved.
             </p>
-            <span className="hidden md:inline text-slate-300">|</span>
-            <p className="text-sm text-slate-500">
+            <span className="hidden md:inline text-neutral-300">|</span>
+            <p className="text-sm text-neutral-500">
               Helping Australian founders expand with confidence
             </p>
           </div>
           <div className="flex gap-6">
-            <span className="text-sm text-slate-900 font-medium">
+            <span className="text-sm text-neutral-900 font-medium">
               Privacy Policy
             </span>
             <Link
               href="/terms"
-              className="text-sm text-slate-500 hover:text-slate-700"
+              className="text-sm text-neutral-500 hover:text-neutral-700"
             >
               Terms of Service
             </Link>
@@ -240,7 +237,7 @@ function Section({
 }) {
   return (
     <div>
-      <h2 className="text-xl font-semibold text-slate-900 mb-4">{title}</h2>
+      <h2 className="text-xl font-semibold text-neutral-900 mb-4">{title}</h2>
       <div className="space-y-3">{children}</div>
     </div>
   );

@@ -18,8 +18,8 @@ const DOMAINS: { key: DomainType; label: string }[] = [
 
 export function CoverageOverview({ coverage, className }: CoverageOverviewProps) {
   return (
-    <div className={cn('bg-white rounded-xl border border-slate-200 p-6', className)}>
-      <h3 className="text-lg font-semibold text-slate-900 mb-4">Coverage Overview</h3>
+    <div className={cn('bg-white rounded-xl border border-neutral-200 p-6', className)}>
+      <h3 className="text-lg font-semibold text-neutral-900 mb-4">Coverage Overview</h3>
 
       <div className="grid grid-cols-5 gap-4">
         {DOMAINS.map(({ key, label }) => {
@@ -31,7 +31,7 @@ export function CoverageOverview({ coverage, className }: CoverageOverviewProps)
 
           return (
             <div key={key} className="text-center">
-              <p className="text-sm font-medium text-slate-700 mb-2">{label}</p>
+              <p className="text-sm font-medium text-neutral-700 mb-2">{label}</p>
 
               {/* Confidence dots */}
               <div className="flex justify-center gap-1 mb-2">
@@ -39,7 +39,7 @@ export function CoverageOverview({ coverage, className }: CoverageOverviewProps)
               </div>
 
               {/* Count */}
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-neutral-500">
                 {domainCoverage.questions_answered} inputs
               </p>
             </div>
@@ -48,18 +48,18 @@ export function CoverageOverview({ coverage, className }: CoverageOverviewProps)
       </div>
 
       {/* Legend */}
-      <div className="flex justify-center gap-6 mt-6 pt-4 border-t border-slate-100">
+      <div className="flex justify-center gap-6 mt-6 pt-4 border-t border-neutral-100">
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-cyan-400" />
-          <span className="text-xs text-slate-600">High Confidence</span>
+          <div className="w-3 h-3 rounded-full bg-accent-500" />
+          <span className="text-xs text-neutral-600">High Confidence</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-orange-400" />
-          <span className="text-xs text-slate-600">Medium</span>
+          <div className="w-3 h-3 rounded-full bg-warm-500" />
+          <span className="text-xs text-neutral-600">Medium</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-slate-300" />
-          <span className="text-xs text-slate-600">Low/Missing</span>
+          <div className="w-3 h-3 rounded-full bg-neutral-300" />
+          <span className="text-xs text-neutral-600">Low/Missing</span>
         </div>
       </div>
     </div>
@@ -81,7 +81,7 @@ function renderDots(coverage: {
       .map((_, i) => (
         <div
           key={i}
-          className="w-2.5 h-2.5 rounded-full bg-slate-200 border border-slate-300"
+          className="w-2.5 h-2.5 rounded-full bg-neutral-200 border border-neutral-300"
         />
       ));
   }
@@ -95,17 +95,17 @@ function renderDots(coverage: {
 
   for (let i = 0; i < highDots; i++) {
     dots.push(
-      <div key={`h${i}`} className="w-2.5 h-2.5 rounded-full bg-cyan-400" />
+      <div key={`h${i}`} className="w-2.5 h-2.5 rounded-full bg-accent-500" />
     );
   }
   for (let i = 0; i < mediumDots; i++) {
     dots.push(
-      <div key={`m${i}`} className="w-2.5 h-2.5 rounded-full bg-orange-400" />
+      <div key={`m${i}`} className="w-2.5 h-2.5 rounded-full bg-warm-500" />
     );
   }
   for (let i = 0; i < lowDots; i++) {
     dots.push(
-      <div key={`l${i}`} className="w-2.5 h-2.5 rounded-full bg-slate-300" />
+      <div key={`l${i}`} className="w-2.5 h-2.5 rounded-full bg-neutral-300" />
     );
   }
 

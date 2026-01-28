@@ -4,20 +4,17 @@ export default function TermsOfServicePage() {
   return (
     <main className="min-h-screen flex flex-col bg-white">
       {/* Header */}
-      <header className="border-b border-slate-200 bg-white">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">A</span>
+      <header className="sticky top-0 z-50 border-b border-neutral-100 bg-white/80 backdrop-blur-sm">
+        <div className="max-w-wide mx-auto px-6 py-4 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2.5">
+            <div className="w-8 h-8 bg-neutral-900 rounded-lg flex items-center justify-center">
+              <span className="text-white font-semibold text-sm">A</span>
             </div>
-            <span className="flex items-baseline gap-1.5">
-              <span className="font-semibold text-slate-900">Atlas</span>
-              <span className="text-xs text-gradient font-medium">by STX Labs</span>
-            </span>
+            <span className="font-semibold text-neutral-900">Atlas</span>
           </Link>
           <Link
             href="/start"
-            className="text-sm font-medium text-primary hover:text-primary-700 transition-colors"
+            className="text-sm font-medium text-neutral-900 hover:text-accent-600 transition-colors"
           >
             Start Assessment
           </Link>
@@ -27,14 +24,14 @@ export default function TermsOfServicePage() {
       {/* Content */}
       <section className="flex-1 py-20 px-6">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4 tracking-tight">
+          <h1 className="text-3xl md:text-4xl font-bold text-neutral-900 mb-4 tracking-tight">
             Terms of Service
           </h1>
-          <p className="text-slate-400 mb-12">
+          <p className="text-neutral-400 mb-12">
             Last updated: January 2026
           </p>
 
-          <div className="space-y-10 text-slate-600 leading-relaxed">
+          <div className="space-y-10 text-neutral-600 leading-relaxed">
             <Section title="1. Acceptance of Terms">
               <p>
                 By accessing or using the Atlas Readiness Guide (&quot;Atlas&quot;, &quot;the Service&quot;),
@@ -64,7 +61,7 @@ export default function TermsOfServicePage() {
               </p>
               <ul className="list-disc pl-6 space-y-2 mt-3">
                 <li>
-                  Atlas does <strong className="text-slate-900">not</strong> provide legal, financial,
+                  Atlas does <strong className="text-neutral-900">not</strong> provide legal, financial,
                   tax, immigration, or professional business advice.
                 </li>
                 <li>
@@ -115,13 +112,13 @@ export default function TermsOfServicePage() {
 
             <Section title="6. Intellectual Property">
               <p>
-                <strong className="text-slate-900">Our property:</strong> The Service, including its design,
+                <strong className="text-neutral-900">Our property:</strong> The Service, including its design,
                 code, AI prompts, domain frameworks, and branding, is owned by STX Labs and protected by
                 intellectual property laws. You may not copy, modify, or distribute any part of the
                 Service without our written permission.
               </p>
               <p>
-                <strong className="text-slate-900">Your content:</strong> You retain ownership of the
+                <strong className="text-neutral-900">Your content:</strong> You retain ownership of the
                 information you provide during the assessment. By using the Service, you grant us a
                 limited licence to process your inputs for the purpose of delivering the Service
                 (generating responses, snapshots, and exports).
@@ -131,7 +128,7 @@ export default function TermsOfServicePage() {
             <Section title="7. Privacy">
               <p>
                 Your use of the Service is also governed by our{' '}
-                <Link href="/privacy" className="text-primary hover:underline">
+                <Link href="/privacy" className="text-accent-600 hover:underline">
                   Privacy Policy
                 </Link>, which describes how we collect, use, and protect your data. By using Atlas,
                 you consent to the data practices described in that policy.
@@ -199,9 +196,9 @@ export default function TermsOfServicePage() {
                 If you have questions about these Terms of Service, please contact us:
               </p>
               <p className="mt-3">
-                <strong className="text-slate-900">STX Labs Pty Ltd</strong><br />
+                <strong className="text-neutral-900">STX Labs Pty Ltd</strong><br />
                 Email:{' '}
-                <a href="mailto:hello@stxlabs.io" className="text-primary hover:underline">
+                <a href="mailto:hello@stxlabs.io" className="text-accent-600 hover:underline">
                   hello@stxlabs.io
                 </a>
               </p>
@@ -211,25 +208,25 @@ export default function TermsOfServicePage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-slate-200 bg-white py-8 px-6">
+      <footer className="border-t border-neutral-200 bg-white py-8 px-6">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4">
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-neutral-500">
               © {new Date().getFullYear()} STX Labs. All rights reserved.
             </p>
-            <span className="hidden md:inline text-slate-300">|</span>
-            <p className="text-sm text-slate-500">
+            <span className="hidden md:inline text-neutral-300">|</span>
+            <p className="text-sm text-neutral-500">
               Helping Australian founders expand with confidence
             </p>
           </div>
           <div className="flex gap-6">
             <Link
               href="/privacy"
-              className="text-sm text-slate-500 hover:text-slate-700"
+              className="text-sm text-neutral-500 hover:text-neutral-700"
             >
               Privacy Policy
             </Link>
-            <span className="text-sm text-slate-900 font-medium">
+            <span className="text-sm text-neutral-900 font-medium">
               Terms of Service
             </span>
           </div>
@@ -248,7 +245,7 @@ function Section({
 }) {
   return (
     <div>
-      <h2 className="text-xl font-semibold text-slate-900 mb-4">{title}</h2>
+      <h2 className="text-xl font-semibold text-neutral-900 mb-4">{title}</h2>
       <div className="space-y-3">{children}</div>
     </div>
   );

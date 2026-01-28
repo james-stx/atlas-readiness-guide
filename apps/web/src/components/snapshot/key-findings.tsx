@@ -10,9 +10,9 @@ interface KeyFindingsProps {
 }
 
 const CONFIDENCE_STYLES: Record<ConfidenceLevel, { bg: string; text: string }> = {
-  high: { bg: 'bg-cyan-100', text: 'text-cyan-700' },
-  medium: { bg: 'bg-orange-100', text: 'text-orange-700' },
-  low: { bg: 'bg-slate-100', text: 'text-slate-600' },
+  high: { bg: 'bg-accent-100', text: 'text-accent-700' },
+  medium: { bg: 'bg-warm-100', text: 'text-warm-700' },
+  low: { bg: 'bg-neutral-100', text: 'text-neutral-600' },
 };
 
 const DOMAIN_LABELS: Record<string, string> = {
@@ -25,10 +25,10 @@ const DOMAIN_LABELS: Record<string, string> = {
 
 export function KeyFindings({ findings, className }: KeyFindingsProps) {
   return (
-    <div className={cn('bg-white rounded-xl border border-slate-200 p-6', className)}>
+    <div className={cn('bg-white rounded-xl border border-neutral-200 p-6', className)}>
       <div className="flex items-center gap-2 mb-4">
-        <Lightbulb className="w-5 h-5 text-primary" />
-        <h3 className="text-lg font-semibold text-slate-900">Key Findings</h3>
+        <Lightbulb className="w-5 h-5 text-warm-500" />
+        <h3 className="text-lg font-semibold text-neutral-900">Key Findings</h3>
       </div>
 
       <div className="space-y-3">
@@ -38,7 +38,7 @@ export function KeyFindings({ findings, className }: KeyFindingsProps) {
           return (
             <div
               key={index}
-              className="flex items-start gap-3 p-3 rounded-lg bg-slate-50"
+              className="flex items-start gap-3 p-3 rounded-lg bg-neutral-50"
             >
               <span
                 className={cn(
@@ -49,7 +49,7 @@ export function KeyFindings({ findings, className }: KeyFindingsProps) {
               >
                 {DOMAIN_LABELS[finding.domain]}
               </span>
-              <p className="text-sm text-slate-700 flex-1">{finding.finding}</p>
+              <p className="text-sm text-neutral-700 flex-1">{finding.finding}</p>
             </div>
           );
         })}
