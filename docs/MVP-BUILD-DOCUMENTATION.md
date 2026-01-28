@@ -231,6 +231,21 @@ If a user leaves and returns:
 - **Accent Colors**: Teal accent color system (accent-500, accent-600) used for focus states and interactive elements
 - **Background**: Clean white backgrounds with neutral-50 for section differentiation
 
+**Color Palette Migration:**
+- Migrated from slate-based color palette to neutral-based system
+- Primary purple replaced with neutral-900 for main elements
+- Accent colors updated to accent-600 for interactive elements
+
+**Confidence Indicators:**
+- High confidence: accent (teal) - `bg-accent-500`, `text-accent-700`
+- Medium confidence: warm (amber) - `bg-warm-500`, `text-warm-700`  
+- Low/missing confidence: neutral - `bg-neutral-300`, `text-neutral-600`
+
+**Header Treatment:**
+- Privacy and Terms pages now feature backdrop blur headers (`bg-white/80 backdrop-blur-sm`)
+- Consistent sticky positioning with border separator
+- Maintains visual hierarchy across all static pages
+
 #### Layout Standards
 - **Container Widths**: 
   - `max-w-wide`: Used for header/navigation areas
@@ -514,6 +529,17 @@ atlas-readiness-guide/
 - **Start Page**: Complete redesign with session recovery integration
 - **How It Works**: Enhanced timeline and FAQ layouts
 - **Header/Footer**: Unified design system implementation across pages
+
+**Snapshot Components** (`apps/web/src/components/snapshot/`):
+- All components updated to use new neutral-based color system
+- Confidence indicators standardized across components:
+  - `assumptions-section.tsx` - Uses warm colors for validation warnings
+  - `coverage-overview.tsx` - Updated confidence dot colors (accent/warm/neutral)
+  - `gaps-section.tsx` - Importance-based color coding with neutral base
+  - `key-findings.tsx` - Domain-specific confidence styling
+  - `strengths-section.tsx` - Accent colors for positive indicators
+  - `next-steps-section.tsx` - Neutral styling for action items
+  - `export-section.tsx` - Consistent button and status styling
 
 ### Key Files Explained
 
@@ -1493,6 +1519,7 @@ If something breaks:
 - **Enhanced Start Page**: Complete redesign with centered layout, session recovery integration, and improved form design with enhanced touch targets
 - **How It Works Page Updates**: Added timeline design, FAQ improvements, and domain card layouts
 - **UI Component System**: Updated input components with 44px touch targets, enhanced focus states, and responsive hover interactions
+- **Snapshot Design Update**: Migrated snapshot, privacy, and terms pages from slate to neutral color palette with new confidence indicators using accent (teal), warm (amber), and neutral color systems, plus backdrop blur headers for visual consistency
 
 ---
 
