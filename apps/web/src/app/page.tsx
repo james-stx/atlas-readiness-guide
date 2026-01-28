@@ -6,11 +6,14 @@ export default function HomePage() {
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-neutral-100 bg-white/80 backdrop-blur-sm">
         <div className="max-w-wide mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5">
+          <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 bg-neutral-900 rounded-lg flex items-center justify-center">
               <span className="text-white font-semibold text-sm">A</span>
             </div>
-            <span className="font-semibold text-neutral-900">Atlas</span>
+            <span className="flex items-baseline gap-1.5">
+              <span className="font-semibold text-neutral-900">Atlas</span>
+              <span className="text-xs text-gradient font-medium">by STX Labs</span>
+            </span>
           </Link>
           <nav className="flex items-center gap-6">
             <Link
@@ -34,9 +37,7 @@ export default function HomePage() {
         <div className="max-w-wide mx-auto">
           <div className="max-w-3xl">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-neutral-900 tracking-tight leading-[1.1] animate-in">
-              Know what you know.
-              <br />
-              <span className="text-neutral-400">See what you&apos;re assuming.</span>
+              Your Readiness. <span className="text-gradient">Revealed.</span>
             </h1>
             <p className="mt-6 text-lg md:text-xl text-neutral-600 max-w-2xl leading-relaxed animate-in animate-in-delay-1">
               Atlas helps Australian founders understand their U.S. expansion readiness
