@@ -36,9 +36,9 @@ export function DomainAccordion({
   return (
     <div
       className={cn(
-        'border border-slate-200 rounded-xl overflow-hidden',
+        'border border-neutral-200 rounded-xl overflow-hidden',
         'transition-colors duration-150',
-        !isExpanded && 'hover:bg-slate-50',
+        !isExpanded && 'hover:bg-neutral-50',
         className
       )}
     >
@@ -46,33 +46,33 @@ export function DomainAccordion({
       <button
         id={headerId}
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center gap-3 p-4 text-left focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-300"
+        className="w-full flex items-center gap-3 p-4 text-left focus:outline-none focus:ring-2 focus:ring-inset focus:ring-accent-500/30"
         aria-expanded={isExpanded}
         aria-controls={contentId}
       >
         {/* Chevron */}
         <ChevronRight
           className={cn(
-            'w-4 h-4 text-slate-400 flex-shrink-0 transition-transform duration-150',
+            'w-4 h-4 text-neutral-400 flex-shrink-0 transition-transform duration-150',
             isExpanded && 'rotate-90'
           )}
         />
 
         {/* Domain name */}
-        <span className="text-sm font-semibold uppercase tracking-wide text-slate-900 flex-1">
+        <span className="text-sm font-semibold uppercase tracking-wide text-neutral-900 flex-1">
           {label}
         </span>
 
         {/* Mini progress bar */}
-        <div className="w-20 h-1.5 bg-slate-200 rounded-full overflow-hidden flex-shrink-0">
+        <div className="w-20 h-1.5 bg-neutral-200 rounded-full overflow-hidden flex-shrink-0">
           <div
-            className="h-full bg-primary rounded-full transition-all duration-300"
+            className="h-full bg-accent-500 rounded-full transition-all duration-300"
             style={{ width: `${fillPercent}%` }}
           />
         </div>
 
         {/* Count */}
-        <span className="text-xs font-medium text-slate-500 flex-shrink-0 w-8 text-right">
+        <span className="text-xs font-medium text-neutral-500 flex-shrink-0 w-8 text-right">
           {coveredCount}/{topics.length}
         </span>
       </button>
@@ -88,10 +88,10 @@ export function DomainAccordion({
         )}
       >
         <div className="overflow-hidden">
-          <div className="px-4 pb-4 border-t border-slate-100">
+          <div className="px-4 pb-4 border-t border-neutral-100">
             {/* Key Topics section */}
             <div className="mt-4">
-              <h4 className="text-[11px] font-medium text-slate-400 uppercase tracking-widest mb-2">
+              <h4 className="text-[11px] font-medium text-neutral-400 uppercase tracking-widest mb-2">
                 Key Topics
               </h4>
               <div className="space-y-0.5">
@@ -113,7 +113,7 @@ export function DomainAccordion({
                             width="16"
                             height="16"
                             viewBox="0 0 16 16"
-                            className="text-primary flex-shrink-0"
+                            className="text-accent-600 flex-shrink-0"
                           >
                             <path
                               d="M3 8L6.5 11.5L13 5"
@@ -125,14 +125,14 @@ export function DomainAccordion({
                             />
                           </svg>
                         ) : (
-                          <div className="w-4 h-4 rounded-full border-2 border-slate-200 flex-shrink-0" />
+                          <div className="w-4 h-4 rounded-full border-2 border-neutral-200 flex-shrink-0" />
                         )}
                         <span
                           className={cn(
                             'text-sm',
                             isCovered
-                              ? 'text-slate-700 font-medium'
-                              : 'text-slate-400'
+                              ? 'text-neutral-700 font-medium'
+                              : 'text-neutral-400'
                           )}
                         >
                           {topic.label}
@@ -146,7 +146,7 @@ export function DomainAccordion({
                           variant="compact"
                         />
                       ) : (
-                        <span className="text-xs text-slate-300">—</span>
+                        <span className="text-xs text-neutral-300">—</span>
                       )}
                     </div>
                   );
@@ -157,7 +157,7 @@ export function DomainAccordion({
             {/* Captured Inputs section */}
             {domainInputs.length > 0 && (
               <div className="mt-4">
-                <h4 className="text-[11px] font-medium text-slate-400 uppercase tracking-widest mb-2">
+                <h4 className="text-[11px] font-medium text-neutral-400 uppercase tracking-widest mb-2">
                   Captured Inputs
                 </h4>
                 <div className="space-y-2">
@@ -173,16 +173,16 @@ export function DomainAccordion({
                     return (
                       <div
                         key={input.id}
-                        className="bg-slate-50 rounded-lg p-3"
+                        className="bg-neutral-50 rounded-lg p-3"
                       >
-                        <p className="text-sm text-slate-700 line-clamp-2">
+                        <p className="text-sm text-neutral-700 line-clamp-2">
                           &ldquo;{preview}&rdquo;
                         </p>
                         <div className="flex items-center gap-2 mt-2">
-                          <span className="text-xs text-slate-500">
+                          <span className="text-xs text-neutral-500">
                             {topicConfig?.label || input.question_id}
                           </span>
-                          <span className="text-slate-300">·</span>
+                          <span className="text-neutral-300">·</span>
                           <ConfidenceBadge
                             confidence={input.confidence_level}
                           />
@@ -191,7 +191,7 @@ export function DomainAccordion({
                     );
                   })}
                   {domainInputs.length > 3 && (
-                    <p className="text-xs font-medium text-primary">
+                    <p className="text-xs font-medium text-accent-600">
                       +{domainInputs.length - 3} more
                     </p>
                   )}

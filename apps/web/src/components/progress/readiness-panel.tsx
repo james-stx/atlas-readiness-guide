@@ -120,7 +120,7 @@ export function ReadinessPanel({
         className={cn(
           'fixed inset-0 z-40 transition-opacity duration-200',
           isOpen
-            ? 'bg-slate-900/20 opacity-100'
+            ? 'bg-neutral-900/20 opacity-100'
             : 'opacity-0 pointer-events-none'
         )}
         onClick={onClose}
@@ -135,7 +135,7 @@ export function ReadinessPanel({
         aria-modal="true"
         aria-label="Assessment Progress"
         className={cn(
-          'fixed top-0 right-0 bottom-0 z-50 bg-white border-l border-slate-200 shadow-[-4px_0_25px_-5px_rgba(0,0,0,0.1)]',
+          'fixed top-0 right-0 bottom-0 z-50 bg-white border-l border-neutral-200 shadow-elevated',
           'w-full sm:w-[400px]',
           'transition-transform duration-300',
           isOpen ? 'translate-x-0' : 'translate-x-full',
@@ -143,22 +143,22 @@ export function ReadinessPanel({
         )}
       >
         {/* Fixed header */}
-        <div className="flex items-center justify-between h-14 px-4 border-b border-slate-200">
+        <div className="flex items-center justify-between h-14 px-4 border-b border-neutral-100">
           {/* Mobile back arrow / Desktop label */}
           <button
             onClick={onClose}
-            className="sm:hidden w-11 h-11 flex items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100"
+            className="sm:hidden w-11 h-11 flex items-center justify-center rounded-lg text-neutral-600 hover:bg-neutral-100 transition-colors"
             aria-label="Close panel"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h2 className="text-base font-semibold text-slate-900">
+          <h2 className="text-base font-semibold text-neutral-900">
             Assessment Progress
           </h2>
           <button
             ref={closeButtonRef}
             onClick={onClose}
-            className="w-10 h-10 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-300"
+            className="w-10 h-10 flex items-center justify-center rounded-lg text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 focus:outline-none focus:ring-2 focus:ring-accent-500/30 transition-colors"
             aria-label="Close assessment progress panel"
           >
             <X className="w-5 h-5" />
@@ -168,27 +168,27 @@ export function ReadinessPanel({
         {/* Scrollable content */}
         <div className="overflow-y-auto h-[calc(100vh-56px)] px-4 py-6">
           {/* Overall Progress Card */}
-          <div className="bg-slate-50 rounded-2xl p-6 mb-6">
+          <div className="bg-neutral-50 rounded-xl p-6 mb-6">
             <div className="flex items-center gap-6">
               <ProgressRing
                 value={progressState.overallProgress}
                 size="lg"
               />
               <div className="space-y-1.5">
-                <p className="text-sm text-slate-600">
-                  <span className="font-semibold text-slate-900">
+                <p className="text-sm text-neutral-600">
+                  <span className="font-semibold text-neutral-900">
                     {progressState.totalInputs}
                   </span>{' '}
                   input{progressState.totalInputs !== 1 ? 's' : ''} captured
                 </p>
-                <p className="text-sm text-slate-600">
-                  <span className="font-semibold text-slate-900">
+                <p className="text-sm text-neutral-600">
+                  <span className="font-semibold text-neutral-900">
                     {progressState.domainsWithInputs}
                   </span>{' '}
                   of 5 domains covered
                 </p>
-                <p className="text-sm text-slate-600">
-                  <span className="font-semibold text-slate-900">
+                <p className="text-sm text-neutral-600">
+                  <span className="font-semibold text-neutral-900">
                     {progressState.highConfidenceCount}
                   </span>{' '}
                   high confidence
@@ -212,7 +212,7 @@ export function ReadinessPanel({
           </div>
 
           {/* Snapshot Readiness */}
-          <div className="border border-slate-200 rounded-xl p-5">
+          <div className="border border-neutral-200 rounded-xl p-5">
             {/* Status header */}
             <div className="flex items-center gap-3 mb-3">
               <div
@@ -271,7 +271,7 @@ export function ReadinessPanel({
               </h3>
             </div>
 
-            <p className="text-sm text-slate-600 mb-4">
+            <p className="text-sm text-neutral-600 mb-4">
               {readinessConfig.message}
             </p>
 
@@ -279,19 +279,19 @@ export function ReadinessPanel({
             {gapSuggestions.length > 0 &&
               progressState.snapshotReadiness !== 'excellent' && (
                 <div className="mb-4">
-                  <p className="text-xs font-medium text-slate-500 mb-2">
+                  <p className="text-xs font-medium text-neutral-500 mb-2">
                     For even better insights:
                   </p>
                   <ul className="space-y-1">
                     {gapSuggestions.map((suggestion, index) => (
                       <li
                         key={index}
-                        className="text-xs text-slate-500 flex items-start gap-1.5"
+                        className="text-xs text-neutral-500 flex items-start gap-1.5"
                       >
-                        <span className="text-slate-300 mt-0.5">•</span>
+                        <span className="text-neutral-300 mt-0.5">•</span>
                         <span>
                           {suggestion.topic}{' '}
-                          <span className="text-slate-400">
+                          <span className="text-neutral-400">
                             ({suggestion.domainLabel})
                           </span>
                         </span>
@@ -304,7 +304,7 @@ export function ReadinessPanel({
             {/* Generate Snapshot button */}
             <button
               onClick={onGenerateSnapshot}
-              className="w-full py-3 px-4 bg-primary text-white font-semibold rounded-xl hover:bg-primary-600 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-300 focus:ring-offset-2"
+              className="w-full py-3 px-4 bg-neutral-900 text-white font-semibold rounded-lg hover:bg-neutral-800 transition-colors focus:outline-none focus:ring-2 focus:ring-neutral-900/30 focus:ring-offset-2"
             >
               Generate Snapshot
             </button>

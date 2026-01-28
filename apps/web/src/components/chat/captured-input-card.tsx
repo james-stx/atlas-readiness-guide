@@ -18,21 +18,21 @@ const CONFIDENCE_STYLES: Record<
   { bg: string; border: string; text: string; label: string }
 > = {
   high: {
-    bg: 'bg-cyan-50',
-    border: 'border-cyan-200',
-    text: 'text-cyan-700',
+    bg: 'bg-accent-50',
+    border: 'border-accent-200',
+    text: 'text-accent-700',
     label: 'High Confidence',
   },
   medium: {
-    bg: 'bg-orange-50',
-    border: 'border-orange-200',
-    text: 'text-orange-700',
+    bg: 'bg-warm-50',
+    border: 'border-warm-200',
+    text: 'text-warm-700',
     label: 'Medium Confidence',
   },
   low: {
-    bg: 'bg-slate-50',
-    border: 'border-slate-200',
-    text: 'text-slate-600',
+    bg: 'bg-neutral-50',
+    border: 'border-neutral-200',
+    text: 'text-neutral-600',
     label: 'Low Confidence',
   },
 };
@@ -61,7 +61,7 @@ export function CapturedInputCard({
         'rounded-lg border px-3 py-2 transition-all duration-500',
         styles.bg,
         styles.border,
-        isHighlighted && 'ring-2 ring-primary ring-offset-2',
+        isHighlighted && 'ring-2 ring-accent-500 ring-offset-2',
         className
       )}
     >
@@ -73,8 +73,8 @@ export function CapturedInputCard({
               {styles.label}
             </span>
           </div>
-          <p className="text-xs text-slate-500 mb-0.5">{label}</p>
-          <p className="text-sm text-slate-800 font-medium truncate">{value}</p>
+          <p className="text-xs text-neutral-500 mb-0.5">{label}</p>
+          <p className="text-sm text-neutral-900 font-medium truncate">{value}</p>
         </div>
       </div>
     </div>

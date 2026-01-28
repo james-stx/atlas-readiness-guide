@@ -25,7 +25,7 @@ export function ProgressHeader({
   return (
     <header
       className={cn(
-        'bg-white border-b border-slate-200 z-40',
+        'bg-white/80 backdrop-blur-sm border-b border-neutral-100 z-40',
         className
       )}
     >
@@ -54,7 +54,7 @@ export function ProgressHeader({
         <div className="flex flex-col items-end">
           <button
             onClick={onViewDetails}
-            className="flex items-center gap-1 text-sm font-medium text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary-300 focus:ring-offset-2 rounded px-2 py-1"
+            className="flex items-center gap-1 text-sm font-medium text-neutral-900 hover:text-accent-600 focus:outline-none focus:ring-2 focus:ring-accent-500/30 focus:ring-offset-2 rounded px-2 py-1 transition-colors"
             aria-expanded={false}
             aria-controls="readiness-panel"
             aria-label="View assessment details"
@@ -62,7 +62,7 @@ export function ProgressHeader({
             View Details
             <ArrowRight className="w-4 h-4" />
           </button>
-          <span className="text-xs text-slate-500 mr-1">
+          <span className="text-xs text-neutral-500 mr-1">
             {progressState.totalInputs} input{progressState.totalInputs !== 1 ? 's' : ''}
           </span>
         </div>
@@ -71,7 +71,7 @@ export function ProgressHeader({
       {/* Mobile layout */}
       <div className="flex sm:hidden items-center justify-between h-14 px-4">
         {/* Left: Progress text */}
-        <span className="text-base font-bold text-slate-900">
+        <span className="text-base font-bold text-neutral-900">
           {progressState.overallProgress}%
         </span>
 
@@ -94,7 +94,7 @@ export function ProgressHeader({
         {/* Right: Menu icon */}
         <button
           onClick={onViewDetails}
-          className="w-11 h-11 flex items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-300"
+          className="w-11 h-11 flex items-center justify-center rounded-lg text-neutral-600 hover:bg-neutral-100 focus:outline-none focus:ring-2 focus:ring-accent-500/30 transition-colors"
           aria-label="View assessment details"
         >
           <Menu className="w-6 h-6" />

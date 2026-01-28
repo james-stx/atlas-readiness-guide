@@ -61,15 +61,15 @@ export function InputNotification({
   }, [notification.id, onDismiss]);
 
   const confidenceIconBg = {
-    high: 'bg-confidence-high-bg',
-    medium: 'bg-confidence-medium-bg',
-    low: 'bg-confidence-low-bg',
+    high: 'bg-accent-50',
+    medium: 'bg-warm-50',
+    low: 'bg-neutral-100',
   }[notification.confidence];
 
   const checkColor = {
-    high: 'text-confidence-high',
-    medium: 'text-confidence-medium',
-    low: 'text-confidence-low',
+    high: 'text-accent-600',
+    medium: 'text-warm-600',
+    low: 'text-neutral-500',
   }[notification.confidence];
 
   return (
@@ -80,7 +80,7 @@ export function InputNotification({
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       className={cn(
-        'w-[280px] bg-white border border-slate-200 rounded-xl p-3 shadow-lg',
+        'w-[280px] bg-white border border-neutral-200 rounded-xl p-3 shadow-elevated',
         isExiting ? 'animate-slide-out-right' : 'animate-slide-in-right'
       )}
     >
@@ -97,13 +97,13 @@ export function InputNotification({
 
         {/* Content */}
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-slate-900 truncate">
+          <p className="text-sm font-semibold text-neutral-900 truncate">
             {notification.topicLabel} captured
           </p>
           <div className="mt-1">
             <ConfidenceBadge confidence={notification.confidence} />
           </div>
-          <p className="text-xs text-slate-500 mt-2">
+          <p className="text-xs text-neutral-500 mt-2">
             Domain: {domainLabels[notification.domain]}
           </p>
         </div>

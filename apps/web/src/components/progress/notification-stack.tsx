@@ -34,7 +34,7 @@ export function NotificationStack({
   return (
     <div
       className={cn(
-        'fixed bottom-4 right-4 z-50 flex flex-col gap-2',
+        'fixed bottom-20 right-4 z-50 flex flex-col gap-2',
         // On mobile, center the notifications
         'max-sm:left-4 max-sm:right-4 max-sm:items-center',
         className

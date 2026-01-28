@@ -31,10 +31,10 @@ export function QuickResponses({
           onClick={() => onSelect(response.value)}
           disabled={disabled}
           className={cn(
-            'px-4 py-2 text-sm font-medium rounded-full border transition-all duration-200',
-            'bg-white border-slate-200 text-slate-700 shadow-sm',
-            'hover:bg-primary/5 hover:border-primary/30 hover:text-primary hover:shadow-md hover:-translate-y-0.5',
-            'focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2',
+            'px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-150',
+            'bg-white border-neutral-200 text-neutral-700',
+            'hover:bg-neutral-50 hover:border-neutral-300 hover:text-neutral-900',
+            'focus:outline-none focus:ring-2 focus:ring-accent-500/30 focus:ring-offset-2',
             'disabled:opacity-50 disabled:cursor-not-allowed'
           )}
         >

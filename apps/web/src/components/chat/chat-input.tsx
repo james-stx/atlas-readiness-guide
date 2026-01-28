@@ -45,7 +45,7 @@ export function ChatInput({
   };
 
   return (
-    <div className={cn('bg-white border-t border-slate-200 p-4 shadow-[0_-2px_10px_rgba(0,0,0,0.03)]', className)}>
+    <div className={cn('bg-white border-t border-neutral-100 p-4', className)}>
       <div className="max-w-4xl mx-auto">
         <div className="relative flex items-end gap-3">
           <div className="flex-1 relative">
@@ -58,9 +58,9 @@ export function ChatInput({
               disabled={disabled}
               rows={1}
               className={cn(
-                'w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 pr-12',
-                'text-sm text-slate-800 placeholder:text-slate-400',
-                'focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 focus:bg-white',
+                'w-full resize-none rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 pr-12',
+                'text-sm text-neutral-900 placeholder:text-neutral-400',
+                'focus:outline-none focus:ring-2 focus:ring-accent-500/30 focus:border-accent-500 focus:bg-white',
                 'disabled:opacity-50 disabled:cursor-not-allowed',
                 'transition-all duration-200'
               )}
@@ -71,10 +71,10 @@ export function ChatInput({
             onClick={handleSubmit}
             disabled={disabled || !value.trim()}
             className={cn(
-              'flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center',
-              'bg-primary text-white transition-all duration-200',
-              'hover:bg-primary-600 hover:shadow-md',
-              'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
+              'flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center',
+              'bg-neutral-900 text-white transition-all duration-150',
+              'hover:bg-neutral-800',
+              'focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:ring-offset-2',
               'disabled:opacity-50 disabled:cursor-not-allowed'
             )}
           >
@@ -86,7 +86,7 @@ export function ChatInput({
           </button>
         </div>
 
-        <p className="text-xs text-slate-400 mt-2 text-center">
+        <p className="text-xs text-neutral-400 mt-2 text-center">
           Press Enter to send, Shift+Enter for new line
         </p>
       </div>

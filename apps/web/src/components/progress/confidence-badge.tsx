@@ -13,31 +13,31 @@ const confidenceConfig = {
   high: {
     label: 'High confidence',
     shortLabel: 'High',
-    bgColor: 'bg-confidence-high-bg',
-    textColor: 'text-confidence-high-text',
-    borderColor: 'border-confidence-high-border',
+    bgColor: 'bg-accent-50',
+    textColor: 'text-accent-700',
+    borderColor: 'border-accent-200',
   },
   medium: {
     label: 'Medium confidence',
     shortLabel: 'Medium',
-    bgColor: 'bg-confidence-medium-bg',
-    textColor: 'text-confidence-medium-text',
-    borderColor: 'border-confidence-medium-border',
+    bgColor: 'bg-warm-50',
+    textColor: 'text-warm-700',
+    borderColor: 'border-warm-200',
   },
   low: {
     label: 'Low confidence',
     shortLabel: 'Low',
-    bgColor: 'bg-confidence-low-bg',
-    textColor: 'text-confidence-low-text',
-    borderColor: 'border-confidence-low-border',
+    bgColor: 'bg-neutral-100',
+    textColor: 'text-neutral-600',
+    borderColor: 'border-neutral-200',
   },
 };
 
 function ConfidenceIcon({ confidence, className }: { confidence: ConfidenceLevel; className?: string }) {
   const iconColor = {
-    high: 'text-confidence-high',
-    medium: 'text-confidence-medium',
-    low: 'text-confidence-low',
+    high: 'text-accent-600',
+    medium: 'text-warm-600',
+    low: 'text-neutral-500',
   }[confidence];
 
   if (confidence === 'high') {

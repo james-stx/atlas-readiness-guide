@@ -122,7 +122,7 @@ function ChatContent() {
 
       {/* Quick responses */}
       {quickResponses.length > 0 && !isLoading && (
-        <div className="px-4 py-3 bg-white border-t border-slate-100">
+        <div className="px-4 py-3 bg-white border-t border-neutral-100">
           <div className="max-w-4xl mx-auto">
             <QuickResponses
               responses={quickResponses}
@@ -202,8 +202,8 @@ export default function ChatPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-4" />
-          <p className="text-slate-600">Loading your session...</p>
+          <Loader2 className="w-8 h-8 animate-spin text-neutral-900 mx-auto mb-4" />
+          <p className="text-neutral-600">Loading your session...</p>
         </div>
       </div>
     );

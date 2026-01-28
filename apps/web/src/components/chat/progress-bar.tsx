@@ -21,11 +21,11 @@ export function ProgressBar({ currentDomain, className }: ProgressBarProps) {
   const progressPercent = ((currentIndex + 1) / DOMAINS.length) * 100;
 
   return (
-    <div className={cn('bg-white border-b border-slate-200 shadow-sm', className)}>
+    <div className={cn('bg-white border-b border-neutral-100', className)}>
       {/* Progress bar */}
-      <div className="h-1 bg-slate-100">
+      <div className="h-1 bg-neutral-100">
         <div
-          className="h-full bg-gradient-to-r from-primary to-cyan transition-all duration-500 ease-out"
+          className="h-full bg-accent-500 transition-all duration-500 ease-out"
           style={{ width: `${progressPercent}%` }}
         />
       </div>
@@ -47,18 +47,18 @@ export function ProgressBar({ currentDomain, className }: ProgressBarProps) {
                 <div
                   className={cn(
                     'w-2.5 h-2.5 rounded-full transition-all duration-300',
-                    isCompleted && 'bg-primary',
-                    isCurrent && 'bg-primary ring-4 ring-primary/20 scale-110',
-                    isPending && 'bg-slate-200'
+                    isCompleted && 'bg-accent-500',
+                    isCurrent && 'bg-accent-500 ring-4 ring-accent-500/20 scale-110',
+                    isPending && 'bg-neutral-200'
                   )}
                 />
                 {/* Label */}
                 <span
                   className={cn(
                     'text-xs font-medium transition-colors',
-                    isCompleted && 'text-primary',
-                    isCurrent && 'text-slate-900 font-semibold',
-                    isPending && 'text-slate-400'
+                    isCompleted && 'text-accent-600',
+                    isCurrent && 'text-neutral-900 font-semibold',
+                    isPending && 'text-neutral-400'
                   )}
                 >
                   {domain.label}

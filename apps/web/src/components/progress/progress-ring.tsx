@@ -65,7 +65,7 @@ export function ProgressRing({
           cy={center}
           r={config.radius}
           fill="none"
-          stroke="#E2E8F0"
+          stroke="#E7E5E4"
           strokeWidth={config.strokeWidth}
         />
         {/* Progress (foreground arc) */}
@@ -74,7 +74,7 @@ export function ProgressRing({
           cy={center}
           r={config.radius}
           fill="none"
-          stroke="#5754FF"
+          stroke="#0D9488"
           strokeWidth={config.strokeWidth}
           strokeLinecap="round"
           strokeDasharray={circumference}
@@ -86,7 +86,7 @@ export function ProgressRing({
       {showLabel && (
         <span
           className={cn(
-            'absolute font-bold text-slate-900',
+            'absolute font-bold text-neutral-900',
             config.fontSize
           )}
         >
