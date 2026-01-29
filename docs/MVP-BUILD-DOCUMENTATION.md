@@ -469,6 +469,10 @@ The conversation agent uses Vercel AI SDK's `streamText()` with tool support:
 
 **AI Response Flow Enhancement**: The conversation agent now includes a fallback mechanism to ensure users always receive text responses. When the AI only uses tools (like recordInput or transitionDomain) without generating conversational text, the system automatically makes a follow-up API call without tools to force a conversational response. This prevents silent tool-only interactions where users might not receive feedback.
 
+**AI Agent Tool Validation**: The conversation agent now enforces strict validation of question IDs, requiring exact matches from predefined domain question lists rather than allowing AI-generated IDs. This ensures proper progress tracking and prevents data inconsistencies.
+
+**Automatic Domain Transitions**: The system now includes explicit instructions for the AI to automatically transition between assessment domains after covering 3-4 key topics, improving conversation flow and completion rates.
+
 #### Database (Supabase)
 - **Purpose**: Persistent data storage
 - **Technology**: PostgreSQL via Supabase
@@ -1274,6 +1278,29 @@ If something breaks:
 
 **Testing AI Response Consistency**: When testing conversations, verify that users always receive text responses even when the AI primarily uses tools. If you notice silent responses where only tool execution occurs, this should trigger the automatic fallback mechanism to generate a follow-up conversational response.
 
+### Progress Tracking Issues
+
+**Problem**: Progress not updating when user provides inputs
+- Check browser network tab for `input` SSE events during conversation
+- Verify tool execution is working by looking for `recordInput` calls in API logs
+- Ensure question IDs in `apps/web/src/lib/progress.ts` match those in `apps/api/src/lib/ai/prompts/domains.ts`
+
+**Problem**: Domain transition not working
+- Look for `domain_change` SSE events in network tab
+- Check that `transitionDomain` tool is being called when domain topics are covered
+- Verify single-step execution allows sufficient tool execution in conversation flow
+
+**Progress Tracking Issues**:
+- **Symptom**: Progress checklist not updating despite user providing answers
+- **Cause**: AI using incorrect question IDs that don't match the predefined domain questions
+- **Solution**: Check that the conversation agent is using exact question IDs from the system prompt
+- **Verification**: Monitor the `recordInput` tool calls to ensure questionId parameters match the domain configuration
+
+**Domain Transition Problems**:
+- **Symptom**: Conversations getting stuck in one domain without progressing
+- **Solution**: The AI now has explicit instructions to call `transitionDomain` after 3-4 topics are covered
+- **Verification**: Check that domain transitions occur naturally in conversation flow
+
 ### Common Issues & Fixes
 
 #### "Failed to fetch" error on start page
@@ -1337,18 +1364,6 @@ If something breaks:
 ### Tool Execution Issues
 
 **Tool Execution Issues**: If the AI chat stops responding after calling tools, verify that maxSteps is properly configured. Without maxSteps, the AI SDK may call tools but never receive results, causing non-Error objects to be thrown during stream iteration. Check the chat route error handling for proper extraction of error messages from non-Error thrown objects.
-
-### Progress Tracking Issues
-
-**Problem**: Progress not updating when user provides inputs
-- Check browser network tab for `input` SSE events during conversation
-- Verify tool execution is working by looking for `recordInput` calls in API logs
-- Ensure question IDs in `apps/web/src/lib/progress.ts` match those in `apps/api/src/lib/ai/prompts/domains.ts`
-
-**Problem**: Domain transition not working
-- Look for `domain_change` SSE events in network tab
-- Check that `transitionDomain` tool is being called when domain topics are covered
-- Verify single-step execution allows sufficient tool execution in conversation flow
 
 ### Rate Limiting & Service Interruptions
 
@@ -1476,6 +1491,11 @@ Key decisions made during development and why.
 ---
 
 ## 15. Known Limitations & Future Roadmap
+
+### Recent Fixes
+- ✅ Fixed question ID validation to prevent AI from generating invalid IDs
+- ✅ Improved domain transition automation for better conversation flow
+- ✅ Resolved progress tracking issues caused by ID mismatches
 
 ### Recently Resolved
 - ✅ **Chat Stream Hanging** (Fixed): SSE streams could hang indefinitely causing chat freeze - now includes timeout handling and improved error recovery
@@ -1668,11 +1688,4 @@ If something breaks:
 - **Major Design System Overhaul**: Implemented comprehensive design system updates with neutral color palette, teal accent system, enhanced typography, and standardized component patterns
 - **Enhanced Start Page**: Complete redesign with centered layout, session recovery integration, and improved form design with enhanced touch targets
 - **How It Works Page Updates**: Added timeline design, FAQ improvements, and domain card layouts
-- **UI Component System**: Updated input components with 44px touch targets, enhanced focus states, and responsive hover interactions
-- **Snapshot Design Update**: Migrated snapshot, privacy, and terms pages from slate to neutral color palette with new confidence indicators using accent (teal), warm (amber), and neutral color systems, plus backdrop blur headers for visual consistency
-- **Branding Revert**: Reverted homepage header and headline to original branding - restored 'Atlas by STX Labs' with gradient in header and 'Your Readiness. Revealed.' headline with gradient styling
-- **Chat Interface Redesign**: Updated chat interface with simplified header layout (domain-only display), new avatar system (compass icon for assistant, user icon for user), enhanced input controls with character counting, platform-aware keyboard shortcuts (⌘/Ctrl+Enter), and improved visual design with fully rounded avatars and message bubbles
-- **Added Retry Logic**: Implemented automatic retry logic with exponential backoff to handle API rate limits and service unavailability, improving chat reliability when the service is under load
-- **Fixed SSE Stream Hanging**: Resolved chat freezing issue by adding 60-second timeout to stream reads and improving error handling for retryable stream errors
-- **Request Timeout Implementation**: Added 90-second timeout for all chat requests using AbortController to prevent hanging requests, with proper error handling and streaming UI cleanup
-- **SSE Debugging**: Added debug logging and improved error handling for incomplete
+- **UI Component System**: Updated input components with 44px touch targets, enhanced focus states
