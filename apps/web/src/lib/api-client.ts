@@ -110,13 +110,15 @@ export async function initChat(sessionId: string): Promise<{
 
 export async function sendMessage(
   sessionId: string,
-  content: string
+  content: string,
+  signal?: AbortSignal
 ): Promise<Response> {
   // Returns raw response for SSE streaming
   const response = await fetch(`${API_URL}/api/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ sessionId, content }),
+    signal,
   });
 
   if (!response.ok) {
