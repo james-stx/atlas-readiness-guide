@@ -442,6 +442,13 @@ If a user leaves and returns:
 #### Real-time Communication
 **Real-time Communication**: The SSE (Server-Sent Events) implementation includes robust error handling and buffering of incomplete chunks across TCP packet boundaries to ensure reliable streaming of AI responses and tool execution results.
 
+**Error Handling & Resilience:**
+- Automatic retry logic for API failures with exponential backoff
+- Rate limit detection and graceful degradation
+- User feedback during service interruptions
+- Robust error recovery for both REST API and SSE streaming connections
+- Maximum 3 retry attempts with 1.5 second base delay
+
 #### Conversation Agent
 The conversation agent uses Vercel AI SDK's `streamText()` with tool support:
 - **Tool Context**: Uses closure pattern to capture `sessionId` and `currentDomain` since AI SDK doesn't pass custom context to tool execute functions
@@ -1309,6 +1316,19 @@ If something breaks:
 - Check that `transitionDomain` tool is being called when domain topics are covered
 - Verify single-step execution allows sufficient tool execution in conversation flow
 
+### Rate Limiting & Service Interruptions
+
+The system now handles API rate limits and temporary service unavailability automatically:
+
+1. **Expected Behavior**: When rate limits are hit, users will see "Service busy. Retrying in Xs..." messages
+2. **Retry Logic**: System attempts up to 3 retries with exponential backoff (1.5s, 2.25s, 3.375s delays)
+3. **Testing**: To test retry behavior, you can simulate rate limits by temporarily modifying API responses
+
+**Troubleshooting Steps:**
+- If chat remains unresponsive after retries, check network connectivity
+- Monitor browser console for non-retryable error messages
+- Verify API service status if persistent failures occur
+
 ### Viewing Logs
 
 #### Local
@@ -1408,6 +1428,9 @@ Key decisions made during development and why.
 | No admin dashboard | Can't view analytics | Build admin panel |
 | Basic error handling | Some errors unclear | Improve error messages |
 | No offline support | Requires internet | Add PWA features |
+| ~~Chat becomes unresponsive when hitting API rate limits~~ | ~~Service unavailable during high load~~ | ✅ **RESOLVED**: Added retry logic with exponential backoff |
+
+**Assessment Sessions May Timeout**: Assessment sessions may timeout during extended periods of inactivity
 
 **Classification Accuracy During Chat**: The conversation tools use simplified regex-based classification instead of full LLM classification to maintain streaming performance. This may result in less accurate confidence level assessment for user inputs captured during real-time conversations, though it ensures responsive user experience.
 
@@ -1578,6 +1601,7 @@ If something breaks:
 - **Snapshot Design Update**: Migrated snapshot, privacy, and terms pages from slate to neutral color palette with new confidence indicators using accent (teal), warm (amber), and neutral color systems, plus backdrop blur headers for visual consistency
 - **Branding Revert**: Reverted homepage header and headline to original branding - restored 'Atlas by STX Labs' with gradient in header and 'Your Readiness. Revealed.' headline with gradient styling
 - **Chat Interface Redesign**: Updated chat interface with simplified header layout (domain-only display), new avatar system (compass icon for assistant, user icon for user), enhanced input controls with character counting, platform-aware keyboard shortcuts (⌘/Ctrl+Enter), and improved visual design with fully rounded avatars and message bubbles
+- **Added Retry Logic**: Implemented automatic retry logic with exponential backoff to handle API rate limits and service unavailability, improving chat reliability when the service is under load
 
 ---
 
