@@ -140,8 +140,10 @@ export async function* streamConversation(
       metadata: { domain: currentDomain },
     });
 
-    // Keep history short to stay within rate limits (~10 msgs ≈ 500-1000 tokens)
-    const recentMessages = await getRecentMessages(sessionId, 10);
+    // Keep history short to stay within rate limits
+    // 6 messages ≈ 1500-3000 tokens, plus system prompt ≈ 700 tokens
+    // Total ~4000-5000 tokens per request, safe for 10k/min limit
+    const recentMessages = await getRecentMessages(sessionId, 6);
     const formattedMessages = formatMessagesForLLM(recentMessages);
 
     // Get domain context
@@ -259,6 +261,11 @@ You just recorded the user's input. Now acknowledge what they shared and continu
       message = (error as Record<string, unknown>).message as string
         || (error as Record<string, unknown>).error as string
         || JSON.stringify(error);
+    }
+
+    // Make rate limit errors more user-friendly
+    if (message.toLowerCase().includes('rate limit') || message.includes('10,000 input tokens')) {
+      message = "I'm receiving a lot of requests right now. Please wait about 30 seconds before sending your next message.";
     }
 
     yield {
