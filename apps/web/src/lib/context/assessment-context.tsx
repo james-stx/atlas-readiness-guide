@@ -317,10 +317,17 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
         const decoder = new TextDecoder();
         let assistantContent = '';
         let buffer = '';
+        let receivedComplete = false;
+        let eventCount = 0;
+
+        console.log('[Atlas] Starting SSE stream read...');
 
         while (true) {
           const { done, value } = await reader.read();
-          if (done) break;
+          if (done) {
+            console.log('[Atlas] Stream done. Events received:', eventCount, 'Content length:', assistantContent.length);
+            break;
+          }
 
           // Append to buffer to handle JSON split across chunks
           buffer += decoder.decode(value, { stream: true });
@@ -334,10 +341,15 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
             if (!trimmed || !trimmed.startsWith('data: ')) continue;
 
             const data = trimmed.slice(6);
-            if (data === '[DONE]') continue;
+            if (data === '[DONE]') {
+              console.log('[Atlas] Received [DONE] marker');
+              continue;
+            }
 
             try {
               const parsed = JSON.parse(data);
+              eventCount++;
+              console.log('[Atlas] Event:', parsed.type);
 
               if (parsed.type === 'text') {
                 assistantContent += parsed.content;
@@ -353,6 +365,7 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
                   payload: parsed.domain,
                 });
               } else if (parsed.type === 'complete') {
+                receivedComplete = true;
                 // Add final assistant message
                 const message = parsed.data?.message || parsed.message;
                 if (message) {
@@ -363,14 +376,41 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
                 }
                 dispatch({ type: 'CLEAR_STREAMING_MESSAGE' });
               } else if (parsed.type === 'error') {
+                console.error('[Atlas] Stream error event:', parsed.content);
                 dispatch({
                   type: 'SET_ERROR',
                   payload: parsed.content || 'A streaming error occurred',
                 });
               }
-            } catch {
-              // Incomplete JSON — will be handled once full line arrives
+            } catch (parseErr) {
+              // Log parse errors (might help debug)
+              console.warn('[Atlas] JSON parse issue:', data.slice(0, 100));
             }
+          }
+        }
+
+        // Handle stream ending without complete event
+        if (!receivedComplete) {
+          console.warn('[Atlas] Stream ended without complete event');
+          if (assistantContent) {
+            // Save partial content as a message
+            dispatch({
+              type: 'ADD_MESSAGE',
+              payload: {
+                id: `partial-${Date.now()}`,
+                session_id: state.session.id,
+                role: 'assistant',
+                content: assistantContent,
+                metadata: { partial: true },
+                created_at: new Date().toISOString(),
+              },
+            });
+          } else {
+            // No content at all - something went wrong
+            dispatch({
+              type: 'SET_ERROR',
+              payload: 'No response received. Please try again.',
+            });
           }
         }
       } catch (error) {
