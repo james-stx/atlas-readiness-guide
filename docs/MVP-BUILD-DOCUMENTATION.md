@@ -1316,19 +1316,19 @@ If something breaks:
 - If you experience streaming issues, check the browser console for error events that are now properly handled
 - Session state corruption from undefined tool results has been prevented with null guards
 
-## SSE Stream Issues
+### SSE Stream Issues
 
-### Symptoms
+#### Symptoms
 - Assessment responses freeze mid-generation
 - Incomplete AI responses in chat
 - Stream appears to stop without completion
 
-### Debugging
+#### Debugging
 - Check browser console for SSE stream debug logs
 - Look for 'SSE Event:', 'Stream completed:', and 'Stream ended without complete event' messages
 - Verify if 'complete' event was received from the stream
 
-### Resolution
+#### Resolution
 - Partial content will be automatically saved if stream ends without completion
 - If no content is received, an error message will be displayed
 - Check network connectivity and server-side SSE implementation
@@ -1362,6 +1362,8 @@ The system now handles API rate limits and temporary service unavailability auto
 - If chat remains unresponsive after retries, check network connectivity
 - Monitor browser console for non-retryable error messages
 - Verify API service status if persistent failures occur
+
+**Rate Limit Errors**: If you encounter rate limit errors during testing, the system now provides user-friendly error messages. The conversation agent is configured to use only the 6 most recent messages to stay within token limits. For testing scenarios requiring longer conversation history, you may need to wait for rate limits to reset or consider using a higher-tier API plan.
 
 ### Chat Stream Issues
 
@@ -1503,7 +1505,7 @@ Key decisions made during development and why.
 
 **Classification Accuracy During Chat**: The conversation tools use simplified regex-based classification instead of full LLM classification to maintain streaming performance. This may result in less accurate confidence level assessment for user inputs captured during real-time conversations, though it ensures responsive user experience.
 
-**API Rate Limits**: The system is optimized for Anthropic's rate limits with ~2,000 tokens per message (reduced from ~15,000). Conversation history is limited to 10 messages and system prompts use minimal domain context to stay within the 10,000 input tokens/minute limit.
+**API Rate Limits**: The system is configured to use a maximum of 6 recent messages in conversation history to stay within token limits (~5000 tokens per request) and avoid rate limiting. This may affect conversation context for very long sessions.
 
 **Rate Limit Considerations**: Tool execution is limited to maxSteps:2 to stay within the 10k tokens/min rate limit. This was reduced from the original 5 steps after removing maxSteps entirely caused tool execution failures.
 
@@ -1673,9 +1675,4 @@ If something breaks:
 - **Added Retry Logic**: Implemented automatic retry logic with exponential backoff to handle API rate limits and service unavailability, improving chat reliability when the service is under load
 - **Fixed SSE Stream Hanging**: Resolved chat freezing issue by adding 60-second timeout to stream reads and improving error handling for retryable stream errors
 - **Request Timeout Implementation**: Added 90-second timeout for all chat requests using AbortController to prevent hanging requests, with proper error handling and streaming UI cleanup
-- **SSE Debugging**: Added debug logging and improved error handling for incomplete SSE streams in the assessment context, including tracking completion status and saving partial content when streams end unexpectedly
-- **AI Response Fallback Mechanism**: Added fallback to ensure AI always provides text responses when it only uses tools, preventing silent tool-only interactions
-
----
-
-*
+- **SSE Debugging**: Added debug logging and improved error handling for incomplete
