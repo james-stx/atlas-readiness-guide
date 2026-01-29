@@ -439,6 +439,12 @@ If a user leaves and returns:
 - Lucide React icons: Compass (assistant), User (user), Send, X, Menu
 - Gradient backgrounds for assistant avatar using Tailwind gradient utilities
 
+**Request Timeout Management**
+- Chat requests include a 90-second timeout to prevent hanging
+- Uses AbortController for proper request cancellation
+- Timeout errors are handled gracefully with user-friendly messaging
+- Streaming message cleanup ensures UI state consistency
+
 #### Real-time Communication
 **Real-time Communication**: The SSE (Server-Sent Events) implementation includes robust error handling and buffering of incomplete chunks across TCP packet boundaries to ensure reliable streaming of AI responses and tool execution results.
 
@@ -877,6 +883,12 @@ Sends a user message and streams AI response.
 - `input` events (extracted inputs)
 - `domain_change` events (domain transitions)
 - `complete` event (final message)
+
+**Request Timeout Behavior**
+- All chat requests automatically timeout after 90 seconds
+- Timeout errors return user-friendly error messages
+- AbortSignal is passed through the request chain for proper cancellation
+- Failed/cancelled requests trigger cleanup of streaming UI state
 
 ---
 
@@ -1343,6 +1355,16 @@ The system now handles API rate limits and temporary service unavailability auto
 
 **How to Test**: Start a chat conversation and verify responses stream properly without hanging. If issues persist, check browser network tab for SSE connection status.
 
+**Chat Request Timeouts**
+
+*Issue*: Chat requests hanging or taking too long
+*Expected Behavior*: Requests automatically timeout after 90 seconds with clear error message
+*Troubleshooting*:
+- Check network connectivity and API server status
+- Verify the 90-second timeout is working as expected
+- Confirm streaming message state is properly cleared after timeout
+- Test that users can retry after timeout without UI issues
+
 ### Viewing Logs
 
 #### Local
@@ -1446,6 +1468,9 @@ Key decisions made during development and why.
 | Basic error handling | Some errors unclear | Improve error messages |
 | No offline support | Requires internet | Add PWA features |
 | ~~Chat becomes unresponsive when hitting API rate limits~~ | ~~Service unavailable during high load~~ | ✅ **RESOLVED**: Added retry logic with exponential backoff |
+| Fixed 90-second timeout for all chat requests | No dynamic adjustment based on request complexity | Implement adaptive timeout logic |
+| No retry logic implemented | Users must manually retry failed requests | Add automatic retry functionality |
+| Single timeout value may not be optimal | May not suit all types of chat interactions | Add request-type-specific timeouts |
 
 **Assessment Sessions May Timeout**: Assessment sessions may timeout during extended periods of inactivity
 
@@ -1620,6 +1645,7 @@ If something breaks:
 - **Chat Interface Redesign**: Updated chat interface with simplified header layout (domain-only display), new avatar system (compass icon for assistant, user icon for user), enhanced input controls with character counting, platform-aware keyboard shortcuts (⌘/Ctrl+Enter), and improved visual design with fully rounded avatars and message bubbles
 - **Added Retry Logic**: Implemented automatic retry logic with exponential backoff to handle API rate limits and service unavailability, improving chat reliability when the service is under load
 - **Fixed SSE Stream Hanging**: Resolved chat freezing issue by adding 60-second timeout to stream reads and improving error handling for retryable stream errors
+- **Request Timeout Implementation**: Added 90-second timeout for all chat requests using AbortController to prevent hanging requests, with proper error handling and streaming UI cleanup
 
 ---
 
