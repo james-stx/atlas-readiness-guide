@@ -279,7 +279,7 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
     }
   }, [state.session, state.messages.length]);
 
-  // Helper to check if error is retryable (rate limit, service unavailable)
+  // Helper to check if error is retryable (rate limit, service unavailable, timeout)
   const isRetryableError = (error: unknown): boolean => {
     if (error instanceof Error) {
       const msg = error.message.toLowerCase();
@@ -290,7 +290,8 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
         msg.includes('503') ||
         msg.includes('overloaded') ||
         msg.includes('busy') ||
-        msg.includes('unavailable')
+        msg.includes('unavailable') ||
+        msg.includes('timeout')
       );
     }
     return false;
@@ -298,6 +299,17 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
 
   // Helper to wait with exponential backoff
   const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  // Helper to read from stream with timeout
+  const readWithTimeout = async (
+    reader: ReadableStreamDefaultReader<Uint8Array>,
+    timeoutMs: number
+  ): Promise<ReadableStreamReadResult<Uint8Array>> => {
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error('Stream read timeout')), timeoutMs);
+    });
+    return Promise.race([reader.read(), timeoutPromise]);
+  };
 
   // Send a message with retry logic
   const sendMessageAction = useCallback(
@@ -351,8 +363,11 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
           const decoder = new TextDecoder();
           let buffer = '';
 
+          // 60 second timeout for each chunk read (prevents infinite hang)
+          const READ_TIMEOUT_MS = 60000;
+
           while (true) {
-            const { done, value } = await reader.read();
+            const { done, value } = await readWithTimeout(reader, READ_TIMEOUT_MS);
             if (done) break;
 
             // Append to buffer to handle JSON split across chunks
@@ -400,7 +415,10 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
                   // Check if this is a retryable error from the stream
                   const errorContent = parsed.content || 'A streaming error occurred';
                   if (isRetryableError(new Error(errorContent)) && attempt < MAX_RETRIES) {
-                    throw new Error(errorContent); // Will be caught and retried
+                    // Use a custom error class to distinguish from JSON parse errors
+                    const retryError = new Error(errorContent);
+                    retryError.name = 'RetryableStreamError';
+                    throw retryError;
                   }
                   dispatch({
                     type: 'SET_ERROR',
@@ -409,11 +427,11 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
                   return; // Non-retryable stream error, exit
                 }
               } catch (parseError) {
-                // If it's our thrown retryable error, rethrow it
-                if (parseError instanceof Error && parseError.message !== 'A streaming error occurred') {
+                // Only rethrow if it's our intentional retryable error
+                if (parseError instanceof Error && parseError.name === 'RetryableStreamError') {
                   throw parseError;
                 }
-                // Otherwise it's incomplete JSON — will be handled once full line arrives
+                // Otherwise it's a JSON parse error (incomplete JSON) — ignore and continue
               }
             }
           }
