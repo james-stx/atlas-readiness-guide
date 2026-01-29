@@ -192,8 +192,37 @@ When the domain's key topics are covered, call transitionDomain and announce the
       }
     }
 
-    // Only save and send message if there's actual content
-    // (Sometimes the AI only calls tools without generating text)
+    // If no text was generated (AI only used tools), make a follow-up call
+    // without tools to force a conversational response
+    if (!fullText.trim()) {
+      console.log('[Atlas] No text generated, making follow-up call for response');
+
+      const followUpResult = await streamText({
+        model: anthropic(models.conversation),
+        system: `${SYSTEM_PROMPT}
+
+Current Domain: ${domainConfig.name}
+
+You just recorded the user's input. Now acknowledge what they shared and continue the conversation with a follow-up question or transition to the next topic. Be conversational and encouraging.`,
+        messages: [
+          ...formattedMessages,
+          { role: 'user', content: userMessage },
+          { role: 'assistant', content: '[Input recorded successfully]' },
+        ],
+        maxTokens: modelConfig.conversation.maxTokens,
+        temperature: modelConfig.conversation.temperature,
+        // No tools - force text generation
+      });
+
+      for await (const part of followUpResult.fullStream) {
+        if (part.type === 'text-delta') {
+          fullText += part.textDelta;
+          yield { type: 'text', content: part.textDelta };
+        }
+      }
+    }
+
+    // Save and send the message
     if (fullText.trim()) {
       const assistantMessage = await saveMessage({
         sessionId,
@@ -209,7 +238,8 @@ When the domain's key topics are covered, call transitionDomain and announce the
         data: { message: assistantMessage },
       };
     } else {
-      // No text generated - just signal completion without a message
+      // Still no text - this shouldn't happen but handle gracefully
+      console.error('[Atlas] No text generated even after follow-up call');
       yield {
         type: 'complete',
         data: { message: null },
