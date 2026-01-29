@@ -279,12 +279,35 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
     }
   }, [state.session, state.messages.length]);
 
-  // Send a message
+  // Helper to check if error is retryable (rate limit, service unavailable)
+  const isRetryableError = (error: unknown): boolean => {
+    if (error instanceof Error) {
+      const msg = error.message.toLowerCase();
+      return (
+        msg.includes('rate') ||
+        msg.includes('limit') ||
+        msg.includes('429') ||
+        msg.includes('503') ||
+        msg.includes('overloaded') ||
+        msg.includes('busy') ||
+        msg.includes('unavailable')
+      );
+    }
+    return false;
+  };
+
+  // Helper to wait with exponential backoff
+  const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  // Send a message with retry logic
   const sendMessageAction = useCallback(
     async (content: string) => {
       if (!state.session) {
         throw new Error('No active session');
       }
+
+      const MAX_RETRIES = 3;
+      const BASE_DELAY = 1500; // 1.5 seconds
 
       dispatch({ type: 'SET_LOADING', payload: true });
       dispatch({ type: 'SET_ERROR', payload: null });
@@ -301,111 +324,157 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
       };
       dispatch({ type: 'ADD_MESSAGE', payload: userMessage });
 
-      let receivedComplete = false;
-      let assistantContent = '';
+      let lastError: Error | null = null;
 
-      try {
-        const response = await api.sendMessage(state.session.id, content);
+      for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+        // Show retry message to user (except on first attempt)
+        if (attempt > 0) {
+          const delaySeconds = Math.round((BASE_DELAY * Math.pow(2, attempt - 1)) / 1000);
+          dispatch({
+            type: 'SET_STREAMING_MESSAGE',
+            payload: `Service busy. Retrying in ${delaySeconds}s... (attempt ${attempt + 1}/${MAX_RETRIES + 1})`,
+          });
+          await wait(BASE_DELAY * Math.pow(2, attempt - 1));
+          dispatch({ type: 'CLEAR_STREAMING_MESSAGE' });
+        }
 
-        // Handle SSE streaming
-        const reader = response.body?.getReader();
-        if (!reader) throw new Error('No response body');
+        let receivedComplete = false;
+        let assistantContent = '';
 
-        const decoder = new TextDecoder();
-        let buffer = '';
+        try {
+          const response = await api.sendMessage(state.session.id, content);
 
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
+          // Handle SSE streaming
+          const reader = response.body?.getReader();
+          if (!reader) throw new Error('No response body');
 
-          // Append to buffer to handle JSON split across chunks
-          buffer += decoder.decode(value, { stream: true });
-          const lines = buffer.split('\n');
+          const decoder = new TextDecoder();
+          let buffer = '';
 
-          // Keep the last (potentially incomplete) line in the buffer
-          buffer = lines.pop() || '';
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
 
-          for (const line of lines) {
-            const trimmed = line.trim();
-            if (!trimmed || !trimmed.startsWith('data: ')) continue;
+            // Append to buffer to handle JSON split across chunks
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
 
-            const data = trimmed.slice(6);
-            if (data === '[DONE]') continue;
+            // Keep the last (potentially incomplete) line in the buffer
+            buffer = lines.pop() || '';
 
-            try {
-              const parsed = JSON.parse(data);
+            for (const line of lines) {
+              const trimmed = line.trim();
+              if (!trimmed || !trimmed.startsWith('data: ')) continue;
 
-              if (parsed.type === 'text') {
-                assistantContent += parsed.content;
-                dispatch({
-                  type: 'SET_STREAMING_MESSAGE',
-                  payload: assistantContent,
-                });
-              } else if (parsed.type === 'input' && parsed.input) {
-                dispatch({ type: 'ADD_INPUT', payload: parsed.input });
-              } else if (parsed.type === 'domain_change' && parsed.domain) {
-                dispatch({
-                  type: 'UPDATE_DOMAIN',
-                  payload: parsed.domain,
-                });
-              } else if (parsed.type === 'complete') {
-                receivedComplete = true;
-                // Add final assistant message
-                const message = parsed.data?.message || parsed.message;
-                if (message) {
+              const data = trimmed.slice(6);
+              if (data === '[DONE]') continue;
+
+              try {
+                const parsed = JSON.parse(data);
+
+                if (parsed.type === 'text') {
+                  assistantContent += parsed.content;
                   dispatch({
-                    type: 'ADD_MESSAGE',
-                    payload: message,
+                    type: 'SET_STREAMING_MESSAGE',
+                    payload: assistantContent,
                   });
+                } else if (parsed.type === 'input' && parsed.input) {
+                  dispatch({ type: 'ADD_INPUT', payload: parsed.input });
+                } else if (parsed.type === 'domain_change' && parsed.domain) {
+                  dispatch({
+                    type: 'UPDATE_DOMAIN',
+                    payload: parsed.domain,
+                  });
+                } else if (parsed.type === 'complete') {
+                  receivedComplete = true;
+                  // Add final assistant message
+                  const message = parsed.data?.message || parsed.message;
+                  if (message) {
+                    dispatch({
+                      type: 'ADD_MESSAGE',
+                      payload: message,
+                    });
+                  }
+                  dispatch({ type: 'CLEAR_STREAMING_MESSAGE' });
+                } else if (parsed.type === 'error') {
+                  // Check if this is a retryable error from the stream
+                  const errorContent = parsed.content || 'A streaming error occurred';
+                  if (isRetryableError(new Error(errorContent)) && attempt < MAX_RETRIES) {
+                    throw new Error(errorContent); // Will be caught and retried
+                  }
+                  dispatch({
+                    type: 'SET_ERROR',
+                    payload: errorContent,
+                  });
+                  return; // Non-retryable stream error, exit
                 }
-                dispatch({ type: 'CLEAR_STREAMING_MESSAGE' });
-              } else if (parsed.type === 'error') {
-                dispatch({
-                  type: 'SET_ERROR',
-                  payload: parsed.content || 'A streaming error occurred',
-                });
+              } catch (parseError) {
+                // If it's our thrown retryable error, rethrow it
+                if (parseError instanceof Error && parseError.message !== 'A streaming error occurred') {
+                  throw parseError;
+                }
+                // Otherwise it's incomplete JSON — will be handled once full line arrives
               }
-            } catch {
-              // Incomplete JSON — will be handled once full line arrives
             }
           }
-        }
 
-        // Handle case where stream ended without 'complete' event
-        if (!receivedComplete && assistantContent) {
-          // Add partial content as a message so it's not lost
-          dispatch({
-            type: 'ADD_MESSAGE',
-            payload: {
-              id: `partial-${Date.now()}`,
-              session_id: state.session.id,
-              role: 'assistant',
-              content: assistantContent,
-              metadata: { partial: true },
-              created_at: new Date().toISOString(),
-            },
-          });
+          // Handle case where stream ended without 'complete' event
+          if (!receivedComplete && assistantContent) {
+            // Add partial content as a message so it's not lost
+            dispatch({
+              type: 'ADD_MESSAGE',
+              payload: {
+                id: `partial-${Date.now()}`,
+                session_id: state.session.id,
+                role: 'assistant',
+                content: assistantContent,
+                metadata: { partial: true },
+                created_at: new Date().toISOString(),
+              },
+            });
+            dispatch({
+              type: 'SET_ERROR',
+              payload: 'Response may be incomplete. Please try again if needed.',
+            });
+          } else if (!receivedComplete && !assistantContent) {
+            // No content received - might be retryable
+            if (attempt < MAX_RETRIES) {
+              lastError = new Error('No response received');
+              continue; // Retry
+            }
+            dispatch({
+              type: 'SET_ERROR',
+              payload: 'No response received. The service may be busy — please try again.',
+            });
+          }
+
+          // Success - exit retry loop
+          dispatch({ type: 'SET_LOADING', payload: false });
+          return;
+        } catch (error) {
+          lastError = error instanceof Error ? error : new Error('Failed to send message');
+
+          // Check if we should retry
+          if (isRetryableError(error) && attempt < MAX_RETRIES) {
+            continue; // Retry
+          }
+
+          // Non-retryable error or max retries exceeded
           dispatch({
             type: 'SET_ERROR',
-            payload: 'Response may be incomplete. Please try again if needed.',
+            payload: lastError.message,
           });
-        } else if (!receivedComplete && !assistantContent) {
-          dispatch({
-            type: 'SET_ERROR',
-            payload: 'No response received. The service may be busy — please try again.',
-          });
+          dispatch({ type: 'SET_LOADING', payload: false });
+          throw lastError;
         }
-      } catch (error) {
-        dispatch({
-          type: 'SET_ERROR',
-          payload:
-            error instanceof Error ? error.message : 'Failed to send message',
-        });
-        throw error;
-      } finally {
-        dispatch({ type: 'SET_LOADING', payload: false });
-        dispatch({ type: 'CLEAR_STREAMING_MESSAGE' });
       }
+
+      // If we get here, all retries failed
+      dispatch({
+        type: 'SET_ERROR',
+        payload: lastError?.message || 'Failed after multiple retries. Please try again later.',
+      });
+      dispatch({ type: 'SET_LOADING', payload: false });
     },
     [state.session]
   );
