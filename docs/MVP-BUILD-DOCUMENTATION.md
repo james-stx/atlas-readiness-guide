@@ -1329,6 +1329,20 @@ The system now handles API rate limits and temporary service unavailability auto
 - Monitor browser console for non-retryable error messages
 - Verify API service status if persistent failures occur
 
+### Chat Stream Issues
+
+#### Chat Freezing During Streaming
+**Problem**: Chat appears to freeze or hang during AI response streaming
+
+**Root Cause**: SSE (Server-Sent Events) stream connections can hang without properly closing, causing the reader to wait indefinitely
+
+**Solution**: The system now includes:
+- 60-second timeout on stream read operations
+- Automatic retry logic for timeout and connection errors
+- Improved error handling to distinguish between retryable stream errors and JSON parsing errors
+
+**How to Test**: Start a chat conversation and verify responses stream properly without hanging. If issues persist, check browser network tab for SSE connection status.
+
 ### Viewing Logs
 
 #### Local
@@ -1416,6 +1430,9 @@ Key decisions made during development and why.
 ---
 
 ## 15. Known Limitations & Future Roadmap
+
+### Recently Resolved
+- ✅ **Chat Stream Hanging** (Fixed): SSE streams could hang indefinitely causing chat freeze - now includes timeout handling and improved error recovery
 
 ### Current Limitations
 
@@ -1602,6 +1619,7 @@ If something breaks:
 - **Branding Revert**: Reverted homepage header and headline to original branding - restored 'Atlas by STX Labs' with gradient in header and 'Your Readiness. Revealed.' headline with gradient styling
 - **Chat Interface Redesign**: Updated chat interface with simplified header layout (domain-only display), new avatar system (compass icon for assistant, user icon for user), enhanced input controls with character counting, platform-aware keyboard shortcuts (⌘/Ctrl+Enter), and improved visual design with fully rounded avatars and message bubbles
 - **Added Retry Logic**: Implemented automatic retry logic with exponential backoff to handle API rate limits and service unavailability, improving chat reliability when the service is under load
+- **Fixed SSE Stream Hanging**: Resolved chat freezing issue by adding 60-second timeout to stream reads and improving error handling for retryable stream errors
 
 ---
 
