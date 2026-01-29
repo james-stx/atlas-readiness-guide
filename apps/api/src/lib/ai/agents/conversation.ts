@@ -161,7 +161,9 @@ Current Domain: ${domainConfig.name}
 Domain Description: ${domainConfig.description}
 Key topics: ${domainConfig.keyQuestions.map((q) => q.id).join(', ')}
 
-After the user answers a question, call recordInput with the matching question_id. When the domain's key topics are covered, call transitionDomain.`,
+IMPORTANT: You MUST always respond with conversational text to the user. After the user answers a question, call recordInput to capture their answer, but ALSO acknowledge their response and ask a follow-up question or move the conversation forward. Never just call tools without providing a text response.
+
+When the domain's key topics are covered, call transitionDomain and announce the transition to the user.`,
       messages: [
         ...formattedMessages,
         { role: 'user', content: userMessage },
@@ -190,20 +192,29 @@ After the user answers a question, call recordInput with the matching question_i
       }
     }
 
-    // Save assistant message
-    const assistantMessage = await saveMessage({
-      sessionId,
-      role: 'assistant',
-      content: fullText,
-      metadata: {
-        domain: currentDomain,
-      },
-    });
+    // Only save and send message if there's actual content
+    // (Sometimes the AI only calls tools without generating text)
+    if (fullText.trim()) {
+      const assistantMessage = await saveMessage({
+        sessionId,
+        role: 'assistant',
+        content: fullText,
+        metadata: {
+          domain: currentDomain,
+        },
+      });
 
-    yield {
-      type: 'complete',
-      data: { message: assistantMessage },
-    };
+      yield {
+        type: 'complete',
+        data: { message: assistantMessage },
+      };
+    } else {
+      // No text generated - just signal completion without a message
+      yield {
+        type: 'complete',
+        data: { message: null },
+      };
+    }
   } catch (error) {
     console.error('Conversation error:', error);
 
