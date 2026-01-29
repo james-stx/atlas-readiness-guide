@@ -1312,6 +1312,24 @@ If something breaks:
 - If you experience streaming issues, check the browser console for error events that are now properly handled
 - Session state corruption from undefined tool results has been prevented with null guards
 
+## SSE Stream Issues
+
+### Symptoms
+- Assessment responses freeze mid-generation
+- Incomplete AI responses in chat
+- Stream appears to stop without completion
+
+### Debugging
+- Check browser console for SSE stream debug logs
+- Look for 'SSE Event:', 'Stream completed:', and 'Stream ended without complete event' messages
+- Verify if 'complete' event was received from the stream
+
+### Resolution
+- Partial content will be automatically saved if stream ends without completion
+- If no content is received, an error message will be displayed
+- Check network connectivity and server-side SSE implementation
+- Monitor for network timeouts or connection drops
+
 ### Tool Execution Issues
 
 **Tool Execution Issues**: If the AI chat stops responding after calling tools, verify that maxSteps is properly configured. Without maxSteps, the AI SDK may call tools but never receive results, causing non-Error objects to be thrown during stream iteration. Check the chat route error handling for proper extraction of error messages from non-Error thrown objects.
@@ -1471,6 +1489,11 @@ Key decisions made during development and why.
 | Fixed 90-second timeout for all chat requests | No dynamic adjustment based on request complexity | Implement adaptive timeout logic |
 | No retry logic implemented | Users must manually retry failed requests | Add automatic retry functionality |
 | Single timeout value may not be optimal | May not suit all types of chat interactions | Add request-type-specific timeouts |
+
+### Current Debugging Measures
+- Debug logging has been added to SSE streams to help diagnose response freeze issues
+- Temporary console.log statements are in place for development troubleshooting
+- These debug logs should be removed or made configurable before production deployment
 
 **Assessment Sessions May Timeout**: Assessment sessions may timeout during extended periods of inactivity
 
@@ -1646,6 +1669,7 @@ If something breaks:
 - **Added Retry Logic**: Implemented automatic retry logic with exponential backoff to handle API rate limits and service unavailability, improving chat reliability when the service is under load
 - **Fixed SSE Stream Hanging**: Resolved chat freezing issue by adding 60-second timeout to stream reads and improving error handling for retryable stream errors
 - **Request Timeout Implementation**: Added 90-second timeout for all chat requests using AbortController to prevent hanging requests, with proper error handling and streaming UI cleanup
+- **SSE Debugging**: Added debug logging and improved error handling for incomplete SSE streams in the assessment context, including tracking completion status and saving partial content when streams end unexpectedly
 
 ---
 
