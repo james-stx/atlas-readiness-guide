@@ -20,9 +20,9 @@ import type { DomainType, ChatMessage } from '@atlas/types';
 function createConversationTools(sessionId: string, currentDomain: DomainType) {
   return {
     recordInput: tool({
-      description: 'Record a captured input from the user with confidence classification. Call this whenever the user provides substantive information about any topic.',
+      description: 'Record a captured input from the user. IMPORTANT: The questionId MUST be one of the exact IDs listed in the system prompt for the current domain (e.g., market_driver, target_segment, product_description, etc.). Do NOT create new IDs.',
       parameters: z.object({
-        questionId: z.string().describe('Identifier for the question being answered (e.g. market_driver, target_segment, etc.)'),
+        questionId: z.string().describe('MUST be an exact questionId from the current domain list (e.g., market_driver, target_segment, competition, product_description, us_product_fit, localization, competitive_advantage, product_validation, gtm_strategy, etc.)'),
         userResponse: z.string().describe('The user response to capture'),
         summary: z.string().describe('Brief summary of what was captured'),
       }),
@@ -155,17 +155,26 @@ export async function* streamConversation(
     // maxSteps: 2 allows the model to call tools AND see results in a follow-up turn.
     // This uses at most 2 API calls per message (~6,500 tokens total),
     // safely within the 10,000 input tokens/min rate limit at conversational pace.
+    // Build explicit list of question IDs for this domain
+    const questionIdList = domainConfig.keyQuestions
+      .map((q) => `- "${q.id}": ${q.question}`)
+      .join('\n');
+
     const result = await streamText({
       model: anthropic(models.conversation),
       system: `${SYSTEM_PROMPT}
 
 Current Domain: ${domainConfig.name}
 Domain Description: ${domainConfig.description}
-Key topics: ${domainConfig.keyQuestions.map((q) => q.id).join(', ')}
 
-IMPORTANT: You MUST always respond with conversational text to the user. After the user answers a question, call recordInput to capture their answer, but ALSO acknowledge their response and ask a follow-up question or move the conversation forward. Never just call tools without providing a text response.
+VALID QUESTION IDs FOR THIS DOMAIN (you MUST use these exact IDs when calling recordInput):
+${questionIdList}
 
-When the domain's key topics are covered, call transitionDomain and announce the transition to the user.`,
+CRITICAL INSTRUCTIONS:
+1. When the user provides information, call recordInput with the EXACT questionId from the list above. Do NOT make up new IDs.
+2. You MUST always respond with conversational text. Never just call tools without also providing a spoken response.
+3. After covering 3-4 topics in this domain, call transitionDomain to move to the next domain. Announce the transition naturally in your response.
+4. If the user's response covers multiple topics, you can call recordInput multiple times with different questionIds.`,
       messages: [
         ...formattedMessages,
         { role: 'user', content: userMessage },
