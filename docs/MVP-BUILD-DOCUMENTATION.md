@@ -467,6 +467,8 @@ The conversation agent uses Vercel AI SDK's `streamText()` with tool support:
 
 **Tool Execution Performance**: Tool execution during conversations uses fast regex-based classification (`quickClassify()`) instead of LLM-based classification to prevent blocking the Server-Sent Events (SSE) stream. This ensures real-time text streaming continues uninterrupted during input recording and domain transitions. Full LLM classification is reserved for non-real-time operations to maintain optimal user experience.
 
+**AI Response Flow Enhancement**: The conversation agent now includes a fallback mechanism to ensure users always receive text responses. When the AI only uses tools (like recordInput or transitionDomain) without generating conversational text, the system automatically makes a follow-up API call without tools to force a conversational response. This prevents silent tool-only interactions where users might not receive feedback.
+
 #### Database (Supabase)
 - **Purpose**: Persistent data storage
 - **Technology**: PostgreSQL via Supabase
@@ -1270,6 +1272,8 @@ If something breaks:
 3. Check readiness panel becomes full-screen on mobile
 4. Test touch interactions on domain pills and accordions
 
+**Testing AI Response Consistency**: When testing conversations, verify that users always receive text responses even when the AI primarily uses tools. If you notice silent responses where only tool execution occurs, this should trigger the automatic fallback mechanism to generate a follow-up conversational response.
+
 ### Common Issues & Fixes
 
 #### "Failed to fetch" error on start page
@@ -1670,8 +1674,8 @@ If something breaks:
 - **Fixed SSE Stream Hanging**: Resolved chat freezing issue by adding 60-second timeout to stream reads and improving error handling for retryable stream errors
 - **Request Timeout Implementation**: Added 90-second timeout for all chat requests using AbortController to prevent hanging requests, with proper error handling and streaming UI cleanup
 - **SSE Debugging**: Added debug logging and improved error handling for incomplete SSE streams in the assessment context, including tracking completion status and saving partial content when streams end unexpectedly
+- **AI Response Fallback Mechanism**: Added fallback to ensure AI always provides text responses when it only uses tools, preventing silent tool-only interactions
 
 ---
 
-*Documentation generated January 2026*
-*Atlas Readiness Guide MVP v1.0*
+*
