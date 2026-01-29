@@ -301,6 +301,9 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
       };
       dispatch({ type: 'ADD_MESSAGE', payload: userMessage });
 
+      let receivedComplete = false;
+      let assistantContent = '';
+
       try {
         const response = await api.sendMessage(state.session.id, content);
 
@@ -309,7 +312,6 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
         if (!reader) throw new Error('No response body');
 
         const decoder = new TextDecoder();
-        let assistantContent = '';
         let buffer = '';
 
         while (true) {
@@ -347,6 +349,7 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
                   payload: parsed.domain,
                 });
               } else if (parsed.type === 'complete') {
+                receivedComplete = true;
                 // Add final assistant message
                 const message = parsed.data?.message || parsed.message;
                 if (message) {
@@ -367,6 +370,31 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
             }
           }
         }
+
+        // Handle case where stream ended without 'complete' event
+        if (!receivedComplete && assistantContent) {
+          // Add partial content as a message so it's not lost
+          dispatch({
+            type: 'ADD_MESSAGE',
+            payload: {
+              id: `partial-${Date.now()}`,
+              session_id: state.session.id,
+              role: 'assistant',
+              content: assistantContent,
+              metadata: { partial: true },
+              created_at: new Date().toISOString(),
+            },
+          });
+          dispatch({
+            type: 'SET_ERROR',
+            payload: 'Response may be incomplete. Please try again if needed.',
+          });
+        } else if (!receivedComplete && !assistantContent) {
+          dispatch({
+            type: 'SET_ERROR',
+            payload: 'No response received. The service may be busy — please try again.',
+          });
+        }
       } catch (error) {
         dispatch({
           type: 'SET_ERROR',
@@ -376,6 +404,7 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
         throw error;
       } finally {
         dispatch({ type: 'SET_LOADING', payload: false });
+        dispatch({ type: 'CLEAR_STREAMING_MESSAGE' });
       }
     },
     [state.session]
