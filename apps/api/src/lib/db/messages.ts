@@ -75,15 +75,27 @@ export async function getRecentMessages(
 }
 
 /**
- * Formats messages for LLM context
+ * Formats messages for LLM context.
+ * Consolidates consecutive messages of the same role to avoid
+ * "Multiple assistant messages in block" errors from Anthropic.
  */
 export function formatMessagesForLLM(
   messages: ChatMessage[]
 ): Array<{ role: 'user' | 'assistant'; content: string }> {
-  return messages
-    .filter((m) => m.role !== 'system')
-    .map((m) => ({
-      role: m.role as 'user' | 'assistant',
-      content: m.content,
-    }));
+  const filtered = messages.filter((m) => m.role !== 'system');
+  const result: Array<{ role: 'user' | 'assistant'; content: string }> = [];
+
+  for (const msg of filtered) {
+    const role = msg.role as 'user' | 'assistant';
+    const lastMsg = result[result.length - 1];
+
+    // If same role as previous, concatenate content
+    if (lastMsg && lastMsg.role === role) {
+      lastMsg.content += '\n\n' + msg.content;
+    } else {
+      result.push({ role, content: msg.content });
+    }
+  }
+
+  return result;
 }

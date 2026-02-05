@@ -1,5 +1,6 @@
 import type { DomainType, ConfidenceLevel, Input } from '@atlas/types';
-import type { DomainStatus } from '@/components/progress/domain-pill';
+
+export type DomainStatus = 'not_started' | 'in_progress' | 'adequate';
 
 // ============================================
 // Constants

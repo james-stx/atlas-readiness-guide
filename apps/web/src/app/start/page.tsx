@@ -34,7 +34,7 @@ export default function StartPage() {
   // Redirect to chat once session is active
   useEffect(() => {
     if (session) {
-      router.push('/chat');
+      router.push('/workspace');
     }
   }, [session, router]);
 

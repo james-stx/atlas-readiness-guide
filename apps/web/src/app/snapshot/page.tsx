@@ -107,8 +107,8 @@ export default function SnapshotPage() {
       <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-600 mb-4">{error}</p>
-          <Link href="/chat" className="text-accent-600 hover:underline">
-            Return to assessment
+          <Link href="/workspace" className="text-accent-600 hover:underline">
+            Return to workspace
           </Link>
         </div>
       </div>
@@ -121,8 +121,8 @@ export default function SnapshotPage() {
       <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
         <div className="text-center">
           <p className="text-neutral-600 mb-4">No snapshot available yet.</p>
-          <Link href="/chat" className="text-accent-600 hover:underline">
-            Complete your assessment
+          <Link href="/workspace" className="text-accent-600 hover:underline">
+            Complete your assessment in workspace
           </Link>
         </div>
       </div>
@@ -135,11 +135,11 @@ export default function SnapshotPage() {
       <header className="bg-white/80 backdrop-blur-sm border-b border-neutral-100 sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link
-            href="/chat"
+            href="/workspace"
             className="flex items-center gap-2 text-neutral-600 hover:text-neutral-900 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span className="text-sm">Back to Chat</span>
+            <span className="text-sm">Back to Workspace</span>
           </Link>
           <div className="text-sm text-neutral-500">
             {session.email}
