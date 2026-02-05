@@ -198,7 +198,8 @@ turbo.json
 ## Recent Commits
 
 ```
-577f292 Redesign frontend to 3-panel workspace layout (V2)
+782e14f Add post-commit hook to auto-update CLAUDE.md
+c3a9db4 Redesign frontend to 3-panel workspace layout (V2)
 408bf8a docs: auto-update MVP documentation [skip ci]
 c668263 Fix question ID matching and domain transitions
 4c15a14 docs: auto-update MVP documentation [skip ci]
@@ -207,6 +208,5 @@ c668263 Fix question ID matching and domain transitions
 7b6f923 Add fallback API call when AI generates no text
 2f8e304 Fix AI sometimes responding with only tools and no text
 c1c92be docs: auto-update MVP documentation [skip ci]
-28f4358 Add debug logging and handle incomplete SSE streams
 ```
 <!-- /AUTO:RECENT_CHANGES -->
