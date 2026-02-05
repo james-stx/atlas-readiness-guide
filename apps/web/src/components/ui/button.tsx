@@ -4,34 +4,34 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-all duration-fast focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-40',
+  'inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-all duration-fast focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-40',
   {
     variants: {
       variant: {
-        // Primary - dark background (for non-accent CTAs)
+        // Primary - warm dark background
         default:
-          'bg-neutral-900 text-white hover:bg-neutral-800 active:scale-[0.98] shadow-soft hover:shadow-medium',
-        // Accent - teal for key CTAs (V2 primary)
+          'bg-warm-900 text-white hover:bg-warm-800 active:scale-[0.98] shadow-soft hover:shadow-medium',
+        // Accent - Notion blue for key CTAs
         accent:
-          'bg-accent-600 text-white hover:bg-accent-700 active:scale-[0.98] shadow-soft hover:shadow-medium',
+          'bg-accent text-white hover:bg-accent-700 active:scale-[0.98] shadow-soft hover:shadow-medium',
         // Destructive
         destructive:
-          'bg-red-600 text-white hover:bg-red-700 active:scale-[0.98]',
-        // Outline / Secondary (V2 secondary)
+          'bg-danger text-white hover:bg-red-700 active:scale-[0.98]',
+        // Outline / Secondary
         outline:
-          'border border-[var(--border-primary)] bg-transparent text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] hover:border-[var(--border-secondary)] active:scale-[0.98]',
-        // Secondary - subtle background
+          'border border-warm-200 bg-transparent text-warm-900 hover:bg-warm-150 hover:border-warm-300 active:scale-[0.98]',
+        // Secondary - subtle warm background
         secondary:
-          'bg-neutral-100 text-neutral-900 hover:bg-neutral-200 active:scale-[0.98]',
-        // Ghost (V2 ghost)
+          'bg-warm-100 text-warm-900 hover:bg-warm-150 active:scale-[0.98]',
+        // Ghost
         ghost:
-          'text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] hover:text-[var(--text-primary)]',
+          'text-warm-700 hover:bg-warm-150 hover:text-warm-900',
         // Danger ghost
         danger:
           'text-danger hover:bg-danger-bg',
         // Link - text only
         link:
-          'text-accent-600 underline-offset-4 hover:underline p-0 h-auto',
+          'text-accent underline-offset-4 hover:underline p-0 h-auto',
       },
       size: {
         // V2 specs

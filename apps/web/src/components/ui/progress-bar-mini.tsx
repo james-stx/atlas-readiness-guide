@@ -26,7 +26,7 @@ export function ProgressBarMini({
   return (
     <div className={cn('flex items-center gap-2', className)}>
       <div
-        className="h-1.5 rounded-full bg-[var(--border-primary)]"
+        className="h-1.5 rounded-full bg-warm-200"
         style={{ width }}
         role="progressbar"
         aria-valuenow={percent}
@@ -34,12 +34,12 @@ export function ProgressBarMini({
         aria-valuemax={100}
       >
         <div
-          className="h-full rounded-full bg-accent-600 transition-[width] duration-slow ease-out"
+          className="h-full rounded-full bg-accent transition-[width] duration-slow ease-out"
           style={{ width: `${percent}%` }}
         />
       </div>
       {showLabel && (
-        <span className="text-caption text-[var(--text-tertiary)] tabular-nums">
+        <span className="text-ws-caption text-warm-500 tabular-nums">
           {labelFormat === 'fraction' && fractionParts
             ? `${fractionParts.current}/${fractionParts.total}`
             : `${percent}%`}

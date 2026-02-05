@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { OverflowMenu } from '@/components/ui/overflow-menu';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import type { Input } from '@atlas/types';
-import { getTopicLabel } from '@/lib/progress';
+import { getTopicLabel, getTopicConfig } from '@/lib/progress';
 
 interface CategoryCardProps {
   input: Input;
@@ -28,18 +28,19 @@ export function CategoryCard({
   const [isExpanded, setIsExpanded] = useState(false);
   const [showConfirmRemove, setShowConfirmRemove] = useState(false);
   const label = getTopicLabel(input.question_id);
-  const preview = input.user_response.length > 35
-    ? input.user_response.slice(0, 35) + '...'
+  const topicConfig = getTopicConfig(input.question_id);
+  const preview = input.user_response.length > 50
+    ? input.user_response.slice(0, 50) + '...'
     : input.user_response;
 
   return (
     <>
       <div
         className={cn(
-          'rounded-lg border transition-all duration-normal',
+          'rounded-lg border transition-all duration-fast',
           isExpanded
-            ? 'border-[var(--border-secondary)] rounded-xl'
-            : 'border-[var(--border-primary)] hover:border-[var(--border-secondary)]',
+            ? 'border-warm-300 bg-white shadow-soft'
+            : 'border-warm-200 hover:border-warm-300',
           isHighlighted && 'animate-card-highlight'
         )}
       >
@@ -52,27 +53,36 @@ export function CategoryCard({
         >
           <ChevronRight
             className={cn(
-              'h-4 w-4 shrink-0 text-[var(--text-tertiary)] transition-transform duration-normal',
+              'h-4 w-4 shrink-0 text-warm-400 transition-transform duration-fast',
               isExpanded && 'rotate-90'
             )}
           />
-          <span className="flex-1 truncate text-body font-medium text-[var(--text-primary)]">
-            {label}
-          </span>
-          {!isExpanded && (
-            <span className="hidden max-w-[180px] truncate text-body-sm text-[var(--text-secondary)] sm:block">
-              &ldquo;{preview}&rdquo;
+          <div className="flex-1 min-w-0">
+            <span className="block truncate text-ws-body font-medium text-warm-900">
+              {label}
             </span>
-          )}
+            {!isExpanded && (
+              <span className="block truncate text-ws-body-sm text-warm-500">
+                {preview}
+              </span>
+            )}
+          </div>
           <ConfidenceBadge level={input.confidence_level} />
         </button>
 
         {/* Expanded view */}
         {isExpanded && (
-          <div className="border-t border-[var(--border-primary)] px-5 py-4 animate-fade-in">
+          <div className="border-t border-warm-200 px-5 py-4 animate-fade-in">
+            {/* Topic description */}
+            {topicConfig?.description && (
+              <p className="mb-3 text-ws-body-sm text-warm-500">
+                {topicConfig.description}
+              </p>
+            )}
+
             {/* User input quote */}
-            <div className="rounded-lg border-l-[3px] border-accent-600 bg-[var(--bg-secondary)] px-4 py-3">
-              <p className="text-body text-[var(--text-primary)]">
+            <div className="rounded-lg border-l-[3px] border-accent bg-warm-50 px-4 py-3">
+              <p className="text-ws-body text-warm-800">
                 &ldquo;{input.user_response}&rdquo;
               </p>
             </div>
@@ -81,7 +91,7 @@ export function CategoryCard({
             <div className="mt-3 flex items-center gap-2">
               <ConfidenceBadge level={input.confidence_level} />
               {input.confidence_rationale && (
-                <span className="text-caption text-[var(--text-tertiary)]">
+                <span className="text-ws-caption text-warm-500">
                   — {input.confidence_rationale}
                 </span>
               )}

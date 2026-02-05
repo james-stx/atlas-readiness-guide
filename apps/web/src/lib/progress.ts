@@ -16,42 +16,148 @@ export const DOMAINS: { key: DomainType; label: string; shortLabel: string }[] =
   { key: 'financials', label: 'Financials', shortLabel: 'F' },
 ];
 
+export interface TopicConfig {
+  id: string;
+  label: string;
+  description: string;
+}
+
 /** Key topics by domain - IDs must match question_ids in apps/api/src/lib/ai/prompts/domains.ts */
-export const DOMAIN_TOPICS: Record<DomainType, { id: string; label: string }[]> = {
+export const DOMAIN_TOPICS: Record<DomainType, TopicConfig[]> = {
   market: [
-    { id: 'market_driver', label: 'Why expand to the U.S.?' },
-    { id: 'target_segment', label: 'Target customer profile' },
-    { id: 'market_size', label: 'Market size estimate' },
-    { id: 'competition', label: 'Competitive landscape' },
-    { id: 'existing_us_customers', label: 'Existing U.S. presence' },
+    {
+      id: 'market_driver',
+      label: 'Why expand to the U.S.?',
+      description: 'Your strategic rationale and timing for entering the U.S. market.',
+    },
+    {
+      id: 'target_segment',
+      label: 'Target customer profile',
+      description: 'Who you will sell to: company size, industry, buyer persona.',
+    },
+    {
+      id: 'market_size',
+      label: 'Market size estimate',
+      description: 'Total addressable market and serviceable market in the U.S.',
+    },
+    {
+      id: 'competition',
+      label: 'Competitive landscape',
+      description: 'Key competitors and how you differentiate in the U.S. market.',
+    },
+    {
+      id: 'existing_us_customers',
+      label: 'Existing U.S. presence',
+      description: 'Any current U.S. customers, pilots, or inbound interest.',
+    },
   ],
   product: [
-    { id: 'product_description', label: 'What you\'re selling' },
-    { id: 'us_product_fit', label: 'Fit for U.S. market' },
-    { id: 'localization', label: 'Localization needs' },
-    { id: 'competitive_advantage', label: 'Competitive advantage' },
-    { id: 'product_validation', label: 'Product-market fit evidence' },
+    {
+      id: 'product_description',
+      label: 'What you\'re selling',
+      description: 'Core product/service and the problem it solves.',
+    },
+    {
+      id: 'us_product_fit',
+      label: 'Fit for U.S. market',
+      description: 'How well your product meets U.S. customer expectations.',
+    },
+    {
+      id: 'localization',
+      label: 'Localization needs',
+      description: 'Language, compliance, and cultural adaptations required.',
+    },
+    {
+      id: 'competitive_advantage',
+      label: 'Competitive advantage',
+      description: 'What makes you hard to replicate or beat in the U.S.',
+    },
+    {
+      id: 'product_validation',
+      label: 'Product-market fit evidence',
+      description: 'Proof points: metrics, testimonials, case studies.',
+    },
   ],
   gtm: [
-    { id: 'gtm_strategy', label: 'Go-to-market approach' },
-    { id: 'sales_presence', label: 'U.S. sales presence' },
-    { id: 'pricing', label: 'Pricing strategy' },
-    { id: 'marketing_channels', label: 'Marketing channels' },
-    { id: 'sales_cycle', label: 'Sales cycle expectations' },
+    {
+      id: 'gtm_strategy',
+      label: 'Go-to-market approach',
+      description: 'How you plan to acquire customers: direct, channel, PLG.',
+    },
+    {
+      id: 'sales_presence',
+      label: 'U.S. sales presence',
+      description: 'Sales team plans: remote, local hires, or partners.',
+    },
+    {
+      id: 'pricing',
+      label: 'Pricing strategy',
+      description: 'How pricing compares to competitors and home market.',
+    },
+    {
+      id: 'marketing_channels',
+      label: 'Marketing channels',
+      description: 'Primary channels for awareness and lead generation.',
+    },
+    {
+      id: 'sales_cycle',
+      label: 'Sales cycle expectations',
+      description: 'Expected time from first contact to closed deal.',
+    },
   ],
   operations: [
-    { id: 'support_coverage', label: 'Customer support coverage' },
-    { id: 'legal_entity', label: 'U.S. legal entity' },
-    { id: 'data_compliance', label: 'Compliance & security' },
-    { id: 'infrastructure', label: 'Technical infrastructure' },
-    { id: 'partnerships', label: 'U.S. partnerships' },
+    {
+      id: 'support_coverage',
+      label: 'Customer support coverage',
+      description: 'How you will provide timely support across U.S. time zones.',
+    },
+    {
+      id: 'legal_entity',
+      label: 'U.S. legal entity',
+      description: 'Plans for incorporating a U.S. subsidiary.',
+    },
+    {
+      id: 'data_compliance',
+      label: 'Compliance & security',
+      description: 'Data privacy, SOC 2, HIPAA, or industry-specific requirements.',
+    },
+    {
+      id: 'infrastructure',
+      label: 'Technical infrastructure',
+      description: 'U.S. hosting, latency, and reliability considerations.',
+    },
+    {
+      id: 'partnerships',
+      label: 'U.S. partnerships',
+      description: 'Strategic partners, integrations, or channel relationships.',
+    },
   ],
   financials: [
-    { id: 'expansion_budget', label: 'Expansion budget' },
-    { id: 'runway', label: 'Runway impact' },
-    { id: 'funding_plans', label: 'Funding status' },
-    { id: 'revenue_timeline', label: 'Revenue expectations' },
-    { id: 'break_even', label: 'Break-even timeline' },
+    {
+      id: 'expansion_budget',
+      label: 'Expansion budget',
+      description: 'How much you can allocate to U.S. expansion.',
+    },
+    {
+      id: 'runway',
+      label: 'Runway impact',
+      description: 'How expansion affects your cash runway.',
+    },
+    {
+      id: 'funding_plans',
+      label: 'Funding status',
+      description: 'Current funding and plans for future rounds.',
+    },
+    {
+      id: 'revenue_timeline',
+      label: 'Revenue expectations',
+      description: 'When you expect first U.S. revenue and growth targets.',
+    },
+    {
+      id: 'break_even',
+      label: 'Break-even timeline',
+      description: 'When U.S. operations should become profitable.',
+    },
   ],
 };
 
@@ -217,6 +323,17 @@ export function getTopicLabel(questionId: string): string {
 }
 
 /**
+ * Get the full topic config for a question_id.
+ */
+export function getTopicConfig(questionId: string): TopicConfig | null {
+  for (const domain of Object.values(DOMAIN_TOPICS)) {
+    const topic = domain.find((t) => t.id === questionId);
+    if (topic) return topic;
+  }
+  return null;
+}
+
+/**
  * Get gap suggestions: uncovered high-impact topics.
  * Returns up to maxSuggestions items.
  */
@@ -263,31 +380,31 @@ export const READINESS_CONFIG: Record<
     title: 'Getting Started',
     message:
       'Keep going! More information will make your snapshot more useful.',
-    color: 'text-slate-500',
-    bgColor: 'bg-slate-50',
-    iconBgColor: 'bg-slate-100',
+    color: 'text-warm-500',
+    bgColor: 'bg-warm-50',
+    iconBgColor: 'bg-warm-100',
   },
   partial: {
     title: 'Making Progress',
     message:
       "You're building a foundation. A few more details would help.",
-    color: 'text-amber-600',
-    bgColor: 'bg-amber-50',
-    iconBgColor: 'bg-amber-100',
+    color: 'text-confidence-medium',
+    bgColor: 'bg-confidence-medium-bg',
+    iconBgColor: 'bg-confidence-medium-bg',
   },
   good: {
     title: 'Looking Good',
     message:
       'You have enough for a useful snapshot. Feel free to add more or generate now.',
-    color: 'text-green-600',
-    bgColor: 'bg-green-50',
-    iconBgColor: 'bg-green-100',
+    color: 'text-confidence-high',
+    bgColor: 'bg-confidence-high-bg',
+    iconBgColor: 'bg-confidence-high-bg',
   },
   excellent: {
     title: 'Excellent Coverage',
     message: 'Great work! Your snapshot will be comprehensive.',
-    color: 'text-emerald-600',
-    bgColor: 'bg-emerald-50',
-    iconBgColor: 'bg-emerald-100',
+    color: 'text-confidence-high',
+    bgColor: 'bg-confidence-high-bg',
+    iconBgColor: 'bg-confidence-high-bg',
   },
 };

@@ -1,27 +1,34 @@
 'use client';
 
 import { cn } from '@/lib/utils';
+import { getTopicConfig } from '@/lib/progress';
 
 interface NotStartedCardProps {
   label: string;
+  topicId?: string;
   onClick: () => void;
 }
 
-export function NotStartedCard({ label, onClick }: NotStartedCardProps) {
+export function NotStartedCard({ label, topicId, onClick }: NotStartedCardProps) {
+  const topicConfig = topicId ? getTopicConfig(topicId) : null;
+
   return (
     <button
       onClick={onClick}
       className={cn(
-        'flex w-full items-center justify-between rounded-lg border border-dashed border-[var(--border-primary)] px-4 py-2.5',
-        'text-left transition-all duration-normal',
-        'hover:border-solid hover:border-[var(--border-secondary)] hover:cursor-pointer'
+        'flex w-full items-start gap-3 rounded-lg border border-dashed border-warm-200 px-4 py-3',
+        'text-left transition-all duration-fast',
+        'hover:border-solid hover:border-warm-300 hover:bg-warm-50 hover:cursor-pointer'
       )}
     >
-      <div className="flex items-center gap-2">
-        <span className="text-[10px] text-[var(--text-tertiary)]">○</span>
-        <span className="text-body text-[var(--text-tertiary)]">{label}</span>
+      <span className="mt-0.5 h-3 w-3 shrink-0 rounded-full border border-warm-300" />
+      <div className="flex-1 min-w-0">
+        <span className="text-ws-body font-medium text-warm-700">{label}</span>
+        {topicConfig?.description && (
+          <p className="mt-0.5 text-ws-body-sm text-warm-500">{topicConfig.description}</p>
+        )}
       </div>
-      <span className="text-caption text-[var(--text-tertiary)]">Not Started</span>
+      <span className="shrink-0 text-ws-caption text-warm-400">Click to start</span>
     </button>
   );
 }

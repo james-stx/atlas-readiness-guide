@@ -17,7 +17,7 @@ export function MobileTabBar() {
 
   return (
     <nav
-      className="flex border-t border-[var(--border-primary)] bg-white safe-area-bottom"
+      className="flex border-t border-warm-200 bg-white safe-area-bottom"
       role="tablist"
       aria-label="Workspace navigation"
     >
@@ -30,17 +30,15 @@ export function MobileTabBar() {
             key={tab.key}
             onClick={() => setMobileTab(tab.key)}
             className={cn(
-              'relative flex flex-1 flex-col items-center gap-0.5 py-2 transition-colors',
-              isActive
-                ? 'text-accent-600'
-                : 'text-[var(--text-tertiary)]'
+              'relative flex flex-1 flex-col items-center gap-0.5 py-2 transition-colors duration-fast',
+              isActive ? 'text-accent' : 'text-warm-400'
             )}
             role="tab"
             aria-selected={isActive}
             aria-controls={`panel-${tab.key}`}
           >
             {isActive && (
-              <span className="absolute top-0 h-0.5 w-12 rounded-full bg-accent-600" />
+              <span className="absolute top-0 h-0.5 w-12 rounded-full bg-accent" />
             )}
             <Icon className="h-5 w-5" />
             <span className="text-[10px] font-medium">{tab.label}</span>

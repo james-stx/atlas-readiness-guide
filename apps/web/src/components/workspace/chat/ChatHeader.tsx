@@ -13,13 +13,13 @@ export function ChatHeader({ domain, onClose }: ChatHeaderProps) {
   const label = domain ? DOMAIN_LABELS[domain] : 'Chat';
 
   return (
-    <div className="flex h-12 items-center justify-between border-b border-[var(--border-primary)] bg-white px-4">
-      <span className="text-body font-medium text-[var(--text-primary)]">
+    <div className="flex h-12 items-center justify-between border-b border-warm-200 bg-white px-4">
+      <span className="text-ws-body font-medium text-warm-900">
         Chat — {label}
       </span>
       <button
         onClick={onClose}
-        className="flex h-7 w-7 items-center justify-center rounded-md text-[var(--text-tertiary)] transition-colors hover:bg-[var(--bg-tertiary)] hover:text-[var(--text-secondary)]"
+        className="flex h-7 w-7 items-center justify-center rounded-lg text-warm-400 transition-colors duration-fast hover:bg-warm-150 hover:text-warm-600"
         aria-label="Close chat panel"
       >
         <X className="h-4 w-4" />

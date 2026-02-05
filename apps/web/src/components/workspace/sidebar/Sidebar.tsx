@@ -20,12 +20,12 @@ export function Sidebar() {
 
   return (
     <nav
-      className="flex h-full w-sidebar flex-col border-r border-[var(--border-primary)] bg-[var(--bg-secondary)]"
+      className="flex h-full w-sidebar flex-col border-r border-warm-200 bg-warm-100"
       aria-label="Assessment navigation"
     >
-      {/* Header */}
-      <div className="px-3 pt-4 pb-2">
-        <span className="text-overline uppercase tracking-widest text-[var(--text-tertiary)]">
+      {/* Section header */}
+      <div className="px-4 pt-4 pb-2">
+        <span className="text-ws-caption-sm uppercase tracking-wider text-warm-500">
           Assessment
         </span>
       </div>
@@ -54,7 +54,7 @@ export function Sidebar() {
                 onSelect={() => selectDomain(domain.key)}
                 onToggleExpand={() => toggleDomainExpand(domain.key)}
               >
-                <div className="relative ml-2">
+                <div className="ml-2">
                   {topics.map((topic, i) => (
                     <SidebarTopicItem
                       key={topic.id}

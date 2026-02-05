@@ -19,10 +19,10 @@ export function ContentDomainHeader({ domain, count }: ContentDomainHeaderProps)
     <div className="mb-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-h2-workspace text-[var(--text-primary)]">
+          <h2 className="text-ws-display text-warm-900">
             {label} Readiness
           </h2>
-          <p className="mt-1 text-body text-[var(--text-secondary)]">
+          <p className="mt-1 text-ws-body text-warm-600">
             {description}
           </p>
         </div>

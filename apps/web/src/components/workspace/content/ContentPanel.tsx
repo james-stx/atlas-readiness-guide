@@ -93,6 +93,7 @@ export function ContentPanel() {
                     ) : (
                       <NotStartedCard
                         label={topic.label}
+                        topicId={topic.id}
                         onClick={() => {
                           selectCategory(selectedDomain, topic.id);
                           openChat(selectedDomain);

@@ -17,14 +17,13 @@ interface SidebarDomainItemProps {
   children?: React.ReactNode;
 }
 
-const statusIcons: Record<DomainStatus, { icon: string; className: string }> = {
-  adequate: { icon: '●', className: 'text-accent-600' },
-  in_progress: { icon: '◐', className: 'text-warm-600' },
-  not_started: { icon: '○', className: 'text-[var(--text-tertiary)]' },
+const statusDot: Record<DomainStatus, string> = {
+  adequate: 'bg-confidence-high',
+  in_progress: 'bg-confidence-medium',
+  not_started: 'bg-warm-300',
 };
 
 export function SidebarDomainItem({
-  domain,
   label,
   status,
   isSelected,
@@ -34,8 +33,6 @@ export function SidebarDomainItem({
   onToggleExpand,
   children,
 }: SidebarDomainItemProps) {
-  const statusConfig = statusIcons[status];
-
   return (
     <div>
       <button
@@ -44,10 +41,11 @@ export function SidebarDomainItem({
           if (!isExpanded) onToggleExpand();
         }}
         className={cn(
-          'group flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left transition-colors',
+          'group flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left',
+          'transition-colors duration-fast',
           isSelected
-            ? 'border-l-2 border-accent-600 bg-accent-50 text-accent-700'
-            : 'hover:bg-[var(--bg-tertiary)]'
+            ? 'bg-warm-150 text-warm-900'
+            : 'text-warm-800 hover:bg-warm-150'
         )}
         aria-expanded={isExpanded}
         role="treeitem"
@@ -65,36 +63,34 @@ export function SidebarDomainItem({
         >
           <ChevronRight
             className={cn(
-              'h-4 w-4 text-[var(--text-tertiary)] transition-transform duration-normal',
+              'h-3.5 w-3.5 text-warm-400 transition-transform duration-fast',
               isExpanded && 'rotate-90'
             )}
           />
         </button>
 
-        {/* Status indicator */}
-        <span className={cn('text-[8px] leading-none', statusConfig.className)}>
-          {statusConfig.icon}
-        </span>
+        {/* Status dot */}
+        <span className={cn('h-1.5 w-1.5 shrink-0 rounded-full', statusDot[status])} />
 
         {/* Domain name */}
         <span
           className={cn(
-            'flex-1 truncate text-h3-workspace font-medium',
-            isSelected ? 'text-accent-700' : 'text-[var(--text-primary)]'
+            'flex-1 truncate text-ws-body-sm',
+            isSelected ? 'font-medium text-warm-950' : 'font-normal'
           )}
         >
           {label}
         </span>
 
         {/* Count */}
-        <span className="text-caption tabular-nums text-[var(--text-tertiary)]">
+        <span className="text-ws-caption tabular-nums text-warm-500">
           {count.current}/{count.total}
         </span>
       </button>
 
       {/* Expanded children (topics) */}
       {isExpanded && children && (
-        <div className="relative ml-1 mt-0.5 overflow-hidden transition-all duration-normal">
+        <div className="mt-0.5 overflow-hidden animate-expand-down">
           {children}
         </div>
       )}

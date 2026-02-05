@@ -25,17 +25,17 @@ export function TopBar() {
   }, [progress, showSnapshotCTA]);
 
   return (
-    <header className="flex h-12 items-center justify-between border-b border-[var(--border-primary)] bg-white px-4 z-50">
+    <header className="flex h-12 items-center justify-between border-b border-warm-200 bg-white px-4 z-50">
       {/* Left: Logo + Title */}
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
-          <div className="flex h-6 w-6 items-center justify-center rounded-md bg-accent-600">
+          <div className="flex h-6 w-6 items-center justify-center rounded-md bg-accent">
             <Compass className="h-3.5 w-3.5 text-white" />
           </div>
-          <span className="text-body font-semibold text-[var(--text-primary)]">Atlas</span>
+          <span className="text-ws-body font-semibold text-warm-900">Atlas</span>
         </div>
-        <span className="hidden text-body-sm text-[var(--text-tertiary)] sm:block">|</span>
-        <span className="hidden max-w-[200px] truncate text-body-sm text-[var(--text-secondary)] sm:block">
+        <span className="hidden text-ws-body-sm text-warm-400 sm:block">|</span>
+        <span className="hidden max-w-[200px] truncate text-ws-body-sm text-warm-600 sm:block">
           {session?.email ? 'My Readiness Assessment' : 'Readiness Assessment'}
         </span>
       </div>
@@ -67,7 +67,7 @@ export function TopBar() {
         {/* Chat toggle */}
         <button
           onClick={toggleChat}
-          className="hidden items-center justify-center rounded-md p-1.5 text-[var(--text-tertiary)] transition-colors hover:bg-[var(--bg-tertiary)] hover:text-[var(--text-secondary)] lg:flex"
+          className="hidden items-center justify-center rounded-lg p-1.5 text-warm-400 transition-colors duration-fast hover:bg-warm-150 hover:text-warm-600 lg:flex"
           aria-label={isChatOpen ? 'Close chat panel' : 'Open chat panel'}
         >
           {isChatOpen ? (
@@ -79,7 +79,7 @@ export function TopBar() {
 
         {/* Settings */}
         <button
-          className="flex items-center justify-center rounded-md p-1.5 text-[var(--text-tertiary)] transition-colors hover:bg-[var(--bg-tertiary)] hover:text-[var(--text-secondary)]"
+          className="flex items-center justify-center rounded-lg p-1.5 text-warm-400 transition-colors duration-fast hover:bg-warm-150 hover:text-warm-600"
           aria-label="Settings"
         >
           <Settings className="h-4 w-4" />

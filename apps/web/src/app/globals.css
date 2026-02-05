@@ -3,76 +3,71 @@
 @tailwind utilities;
 
 /* Import Inter font */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
 @layer base {
   :root {
-    /* ─── Semantic design tokens (dark-mode ready naming) ─── */
+    /* ─── shadcn/ui tokens ─── */
     --background: 0 0% 100%;
-    --foreground: 0 0% 9%;
+    --foreground: 30 5% 20%;
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 9%;
+    --card-foreground: 30 5% 20%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 9%;
+    --popover-foreground: 30 5% 20%;
 
-    --primary: 0 0% 9%;
+    --primary: 30 5% 20%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 60 5% 96%;
-    --secondary-foreground: 0 0% 9%;
+    --secondary: 40 6% 97%;
+    --secondary-foreground: 30 5% 20%;
 
-    --muted: 60 5% 96%;
-    --muted-foreground: 25 5% 45%;
+    --muted: 40 6% 97%;
+    --muted-foreground: 30 3% 60%;
 
-    --accent: 173 58% 39%;
+    --accent: 210 74% 51%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 72% 56%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 30 6% 90%;
-    --input: 30 6% 90%;
-    --ring: 173 58% 39%;
+    --border: 37 10% 89%;
+    --input: 37 10% 89%;
+    --ring: 210 74% 51%;
 
     --radius: 0.5rem;
 
-    /* ─── V2 workspace tokens ─── */
+    /* ─── V3 Warm workspace tokens ─── */
     --bg-primary: #FFFFFF;
-    --bg-secondary: #FAFAF9;
-    --bg-tertiary: #F5F5F4;
-    --bg-workspace: #F8F8F7;
+    --bg-secondary: #FAF9F7;
+    --bg-tertiary: #F8F7F4;
+    --bg-sidebar: #F8F7F4;
+    --bg-hover: #F1F0EC;
 
-    --text-primary: #171717;
-    --text-secondary: #525252;
-    --text-tertiary: #A3A3A3;
+    --text-primary: #37352F;
+    --text-secondary: #5C5A56;
+    --text-tertiary: #9B9A97;
+    --text-placeholder: #B0ADA6;
 
-    --border-primary: #E7E5E4;
-    --border-secondary: #D6D3D1;
+    --border-primary: #E8E6E1;
+    --border-secondary: #D4D1CB;
+    --border-subtle: #F1F0EC;
 
-    --accent-color: #0D9488;
-    --accent-light: #F0FDFA;
-    --accent-hover: #0F766E;
-
-    --warm-color: #F59E0B;
-    --warm-light: #FFFBEB;
+    --accent-color: #2383E2;
+    --accent-light: #DDEBF1;
+    --accent-text: #0B6E99;
 
     /* ─── Animation tokens ─── */
-    --duration-fast: 150ms;
+    --duration-fast: 120ms;
     --duration-normal: 200ms;
     --duration-slow: 300ms;
-    --duration-reveal: 500ms;
-    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-    --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
-    --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
 
     /* ─── Layout tokens ─── */
     --topbar-height: 48px;
     --sidebar-width: 240px;
-    --sidebar-width-sm: 220px;
-    --chat-width: 360px;
-    --content-max-width: 680px;
+    --chat-width: 380px;
+    --content-max-width: 720px;
     --mobile-tabbar-height: 56px;
   }
 }
@@ -90,7 +85,7 @@
 
   body {
     background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
+    color: var(--text-primary);
     font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
   }
@@ -104,7 +99,7 @@
 
 /* ─── Gradient text ─── */
 .text-gradient {
-  background: linear-gradient(135deg, #0D9488 0%, #14B8A6 100%);
+  background: linear-gradient(135deg, #2383E2 0%, #0B6E99 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -112,15 +107,15 @@
 
 /* ─── Card hover ─── */
 .card-hover {
-  transition: box-shadow var(--duration-normal) ease, border-color var(--duration-normal) ease;
+  transition: border-color var(--duration-fast) ease;
 }
 .card-hover:hover {
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.05);
+  border-color: var(--border-secondary);
 }
 
 /* ─── Button interactions ─── */
 .btn-hover {
-  transition: transform var(--duration-fast) ease, background-color var(--duration-fast) ease;
+  transition: background-color var(--duration-fast) ease;
 }
 .btn-hover:active {
   transform: scale(0.98);
@@ -137,7 +132,7 @@
   height: calc(100dvh - var(--topbar-height) - var(--mobile-tabbar-height));
 }
 
-/* ─── Tree connector lines (sidebar) ─── */
+/* ─── Sidebar tree lines (warm color) ─── */
 .tree-line::before {
   content: '';
   position: absolute;
@@ -145,7 +140,7 @@
   top: 0;
   bottom: 0;
   width: 1px;
-  background: var(--border-primary);
+  background: var(--border-subtle);
 }
 
 .tree-branch::before {
@@ -155,7 +150,7 @@
   top: 50%;
   width: 9px;
   height: 1px;
-  background: var(--border-primary);
+  background: var(--border-subtle);
 }
 
 /* ─── Skeleton shimmer ─── */
@@ -170,7 +165,7 @@
   animation: shimmer 2s linear infinite;
 }
 
-/* ─── Scrollbar ─── */
+/* ─── Scrollbar (warm) ─── */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -186,24 +181,23 @@
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #A8A29E;
+  background: #B0ADA6;
 }
 
-/* Thin scrollbar for sidebar */
 .scrollbar-thin::-webkit-scrollbar {
   width: 4px;
 }
 
 /* ─── Focus styles ─── */
 :focus-visible {
-  outline: 2px solid hsl(var(--ring));
+  outline: 2px solid var(--accent-color);
   outline-offset: 2px;
 }
 
 /* ─── Selection ─── */
 ::selection {
-  background-color: #CCFBF1;
-  color: #0F766E;
+  background-color: var(--accent-light);
+  color: var(--accent-text);
 }
 
 /* ─── Reduced motion ─── */
@@ -235,30 +229,29 @@
   background: linear-gradient(90deg, transparent, var(--border-primary) 20%, var(--border-primary) 80%, transparent);
 }
 
-/* ─── Bento / feature cards ─── */
+/* ─── Bento / feature cards (marketing) ─── */
 .bento-card {
   background: var(--bg-secondary);
   border: 1px solid var(--border-primary);
   border-radius: 1rem;
   padding: 2rem;
-  transition: box-shadow var(--duration-normal) ease, border-color var(--duration-normal) ease;
+  transition: border-color var(--duration-normal) ease;
 }
 .bento-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
   border-color: var(--border-secondary);
 }
 
 .feature-card-teal {
-  background: linear-gradient(135deg, #F0FDFA 0%, #CCFBF1 100%);
-  border-color: #99F6E4;
+  background: linear-gradient(135deg, #DDEDEA 0%, #DDEDEA 100%);
+  border-color: #D4D1CB;
 }
 .feature-card-amber {
-  background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
-  border-color: #FDE68A;
+  background: linear-gradient(135deg, #FAEBDD 0%, #FAEBDD 100%);
+  border-color: #D4D1CB;
 }
 .feature-card-neutral {
-  background: linear-gradient(135deg, #FAFAF9 0%, #F5F5F4 100%);
-  border-color: #E7E5E4;
+  background: linear-gradient(135deg, #FAF9F7 0%, #F8F7F4 100%);
+  border-color: #E8E6E1;
 }
 
 /* ─── Entrance animations ─── */

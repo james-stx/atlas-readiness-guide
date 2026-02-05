@@ -20,7 +20,8 @@ export function SidebarTopicItem({
     <button
       onClick={onClick}
       className={cn(
-        'relative flex w-full items-center gap-2 rounded-md py-1 pl-8 pr-2 text-left transition-colors hover:bg-[var(--bg-tertiary)]',
+        'relative flex w-full items-center gap-2 rounded-lg py-1 pl-8 pr-2 text-left',
+        'transition-colors duration-fast hover:bg-warm-150',
         'tree-branch'
       )}
       role="treeitem"
@@ -28,22 +29,25 @@ export function SidebarTopicItem({
     >
       {/* Tree line */}
       {!isLast && (
-        <span className="absolute left-[23px] top-1/2 bottom-0 w-px bg-[var(--border-primary)]" />
+        <span className="absolute left-[23px] top-1/2 bottom-0 w-px bg-warm-200" />
       )}
 
       {/* Status icon */}
       {covered ? (
         <span className="flex h-4 w-4 shrink-0 items-center justify-center">
-          <Check className="h-3.5 w-3.5 text-accent-600 animate-checkmark-draw" />
+          <Check className="h-3 w-3 text-confidence-high animate-checkmark-draw" />
         </span>
       ) : (
-        <span className="flex h-4 w-4 shrink-0 items-center justify-center text-[10px] text-[var(--text-tertiary)]">
-          ○
-        </span>
+        <span className="flex h-3 w-3 shrink-0 rounded-full border border-warm-300" />
       )}
 
       {/* Topic label */}
-      <span className="truncate text-body text-[var(--text-secondary)]">
+      <span
+        className={cn(
+          'truncate text-ws-body-sm',
+          covered ? 'text-warm-700' : 'text-warm-600'
+        )}
+      >
         {label}
       </span>
     </button>

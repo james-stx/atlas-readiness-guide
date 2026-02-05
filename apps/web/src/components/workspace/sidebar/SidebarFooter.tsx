@@ -26,14 +26,14 @@ export function SidebarFooter() {
   };
 
   return (
-    <div className="sticky bottom-0 border-t border-[var(--border-primary)] bg-[var(--bg-secondary)] p-3">
+    <div className="sticky bottom-0 border-t border-warm-200 bg-warm-100 p-3">
       {/* Progress */}
       <div className="mb-3">
         <div className="mb-1.5 flex items-center justify-between">
-          <span className="text-caption text-[var(--text-secondary)]">
+          <span className="text-ws-caption text-warm-500">
             Overall Progress
           </span>
-          <span className="text-caption tabular-nums text-[var(--text-secondary)]">
+          <span className="text-ws-caption tabular-nums text-warm-500">
             {progress}%
           </span>
         </div>

@@ -58,20 +58,20 @@ export function ConfirmDialog({
         aria-modal
         aria-labelledby="confirm-title"
         aria-describedby="confirm-message"
-        className="relative z-10 mx-4 w-full max-w-sm rounded-xl border border-[var(--border-primary)] bg-white p-6 shadow-elevated animate-fade-in"
+        className="relative z-10 mx-4 w-full max-w-sm rounded-lg border border-warm-200 bg-white p-6 shadow-elevated animate-fade-in"
       >
         <h3
           id="confirm-title"
           className={cn(
-            'text-h3-workspace',
-            variant === 'danger' ? 'text-danger' : 'text-[var(--text-primary)]'
+            'text-ws-heading',
+            variant === 'danger' ? 'text-danger' : 'text-warm-900'
           )}
         >
           {title}
         </h3>
         <p
           id="confirm-message"
-          className="mt-2 text-body text-[var(--text-secondary)]"
+          className="mt-2 text-ws-body text-warm-600"
         >
           {message}
         </p>

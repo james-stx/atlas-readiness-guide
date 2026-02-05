@@ -35,7 +35,7 @@ export function OverflowMenu({ items, className }: OverflowMenuProps) {
     <div ref={menuRef} className={cn('relative', className)}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex h-8 w-8 items-center justify-center rounded-md text-[var(--text-tertiary)] transition-colors hover:bg-[var(--bg-tertiary)] hover:text-[var(--text-secondary)]"
+        className="flex h-8 w-8 items-center justify-center rounded-lg text-warm-400 transition-colors duration-fast hover:bg-warm-150 hover:text-warm-600"
         aria-label="More options"
         aria-expanded={isOpen}
       >
@@ -43,7 +43,7 @@ export function OverflowMenu({ items, className }: OverflowMenuProps) {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full z-50 mt-1 min-w-[140px] rounded-lg border border-[var(--border-primary)] bg-white py-1 shadow-medium animate-fade-in">
+        <div className="absolute right-0 top-full z-50 mt-1 min-w-[140px] rounded-lg border border-warm-200 bg-white py-1 shadow-medium animate-fade-in">
           {items.map((item) => (
             <button
               key={item.label}
@@ -52,10 +52,10 @@ export function OverflowMenu({ items, className }: OverflowMenuProps) {
                 setIsOpen(false);
               }}
               className={cn(
-                'flex w-full items-center px-3 py-1.5 text-body-sm transition-colors',
+                'flex w-full items-center px-3 py-1.5 text-ws-body-sm transition-colors duration-fast',
                 item.variant === 'danger'
                   ? 'text-danger hover:bg-danger-bg'
-                  : 'text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]'
+                  : 'text-warm-700 hover:bg-warm-100'
               )}
             >
               {item.label}

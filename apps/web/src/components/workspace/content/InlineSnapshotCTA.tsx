@@ -24,12 +24,12 @@ export function InlineSnapshotCTA({ domainLabel, covered, total }: InlineSnapsho
   };
 
   return (
-    <div className="mt-6 flex items-center justify-between rounded-xl border border-accent-600/15 bg-accent-50 px-5 py-4">
+    <div className="mt-6 flex items-center justify-between rounded-lg border border-accent/15 bg-accent-100 px-5 py-4">
       <div>
-        <p className="text-body font-medium text-[var(--text-primary)]">
+        <p className="text-ws-body font-medium text-warm-900">
           Ready for a snapshot?
         </p>
-        <p className="mt-0.5 text-body-sm text-[var(--text-secondary)]">
+        <p className="mt-0.5 text-ws-body-sm text-warm-600">
           {covered} of {total} {domainLabel} topics covered.
         </p>
       </div>

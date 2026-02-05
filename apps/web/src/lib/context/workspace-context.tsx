@@ -17,7 +17,6 @@ import type { ProgressState } from '../progress';
 // Types
 // ============================================
 
-type WorkspaceStage = 'chat-first' | 'full';
 type MobileTab = 'domains' | 'content' | 'chat';
 
 interface WorkspaceState {
@@ -26,15 +25,9 @@ interface WorkspaceState {
   expandedDomains: DomainType[];
   selectedCategory: string | null;
 
-  // Chat panel
+  // Chat panel — hidden by default, slides in on category select
   isChatOpen: boolean;
   chatDomain: DomainType | null;
-
-  // First-run
-  hasSeenWorkspace: boolean;
-  contentPanelRevealed: boolean;
-  workspaceStage: WorkspaceStage;
-  showOnboardingTooltip: boolean;
 
   // Mobile
   mobileTab: MobileTab;
@@ -50,8 +43,6 @@ type WorkspaceAction =
   | { type: 'OPEN_CHAT'; payload?: DomainType }
   | { type: 'CLOSE_CHAT' }
   | { type: 'TOGGLE_CHAT' }
-  | { type: 'REVEAL_CONTENT_PANEL' }
-  | { type: 'DISMISS_ONBOARDING_TOOLTIP' }
   | { type: 'SET_MOBILE_TAB'; payload: MobileTab }
   | { type: 'TOGGLE_SIDEBAR' }
   | { type: 'RESTORE_STATE'; payload: Partial<WorkspaceState> };
@@ -63,21 +54,30 @@ type WorkspaceAction =
 const STORAGE_KEY = 'atlas-workspace-state';
 
 function getInitialState(): WorkspaceState {
-  const hasSeenWorkspace =
-    typeof window !== 'undefined' &&
-    localStorage.getItem(STORAGE_KEY) !== null;
+  // Restore persisted nav state if available
+  let restoredDomain: DomainType | null = 'market';
+  let restoredExpanded: DomainType[] = ['market'];
+
+  if (typeof window !== 'undefined') {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.selectedDomain) restoredDomain = parsed.selectedDomain;
+        if (parsed.expandedDomains) restoredExpanded = parsed.expandedDomains;
+      }
+    } catch {
+      // Ignore parse errors
+    }
+  }
 
   return {
-    selectedDomain: 'market',
-    expandedDomains: ['market'],
+    selectedDomain: restoredDomain,
+    expandedDomains: restoredExpanded,
     selectedCategory: null,
-    isChatOpen: true,
-    chatDomain: 'market',
-    hasSeenWorkspace,
-    contentPanelRevealed: hasSeenWorkspace,
-    workspaceStage: hasSeenWorkspace ? 'full' : 'chat-first',
-    showOnboardingTooltip: false,
-    mobileTab: hasSeenWorkspace ? 'content' : 'chat',
+    isChatOpen: false, // Chat hidden by default — opens on category select
+    chatDomain: null,
+    mobileTab: 'content', // Default to content view on mobile
     isSidebarCollapsed: false,
   };
 }
@@ -101,8 +101,7 @@ function workspaceReducer(
         selectedDomain: domain,
         expandedDomains: expanded,
         selectedCategory: null,
-        chatDomain: domain,
-        isChatOpen: true,
+        // Selecting a domain does NOT open chat — only category select does
       };
     }
 
@@ -112,7 +111,7 @@ function workspaceReducer(
         selectedDomain: action.payload.domain,
         selectedCategory: action.payload.categoryId,
         chatDomain: action.payload.domain,
-        isChatOpen: true,
+        isChatOpen: true, // Category select opens chat
         expandedDomains: state.expandedDomains.includes(action.payload.domain)
           ? state.expandedDomains
           : [...state.expandedDomains, action.payload.domain],
@@ -138,18 +137,6 @@ function workspaceReducer(
 
     case 'TOGGLE_CHAT':
       return { ...state, isChatOpen: !state.isChatOpen };
-
-    case 'REVEAL_CONTENT_PANEL':
-      return {
-        ...state,
-        contentPanelRevealed: true,
-        workspaceStage: 'full',
-        showOnboardingTooltip: true,
-        hasSeenWorkspace: true,
-      };
-
-    case 'DISMISS_ONBOARDING_TOOLTIP':
-      return { ...state, showOnboardingTooltip: false };
 
     case 'SET_MOBILE_TAB':
       return { ...state, mobileTab: action.payload };
@@ -179,10 +166,6 @@ interface WorkspaceContextValue extends WorkspaceState {
   openChat: (domain?: DomainType) => void;
   closeChat: () => void;
   toggleChat: () => void;
-
-  // First-run
-  revealContentPanel: () => void;
-  dismissOnboardingTooltip: () => void;
 
   // Mobile
   setMobileTab: (tab: MobileTab) => void;
@@ -216,30 +199,13 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
 
   // Persist workspace state to localStorage
   useEffect(() => {
-    if (state.hasSeenWorkspace) {
+    if (state.selectedDomain) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
         selectedDomain: state.selectedDomain,
         expandedDomains: state.expandedDomains,
       }));
     }
-  }, [state.hasSeenWorkspace, state.selectedDomain, state.expandedDomains]);
-
-  // Auto-dismiss onboarding tooltip
-  useEffect(() => {
-    if (state.showOnboardingTooltip) {
-      const timer = setTimeout(() => {
-        dispatch({ type: 'DISMISS_ONBOARDING_TOOLTIP' });
-      }, 4000);
-      return () => clearTimeout(timer);
-    }
-  }, [state.showOnboardingTooltip]);
-
-  // Auto-reveal content panel on first input
-  useEffect(() => {
-    if (!state.contentPanelRevealed && inputs.length > 0) {
-      dispatch({ type: 'REVEAL_CONTENT_PANEL' });
-    }
-  }, [inputs.length, state.contentPanelRevealed]);
+  }, [state.selectedDomain, state.expandedDomains]);
 
   // Actions
   const selectDomain = useCallback((domain: DomainType) => {
@@ -264,14 +230,6 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
 
   const toggleChat = useCallback(() => {
     dispatch({ type: 'TOGGLE_CHAT' });
-  }, []);
-
-  const revealContentPanel = useCallback(() => {
-    dispatch({ type: 'REVEAL_CONTENT_PANEL' });
-  }, []);
-
-  const dismissOnboardingTooltip = useCallback(() => {
-    dispatch({ type: 'DISMISS_ONBOARDING_TOOLTIP' });
   }, []);
 
   const setMobileTab = useCallback((tab: MobileTab) => {
@@ -313,8 +271,6 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     openChat,
     closeChat,
     toggleChat,
-    revealContentPanel,
-    dismissOnboardingTooltip,
     setMobileTab,
     toggleSidebar,
     progressState,

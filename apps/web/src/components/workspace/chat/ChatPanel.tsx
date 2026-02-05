@@ -83,7 +83,7 @@ export function ChatPanel() {
   return (
     <div
       className={cn(
-        'flex flex-col border-l border-[var(--border-primary)] bg-white workspace-panel',
+        'flex flex-col border-l border-warm-200 bg-white workspace-panel',
         'w-chat shrink-0'
       )}
       role="complementary"
@@ -154,7 +154,7 @@ export function ChatPanel() {
       )}
 
       {/* Input area */}
-      <div className="sticky bottom-0 border-t border-[var(--border-primary)] bg-white px-4 py-3">
+      <div className="sticky bottom-0 border-t border-warm-200 bg-white px-4 py-3">
         {/* Quick responses could go here */}
 
         <div className="relative">
@@ -167,9 +167,9 @@ export function ChatPanel() {
             disabled={isLoading}
             rows={1}
             className={cn(
-              'w-full resize-none rounded-lg bg-[var(--bg-secondary)] px-3 py-2.5 pr-10',
-              'text-body text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]',
-              'focus:outline-none focus:ring-2 focus:ring-accent-600/30 focus:bg-white',
+              'w-full resize-none rounded-lg bg-warm-50 px-3 py-2.5 pr-10',
+              'text-ws-body text-warm-900 placeholder:text-warm-400',
+              'focus:outline-none focus:ring-2 focus:ring-accent/30 focus:bg-white',
               'disabled:opacity-50 disabled:cursor-not-allowed',
               'transition-all duration-fast'
             )}
@@ -181,7 +181,7 @@ export function ChatPanel() {
             disabled={isLoading || !inputValue.trim()}
             className={cn(
               'absolute right-2 bottom-2 flex h-7 w-7 items-center justify-center rounded-full',
-              'bg-accent-600 text-white transition-all duration-fast',
+              'bg-accent text-white transition-all duration-fast',
               'hover:bg-accent-700',
               'disabled:opacity-40 disabled:cursor-not-allowed'
             )}
@@ -195,7 +195,7 @@ export function ChatPanel() {
           </button>
         </div>
 
-        <p className="mt-1 text-right text-caption text-[var(--text-tertiary)]">
+        <p className="mt-1 text-right text-ws-caption text-warm-400">
           {isMac ? '⌘' : 'Ctrl'}+Enter to send
         </p>
       </div>
@@ -222,7 +222,7 @@ function ChatBubble({
       )}
     >
       {isAssistant && (
-        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent-600">
+        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent">
           <Compass className="h-3 w-3 text-white" />
         </div>
       )}
@@ -231,11 +231,11 @@ function ChatBubble({
         className={cn(
           'max-w-[85%] rounded-xl px-3.5 py-2.5',
           isAssistant
-            ? 'rounded-tl-sm bg-[var(--bg-secondary)] text-[var(--text-primary)]'
-            : 'rounded-tr-sm bg-accent-600 text-white'
+            ? 'rounded-tl-sm bg-warm-50 text-warm-900'
+            : 'rounded-tr-sm bg-accent text-white'
         )}
       >
-        <p className="whitespace-pre-wrap text-body leading-relaxed">
+        <p className="whitespace-pre-wrap text-ws-body leading-relaxed">
           {message.content}
           {isStreaming && (
             <span className="ml-0.5 inline-block h-3.5 w-1 animate-pulse-subtle bg-current" />
@@ -249,15 +249,15 @@ function ChatBubble({
 function TypingDots() {
   return (
     <div className="flex gap-2.5 justify-start">
-      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent-600">
+      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent">
         <Compass className="h-3 w-3 text-white" />
       </div>
-      <div className="rounded-xl rounded-tl-sm bg-[var(--bg-secondary)] px-4 py-3">
+      <div className="rounded-xl rounded-tl-sm bg-warm-50 px-4 py-3">
         <div className="flex gap-1">
           {[0, 1, 2].map((i) => (
             <span
               key={i}
-              className="h-1.5 w-1.5 rounded-full bg-[var(--text-tertiary)] animate-typing-dot"
+              className="h-1.5 w-1.5 rounded-full bg-warm-400 animate-typing-dot"
               style={{ animationDelay: `${i * 0.2}s` }}
             />
           ))}

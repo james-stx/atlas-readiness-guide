@@ -100,7 +100,10 @@ apps/web/tsconfig.json
 apps/web/vercel.json
 CLAUDE.md
 docs
+docs/CONTENT-PANEL-V3-SPEC.md
 docs/DESIGN-OVERHAUL-BRIEF.md
+docs/DESIGN-SYSTEM-V3.md
+docs/FOUNDER-FEEDBACK-V3-PLAN.md
 docs/MVP-BUILD-DOCUMENTATION.md
 docs/PRD-Progress-Visibility-Feature.md
 docs/UX-UI-Design-Specifications.md
@@ -203,7 +206,8 @@ turbo.json
 ## Recent Commits
 
 ```
-8d8eabe Add AGENTS.md registry and link from CLAUDE.md
+2666642 Implement V3 workspace redesign with Notion-inspired UI
+727210a Add AGENTS.md registry and link from CLAUDE.md
 f0e6e87 Add post-commit hook to auto-update CLAUDE.md
 c3a9db4 Redesign frontend to 3-panel workspace layout (V2)
 408bf8a docs: auto-update MVP documentation [skip ci]
@@ -212,6 +216,5 @@ c668263 Fix question ID matching and domain transitions
 9ccfcd7 Reduce token usage to avoid rate limits
 1a80329 docs: auto-update MVP documentation [skip ci]
 7b6f923 Add fallback API call when AI generates no text
-2f8e304 Fix AI sometimes responding with only tools and no text
 ```
 <!-- /AUTO:RECENT_CHANGES -->

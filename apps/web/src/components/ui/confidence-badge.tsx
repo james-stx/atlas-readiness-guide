@@ -13,25 +13,21 @@ const config = {
   high: {
     bg: 'bg-confidence-high-bg',
     text: 'text-confidence-high-text',
-    icon: '●',
     label: 'High',
   },
   medium: {
     bg: 'bg-confidence-medium-bg',
     text: 'text-confidence-medium-text',
-    icon: '◐',
     label: 'Medium',
   },
   low: {
     bg: 'bg-confidence-low-bg',
     text: 'text-confidence-low-text',
-    icon: '○',
     label: 'Low',
   },
   not_started: {
-    bg: 'bg-transparent',
-    text: 'text-[var(--text-tertiary)]',
-    icon: '—',
+    bg: 'bg-warm-100',
+    text: 'text-warm-500',
     label: 'Not Started',
   },
 } as const;
@@ -46,14 +42,14 @@ export function ConfidenceBadge({
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-caption font-medium',
+        'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-ws-caption',
         c.bg,
         c.text,
         animate && 'animate-badge-appear',
         className
       )}
     >
-      <span className="text-[8px] leading-none">{c.icon}</span>
+      <span className="h-1.5 w-1.5 rounded-full bg-current" />
       {c.label}
     </span>
   );
