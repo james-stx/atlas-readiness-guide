@@ -105,16 +105,24 @@ export async function POST(request: NextRequest) {
     console.log('[Snapshot] Prompt built, length:', userPrompt.length);
 
     // Generate structured snapshot using Claude
-    console.log('[Snapshot] Calling Claude API...');
-    const { object: generatedSnapshot } = await generateObject({
-      model: anthropic(models.synthesis),
-      schema: snapshotSchema,
-      system: SYNTHESIS_SYSTEM_PROMPT,
-      prompt: userPrompt,
-      maxTokens: modelConfig.synthesis.maxTokens,
-      temperature: modelConfig.synthesis.temperature,
-    });
-    console.log('[Snapshot] Claude API response received');
+    console.log('[Snapshot] Calling Claude API with model:', models.synthesis);
+    let generatedSnapshot;
+    try {
+      const result = await generateObject({
+        model: anthropic(models.synthesis),
+        schema: snapshotSchema,
+        system: SYNTHESIS_SYSTEM_PROMPT,
+        prompt: userPrompt,
+        maxTokens: modelConfig.synthesis.maxTokens,
+        temperature: modelConfig.synthesis.temperature,
+      });
+      generatedSnapshot = result.object;
+      console.log('[Snapshot] Claude API response received');
+    } catch (aiError) {
+      const msg = aiError instanceof Error ? aiError.message : String(aiError);
+      console.error('[Snapshot] Claude API error:', msg);
+      throw new Error(`AI generation failed: ${msg}`);
+    }
 
     // Transform coverage summary to match DB schema
     const dbCoverageSummary = {
@@ -212,12 +220,19 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ snapshot: savedSnapshot });
   } catch (error) {
-    console.error('[Snapshot] Error:', error);
-    // Log more details about the error
-    if (error instanceof Error) {
-      console.error('[Snapshot] Error message:', error.message);
-      console.error('[Snapshot] Error stack:', error.stack);
+    // Safely log error details (AI SDK errors can have non-serializable properties)
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorName = error instanceof Error ? error.name : 'Unknown';
+    console.error('[Snapshot] Error:', errorName, '-', errorMessage);
+
+    // Check for common AI SDK errors
+    if (errorMessage.includes('rate') || errorMessage.includes('limit')) {
+      console.error('[Snapshot] Rate limit hit');
     }
+    if (errorMessage.includes('invalid') || errorMessage.includes('api_key')) {
+      console.error('[Snapshot] API key issue');
+    }
+
     return handleApiError(error);
   }
 }
