@@ -56,25 +56,18 @@ export function ChatPanel() {
     }
   }, [session, messages.length, initChat]);
 
-  // When user clicks "Talk to Atlas" on a topic, focus input and pre-fill a prompt
+  // When user clicks "Talk to Atlas" on a topic, auto-send a message to start the conversation
   useEffect(() => {
-    if (selectedCategory && selectedCategory !== lastFocusedTopic && isChatOpen) {
+    if (selectedCategory && selectedCategory !== lastFocusedTopic && isChatOpen && !isLoading) {
       setLastFocusedTopic(selectedCategory);
 
-      // Get topic label for a helpful prompt
+      // Get topic label for the prompt
       const topicLabel = getTopicLabel(selectedCategory);
 
-      // Pre-fill the input with a topic-specific prompt
-      setInputValue(`I'd like to discuss: ${topicLabel}`);
-
-      // Focus the textarea after a brief delay to ensure it's rendered
-      setTimeout(() => {
-        textareaRef.current?.focus();
-        // Select the text so user can easily replace it
-        textareaRef.current?.select();
-      }, 100);
+      // Automatically send a message to start discussing this topic
+      sendMessage(`Let's talk about: ${topicLabel}`).catch(() => {});
     }
-  }, [selectedCategory, lastFocusedTopic, isChatOpen]);
+  }, [selectedCategory, lastFocusedTopic, isChatOpen, isLoading, sendMessage]);
 
   // Auto-scroll
   useEffect(() => {
