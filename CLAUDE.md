@@ -212,7 +212,8 @@ supabase
 ## Recent Commits
 
 ```
-48985e3 Fix inconsistent status indicators in WelcomeModal
+1b095a0 Improve error handling for API connection issues
+28644de Fix inconsistent status indicators in WelcomeModal
 ca000f0 Improve visual distinction between status and rating pills
 3d44196 Unify card appearance with TopicCard component
 1667a13 Implement P2/P3 UX improvements: welcome back, time estimates, skip topics
@@ -221,6 +222,5 @@ ca000f0 Improve visual distinction between status and rating pills
 b065842 Implement V3 workspace redesign with Notion-inspired UI
 727210a Add AGENTS.md registry and link from CLAUDE.md
 f0e6e87 Add post-commit hook to auto-update CLAUDE.md
-c3a9db4 Redesign frontend to 3-panel workspace layout (V2)
 ```
 <!-- /AUTO:RECENT_CHANGES -->

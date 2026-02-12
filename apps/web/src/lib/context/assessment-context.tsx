@@ -310,6 +310,17 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
       try {
         const response = await api.sendMessage(state.session.id, content, controller.signal);
 
+        // Check for HTTP errors before streaming
+        if (!response.ok) {
+          const errorText = await response.text().catch(() => 'Unknown error');
+          console.error('[Atlas] HTTP error:', response.status, errorText);
+          throw new Error(
+            response.status === 500
+              ? 'Server error. Please check API configuration and try again.'
+              : `Request failed: ${response.statusText}`
+          );
+        }
+
         // Handle SSE streaming
         const reader = response.body?.getReader();
         if (!reader) throw new Error('No response body');
@@ -391,7 +402,7 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
 
         // Handle stream ending without complete event
         if (!receivedComplete) {
-          console.warn('[Atlas] Stream ended without complete event');
+          console.warn('[Atlas] Stream ended without complete event. Events:', eventCount, 'Content:', assistantContent.length);
           if (assistantContent) {
             // Save partial content as a message
             dispatch({
@@ -406,10 +417,14 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
               },
             });
           } else {
-            // No content at all - something went wrong
+            // No content at all - provide helpful error message
+            const errorMsg = eventCount === 0
+              ? 'Unable to connect to AI service. Please check API configuration.'
+              : 'No response received. Please try again.';
+            console.error('[Atlas] No response. Events received:', eventCount);
             dispatch({
               type: 'SET_ERROR',
-              payload: 'No response received. Please try again.',
+              payload: errorMsg,
             });
           }
         }
