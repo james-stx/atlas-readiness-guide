@@ -156,13 +156,6 @@ A reference for technical terms used throughout this documentation.
 2. Logo click returns to home page
 3. Current domain/progress visible in simplified header format
 
-*Topic Selection Behavior:*
-When user clicks 'Talk to Atlas' on a topic card:
-1. Chat panel opens automatically
-2. System automatically sends a message to Atlas: "Let's talk about: [Topic Name]"
-3. Atlas immediately responds with relevant information about the topic
-4. User can continue the conversation naturally
-
 #### 3. Snapshot Generation (`/snapshot`)
 - When all domains are covered, user triggers snapshot generation
 - AI synthesizes all inputs into:
@@ -184,6 +177,26 @@ When user clicks 'Talk to Atlas' on a topic card:
 - When AI transitions to a new domain, the content panel navigates to that domain
 - The sidebar automatically expands collapsed domains when navigation occurs
 - This provides seamless context switching between AI interactions and content exploration
+
+### Content Browsing Flow
+
+**Content Browsing Flow:**
+1. User selects domain from sidebar
+2. User clicks on topic card to view details
+3. Content panel updates to show selected topic (highlighted)
+4. Chat does NOT auto-open or send messages
+5. User can browse multiple topics without triggering AI discussions
+
+### AI Discussion Flow
+
+**AI Discussion Flow:**
+1. User browses to desired topic (as above)
+2. User explicitly clicks "Talk to Atlas" or "Discuss" button
+3. Chat panel opens automatically
+4. System auto-sends introductory message about the selected topic
+5. AI responds and conversation begins
+
+**Key Distinction:** Topic selection (navigation) is now separate from topic discussion (AI chat initiation)
 
 ### Session Recovery Flow
 
@@ -334,10 +347,12 @@ If a user leaves and returns:
 - Text input at bottom with send button
 - Loading indicators during AI responses
 
-**Topic Selection Behavior:**
-- Clicking 'Talk to Atlas' on any topic card automatically initiates a conversation
-- No manual input required - the system sends an introductory message on behalf of the user
-- Creates immediate engagement with relevant topic discussion
+**Topic Card Interactions:**
+- **Click on card**: Navigates to topic, highlights it in domain header, updates content view (does not open chat)
+- **Click "Talk to Atlas" button**: Opens chat panel AND starts AI discussion about the topic
+- **Click "Discuss" button**: Same as "Talk to Atlas" - explicit discussion trigger
+
+This separation allows users to browse content freely without accidentally triggering AI conversations.
 
 **Chat Interface Components:**
 
@@ -521,11 +536,22 @@ The AI service layer utilizes Anthropic's Claude 4.5 models for different purpos
 
 ### Workspace Context Auto-Navigation
 
-**Workspace Context Auto-Navigation:**
-- Workspace context now includes auto-navigation logic that responds to AI state changes
-- Integration between assessment context and workspace navigation
-- Automatic domain expansion and content panel synchronization
-- Event-driven navigation updates based on AI conversation flow
+**Workspace State Management:**
+
+*Navigation State:*
+- `selectedDomain`: Currently viewed domain
+- `selectedCategory`: Currently highlighted topic (for browsing)
+
+*Chat State:*
+- `isChatOpen`: Whether chat panel is visible
+- `topicToDiscuss`: Topic user explicitly wants to discuss (set only by "Talk to Atlas" button)
+
+*State Flow:*
+1. Topic card click → sets `selectedCategory` (navigation only)
+2. "Talk to Atlas" click → sets `topicToDiscuss` + opens chat + auto-sends message
+3. After auto-message sent → `topicToDiscuss` is cleared
+
+This prevents accidental AI conversations when users are just browsing content.
 
 ### Progress Context System
 
@@ -1653,45 +1679,3 @@ Key decisions made during development and why.
 - Address user-reported issues
 
 ### Updating Dependencies
-
-```bash
-# Check for updates
-pnpm outdated
-
-# Update all dependencies
-pnpm update
-
-# Test locally
-pnpm dev
-
-# If working, deploy
-git add .
-git commit -m "Update dependencies"
-git push
-```
-
-### Documentation Maintenance
-
-**Automated Updates**
-- Documentation is automatically updated via GitHub Actions when code changes are pushed
-- The workflow analyzes changes and updates relevant sections using AI
-- Manual review of auto-generated updates is recommended
-
-**Manual Updates**
-- Run `pnpm update-docs` locally to generate documentation updates
-- Ensure `ANTHROPIC_API_KEY` environment variable is set
-- The script analyzes recent changes and suggests documentation updates
-
-### Database Maintenance
-
-Supabase handles most maintenance automatically. For manual tasks:
-
-1. Go to Supabase Dashboard
-2. SQL Editor for direct queries
-3. Table Editor for data inspection
-
-### Monitoring Costs
-
-| Service | Free Tier Limit | How to Check |
-|---------|-----------------|--------------|
-| Vercel | 100GB
