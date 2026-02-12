@@ -13,8 +13,7 @@ export const anthropic = createAnthropic({
 export const models = {
   conversation: 'claude-sonnet-4-5-20250929',
   classification: 'claude-haiku-4-5-20251001',
-  // Use Haiku for synthesis - much faster to avoid Vercel timeouts
-  synthesis: 'claude-haiku-4-5-20251001',
+  synthesis: 'claude-sonnet-4-5-20250929',
 } as const;
 
 export const modelConfig = {
