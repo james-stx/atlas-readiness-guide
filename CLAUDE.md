@@ -212,7 +212,8 @@ supabase
 ## Recent Commits
 
 ```
-db5655f Fix error logging and add specific AI error handling
+13ebf28 Fix snapshot: increase maxTokens to 4096, make arrays optional with defaults
+8e38e6a Fix error logging and add specific AI error handling
 c174a65 Add detailed logging to snapshot generation for debugging
 10ac5ad Revert synthesis to Sonnet (Vercel Pro now active)
 fbc9417 Fix snapshot timeout: use Haiku + increase maxDuration
@@ -221,6 +222,5 @@ ac28106 docs: auto-update MVP documentation [skip ci]
 10febb6 Improve snapshot generation error handling and feedback
 4163268 docs: auto-update MVP documentation [skip ci]
 908f107 Fix: Only auto-send topic message when "Talk to Atlas" button is clicked
-8c22431 docs: auto-update MVP documentation [skip ci]
 ```
 <!-- /AUTO:RECENT_CHANGES -->

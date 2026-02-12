@@ -26,7 +26,7 @@ export const modelConfig = {
     temperature: 0,
   },
   synthesis: {
-    maxTokens: 2048,
+    maxTokens: 4096,
     temperature: 0.3,
   },
 } as const;

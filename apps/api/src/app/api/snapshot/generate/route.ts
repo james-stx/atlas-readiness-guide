@@ -16,6 +16,7 @@ import { handleApiError, ValidationError } from '@/lib/errors';
 export const maxDuration = 60;
 
 // Snapshot schema for structured generation
+// Using .default([]) for arrays that might not be generated if AI hits token limit
 const snapshotSchema = z.object({
   keyFindings: z.array(
     z.object({
@@ -23,7 +24,7 @@ const snapshotSchema = z.object({
       finding: z.string(),
       confidence: z.enum(['high', 'medium', 'low']),
     })
-  ).min(3).max(5),
+  ).min(1).max(5),
 
   strengths: z.array(
     z.object({
@@ -31,7 +32,7 @@ const snapshotSchema = z.object({
       item: z.string(),
       evidence: z.string(),
     })
-  ),
+  ).default([]),
 
   assumptions: z.array(
     z.object({
@@ -40,7 +41,7 @@ const snapshotSchema = z.object({
       risk: z.string(),
       validationSuggestion: z.string(),
     })
-  ),
+  ).default([]),
 
   gaps: z.array(
     z.object({
@@ -49,7 +50,7 @@ const snapshotSchema = z.object({
       importance: z.enum(['critical', 'important', 'nice-to-have']),
       recommendation: z.string(),
     })
-  ),
+  ).default([]),
 
   nextSteps: z.array(
     z.object({
@@ -58,7 +59,7 @@ const snapshotSchema = z.object({
       domain: z.enum(['market', 'product', 'gtm', 'operations', 'financials']),
       rationale: z.string(),
     })
-  ).length(5),
+  ).default([]),
 });
 
 const requestSchema = z.object({
