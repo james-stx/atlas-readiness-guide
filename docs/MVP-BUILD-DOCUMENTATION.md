@@ -897,6 +897,12 @@ Sends a user message and streams AI response.
 - `domain_change` events (domain transitions)
 - `complete` event (final message)
 
+The `recordInput` tool now includes server-side validation:
+
+- **questionId validation**: The tool validates that the provided `questionId` exists in the current domain's valid question IDs
+- **Error handling**: If an invalid `questionId` is provided, the tool returns an error response containing the list of valid IDs for the current domain
+- **Self-correction**: This enables the AI agent to automatically retry with a correct `questionId` when validation fails
+
 **Request Timeout Behavior**
 - All chat requests automatically timeout after 90 seconds
 - Timeout errors return user-friendly error messages
@@ -1411,6 +1417,14 @@ The system now handles API rate limits and temporary service unavailability auto
 - Confirm streaming message state is properly cleared after timeout
 - Test that users can retry after timeout without UI issues
 
+**Invalid questionId errors**:
+
+If you see errors about invalid questionId values:
+1. Check the console logs for the exact error message showing valid IDs
+2. Verify the current domain has the expected question configuration
+3. The AI should automatically retry with a valid questionId from the error response
+4. If persistent, check that the domain configuration matches the questionIds being used
+
 ### Viewing Logs
 
 #### Local
@@ -1679,13 +1693,4 @@ If something breaks:
 - Added automated documentation update workflow
 - Integrated Claude API for intelligent documentation analysis
 - Added GitHub Actions workflow for continuous documentation maintenance
-- Implemented Phase 1 Progress Visibility system with real-time progress tracking UI
-- Added progress rings, domain pills, confidence badges, and toast notifications
-- Built comprehensive readiness panel with expandable domain accordions
-- Added slide-out progress panel with snapshot generation capabilities
-- Fixed critical bugs: enabled tool execution in conversation agent and aligned question IDs between progress tracking and API domains
-- Fixed chatbot performance issue by switching from LLM-based to instant regex-based classification during tool execution
-- Added error handling to prevent stream failures and ensure uninterrupted real-time text streaming
-- Enhanced SSE streaming reliability with better error handling, TCP packet boundary buffering, and null guards for tool results
-- Optimized AI token usage by switching from multi-step to single-step interactions, reducing conversation history to 10 messages, and trimming system prompts to stay within Anthropic's rate limits
-- Restored
+- Implemented Phase 1 Progress Visibility system with real-time progress
