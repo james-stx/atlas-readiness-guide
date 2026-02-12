@@ -16,7 +16,7 @@ const isMac =
   /Mac|iPod|iPhone|iPad/.test(navigator.userAgent);
 
 export function ChatPanel() {
-  const { isChatOpen, closeChat, chatDomain, selectedCategory, selectCategory } = useWorkspace();
+  const { isChatOpen, closeChat, chatDomain, selectedCategory, selectCategory, topicToDiscuss, clearTopicToDiscuss } = useWorkspace();
   const {
     messages,
     inputs,
@@ -29,7 +29,6 @@ export function ChatPanel() {
   } = useAssessment();
 
   const [inputValue, setInputValue] = useState('');
-  const [lastFocusedTopic, setLastFocusedTopic] = useState<string | null>(null);
   const [domainTransitions, setDomainTransitions] = useState<{ messageIndex: number; toDomain: string }[]>([]);
   const [lastKnownDomain, setLastKnownDomain] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -56,18 +55,20 @@ export function ChatPanel() {
     }
   }, [session, messages.length, initChat]);
 
-  // When user clicks "Talk to Atlas" on a topic, auto-send a message to start the conversation
+  // When user clicks "Talk to Atlas" button, auto-send a message to start the conversation
+  // Only triggers on explicit button click (topicToDiscuss), not on navigation (selectedCategory)
   useEffect(() => {
-    if (selectedCategory && selectedCategory !== lastFocusedTopic && isChatOpen && !isLoading) {
-      setLastFocusedTopic(selectedCategory);
-
+    if (topicToDiscuss && isChatOpen && !isLoading) {
       // Get topic label for the prompt
-      const topicLabel = getTopicLabel(selectedCategory);
+      const topicLabel = getTopicLabel(topicToDiscuss);
 
       // Automatically send a message to start discussing this topic
       sendMessage(`Let's talk about: ${topicLabel}`).catch(() => {});
+
+      // Clear the flag so it doesn't trigger again
+      clearTopicToDiscuss();
     }
-  }, [selectedCategory, lastFocusedTopic, isChatOpen, isLoading, sendMessage]);
+  }, [topicToDiscuss, isChatOpen, isLoading, sendMessage, clearTopicToDiscuss]);
 
   // Auto-scroll
   useEffect(() => {

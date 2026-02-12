@@ -30,6 +30,9 @@ interface WorkspaceState {
   isChatOpen: boolean;
   chatDomain: DomainType | null;
 
+  // Topic the user explicitly wants to discuss (set by "Talk to Atlas" button)
+  topicToDiscuss: string | null;
+
   // Mobile
   mobileTab: MobileTab;
 
@@ -46,7 +49,9 @@ type WorkspaceAction =
   | { type: 'TOGGLE_CHAT' }
   | { type: 'SET_MOBILE_TAB'; payload: MobileTab }
   | { type: 'TOGGLE_SIDEBAR' }
-  | { type: 'RESTORE_STATE'; payload: Partial<WorkspaceState> };
+  | { type: 'RESTORE_STATE'; payload: Partial<WorkspaceState> }
+  | { type: 'DISCUSS_TOPIC'; payload: { domain: DomainType; topicId: string } }
+  | { type: 'CLEAR_TOPIC_TO_DISCUSS' };
 
 // ============================================
 // Initial State
@@ -78,6 +83,7 @@ function getInitialState(): WorkspaceState {
     selectedCategory: null,
     isChatOpen: false, // Chat hidden by default — opens on category select
     chatDomain: null,
+    topicToDiscuss: null, // Set when user clicks "Talk to Atlas" button
     mobileTab: 'content', // Default to content view on mobile
     isSidebarCollapsed: false,
   };
@@ -148,6 +154,19 @@ function workspaceReducer(
     case 'RESTORE_STATE':
       return { ...state, ...action.payload };
 
+    case 'DISCUSS_TOPIC':
+      return {
+        ...state,
+        selectedDomain: action.payload.domain,
+        selectedCategory: action.payload.topicId,
+        chatDomain: action.payload.domain,
+        isChatOpen: true,
+        topicToDiscuss: action.payload.topicId,
+      };
+
+    case 'CLEAR_TOPIC_TO_DISCUSS':
+      return { ...state, topicToDiscuss: null };
+
     default:
       return state;
   }
@@ -167,6 +186,8 @@ interface WorkspaceContextValue extends WorkspaceState {
   openChat: (domain?: DomainType) => void;
   closeChat: () => void;
   toggleChat: () => void;
+  discussTopic: (domain: DomainType, topicId: string) => void;
+  clearTopicToDiscuss: () => void;
 
   // Mobile
   setMobileTab: (tab: MobileTab) => void;
@@ -270,6 +291,14 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'TOGGLE_CHAT' });
   }, []);
 
+  const discussTopic = useCallback((domain: DomainType, topicId: string) => {
+    dispatch({ type: 'DISCUSS_TOPIC', payload: { domain, topicId } });
+  }, []);
+
+  const clearTopicToDiscuss = useCallback(() => {
+    dispatch({ type: 'CLEAR_TOPIC_TO_DISCUSS' });
+  }, []);
+
   const setMobileTab = useCallback((tab: MobileTab) => {
     dispatch({ type: 'SET_MOBILE_TAB', payload: tab });
   }, []);
@@ -314,6 +343,8 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     openChat,
     closeChat,
     toggleChat,
+    discussTopic,
+    clearTopicToDiscuss,
     setMobileTab,
     toggleSidebar,
     progressState,

@@ -17,7 +17,7 @@ export function ContentPanel() {
     selectedCategory,
     getDomainInputCount,
     selectCategory,
-    openChat,
+    discussTopic,
     progressState,
   } = useWorkspace();
   const { inputs, addInput, session } = useAssessment();
@@ -48,11 +48,10 @@ export function ContentPanel() {
   const dp = progressState.domainProgress[selectedDomain];
   const showSnapshotCTA = count.total > 0 && count.current / count.total >= 0.6;
 
-  // Open chat and focus on a topic - explicit user action
+  // Open chat and start discussing a topic - explicit user action via "Talk to Atlas" button
   const handleDiscussTopic = useCallback((topicId: string) => {
-    selectCategory(selectedDomain, topicId);
-    openChat(selectedDomain);
-  }, [selectedDomain, selectCategory, openChat]);
+    discussTopic(selectedDomain, topicId);
+  }, [selectedDomain, discussTopic]);
 
   // Just highlight the topic in domain header without opening chat
   const handleTopicSelect = useCallback((topicId: string) => {
