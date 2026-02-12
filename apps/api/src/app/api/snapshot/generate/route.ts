@@ -12,6 +12,9 @@ import { getSessionInputs } from '@/lib/db/inputs';
 import { supabase } from '@/lib/db/supabase';
 import { handleApiError, ValidationError } from '@/lib/errors';
 
+// Increase timeout for this route (Vercel Pro: up to 300s, Hobby: 10s max)
+export const maxDuration = 60;
+
 // Snapshot schema for structured generation
 const snapshotSchema = z.object({
   keyFindings: z.array(
