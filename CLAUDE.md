@@ -212,7 +212,8 @@ supabase
 ## Recent Commits
 
 ```
-845fd2f Fix invalid model ID and add debugging logs
+46370f0 Add detailed API route logging for debugging
+e929d0f Fix invalid model ID and add debugging logs
 52898e0 Improve error handling for API connection issues
 28644de Fix inconsistent status indicators in WelcomeModal
 ca000f0 Improve visual distinction between status and rating pills
@@ -221,6 +222,5 @@ ca000f0 Improve visual distinction between status and rating pills
 739e411 Implement P1 UX improvements: chat default, status indicators, onboarding
 60d4764 Decouple card interactions from chat (P0 UX fix)
 b065842 Implement V3 workspace redesign with Notion-inspired UI
-727210a Add AGENTS.md registry and link from CLAUDE.md
 ```
 <!-- /AUTO:RECENT_CHANGES -->

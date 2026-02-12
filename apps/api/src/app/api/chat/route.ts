@@ -12,8 +12,12 @@ const chatRequestSchema = z.object({
 
 // POST /api/chat - Send a message and stream response
 export async function POST(request: NextRequest) {
+  console.log('[Atlas API] POST /api/chat called');
+  console.log('[Atlas API] ANTHROPIC_API_KEY present:', !!process.env.ANTHROPIC_API_KEY);
+
   try {
     const body = await request.json();
+    console.log('[Atlas API] Request body:', { sessionId: body.sessionId, contentLength: body.content?.length });
     const validation = chatRequestSchema.safeParse(body);
 
     if (!validation.success) {
@@ -32,10 +36,14 @@ export async function POST(request: NextRequest) {
 
     // Check if this is the first message (need welcome message first)
     const existingMessages = await getSessionMessages(sessionId);
+    console.log('[Atlas API] Existing messages:', existingMessages.length);
     if (existingMessages.length === 0) {
       // Generate welcome message first
+      console.log('[Atlas API] Generating welcome message...');
       await generateWelcomeMessage(sessionId);
     }
+
+    console.log('[Atlas API] Starting SSE stream for domain:', session.current_domain);
 
     // Create SSE response
     const encoder = new TextEncoder();
