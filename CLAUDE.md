@@ -212,7 +212,8 @@ supabase
 ## Recent Commits
 
 ```
-352172d Unify card appearance with TopicCard component
+ba23da4 Improve visual distinction between status and rating pills
+3d44196 Unify card appearance with TopicCard component
 1667a13 Implement P2/P3 UX improvements: welcome back, time estimates, skip topics
 739e411 Implement P1 UX improvements: chat default, status indicators, onboarding
 60d4764 Decouple card interactions from chat (P0 UX fix)
@@ -221,6 +222,5 @@ b065842 Implement V3 workspace redesign with Notion-inspired UI
 f0e6e87 Add post-commit hook to auto-update CLAUDE.md
 c3a9db4 Redesign frontend to 3-panel workspace layout (V2)
 408bf8a docs: auto-update MVP documentation [skip ci]
-c668263 Fix question ID matching and domain transitions
 ```
 <!-- /AUTO:RECENT_CHANGES -->

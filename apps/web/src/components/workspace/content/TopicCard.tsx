@@ -13,6 +13,8 @@ import {
   Circle,
   Pencil,
   X,
+  Loader2,
+  Star,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Input, ConfidenceLevel } from '@atlas/types';
@@ -39,71 +41,76 @@ interface TopicCardProps {
 }
 
 // ============================================
-// Confidence Config
+// Confidence Config (Rating - filled semantic colors)
 // ============================================
 
 const confidenceConfig: Record<ConfidenceLevel, {
   label: string;
-  shortLabel: string;
   color: string;
   bgColor: string;
+  iconColor: string;
   description: string;
 }> = {
   high: {
     label: 'Strong',
-    shortLabel: 'Strong',
     color: 'text-[#0F7B6C]',
     bgColor: 'bg-[#DBEDDB]',
+    iconColor: 'text-[#0F7B6C]',
     description: 'Clear, specific, data-backed response',
   },
   medium: {
     label: 'Developing',
-    shortLabel: 'Developing',
     color: 'text-[#9A6700]',
     bgColor: 'bg-[#FBF3DB]',
+    iconColor: 'text-[#9A6700]',
     description: 'Good foundation, could be more specific',
   },
   low: {
     label: 'Needs work',
-    shortLabel: 'Needs work',
     color: 'text-[#E03E3E]',
     bgColor: 'bg-[#FFE2DD]',
+    iconColor: 'text-[#E03E3E]',
     description: 'Consider adding more detail',
   },
 };
 
 // ============================================
-// Status Config
+// Status Config (State - outlined with icons)
 // ============================================
 
 const statusConfig: Record<TopicStatus, {
   label: string;
   color: string;
+  borderColor: string;
   bgColor: string;
   icon: typeof Check;
 }> = {
   not_started: {
     label: 'Not started',
     color: 'text-[#787774]',
-    bgColor: 'bg-[#F1F0EC]',
+    borderColor: 'border-[#D4D1CB]',
+    bgColor: 'bg-transparent',
     icon: Circle,
   },
   in_progress: {
     label: 'In progress',
     color: 'text-[#9A6700]',
-    bgColor: 'bg-[#FBF3DB]',
-    icon: Circle,
+    borderColor: 'border-[#E9B949]',
+    bgColor: 'bg-transparent',
+    icon: Loader2,
   },
   complete: {
     label: 'Complete',
     color: 'text-[#0F7B6C]',
-    bgColor: 'bg-[#DBEDDB]',
+    borderColor: 'border-[#0F7B6C]',
+    bgColor: 'bg-transparent',
     icon: Check,
   },
   skipped: {
     label: 'Skipped',
-    color: 'text-[#787774]',
-    bgColor: 'bg-[#F1F0EC]',
+    color: 'text-[#9B9A97]',
+    borderColor: 'border-[#D4D1CB]',
+    bgColor: 'bg-transparent',
     icon: SkipForward,
   },
 };
@@ -239,23 +246,26 @@ export function TopicCard({
             {label}
           </span>
 
-          {/* Status pill */}
+          {/* Status indicator - outlined with icon */}
           <span className={cn(
-            'shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium',
+            'shrink-0 inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-medium',
+            statusCfg.borderColor,
             statusCfg.bgColor,
             statusCfg.color
           )}>
+            <StatusIcon status={status} className="h-3 w-3" />
             {statusCfg.label}
           </span>
 
-          {/* Confidence badge (only for complete) */}
+          {/* Confidence rating - filled with star */}
           {confidenceCfg && (
             <span className={cn(
-              'shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium',
+              'shrink-0 inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium',
               confidenceCfg.bgColor,
               confidenceCfg.color
             )}>
-              {confidenceCfg.shortLabel}
+              <Star className={cn('h-3 w-3', confidenceCfg.iconColor)} fill="currentColor" />
+              {confidenceCfg.label}
             </span>
           )}
 
@@ -276,23 +286,26 @@ export function TopicCard({
               {label}
             </span>
 
-            {/* Status pill */}
+            {/* Status indicator - outlined with icon */}
             <span className={cn(
-              'shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium',
+              'shrink-0 inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-medium',
+              statusCfg.borderColor,
               statusCfg.bgColor,
               statusCfg.color
             )}>
+              <StatusIcon status={status} className="h-3 w-3" />
               {statusCfg.label}
             </span>
 
-            {/* Confidence badge */}
+            {/* Confidence rating - filled with star */}
             {confidenceCfg && (
               <span className={cn(
-                'shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium',
+                'shrink-0 inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium',
                 confidenceCfg.bgColor,
                 confidenceCfg.color
               )}>
-                {confidenceCfg.shortLabel}
+                <Star className={cn('h-3 w-3', confidenceCfg.iconColor)} fill="currentColor" />
+                {confidenceCfg.label}
               </span>
             )}
 
@@ -404,10 +417,11 @@ export function TopicCard({
             {confidenceCfg && (
               <div className="flex items-center gap-2 pt-2 border-t border-[#F1F0EC]">
                 <span className={cn(
-                  'rounded-full px-2 py-0.5 text-[11px] font-medium',
+                  'inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium',
                   confidenceCfg.bgColor,
                   confidenceCfg.color
                 )}>
+                  <Star className={cn('h-3 w-3', confidenceCfg.iconColor)} fill="currentColor" />
                   {confidenceCfg.label}
                 </span>
                 <span className="text-[12px] text-[#9B9A97]">
@@ -600,6 +614,17 @@ export function TopicCard({
 // ============================================
 // Helpers
 // ============================================
+
+function StatusIcon({ status, className }: { status: TopicStatus; className?: string }) {
+  const icons: Record<TopicStatus, typeof Check> = {
+    not_started: Circle,
+    in_progress: Loader2,
+    complete: Check,
+    skipped: SkipForward,
+  };
+  const Icon = icons[status];
+  return <Icon className={cn(className, status === 'in_progress' && 'animate-spin')} />;
+}
 
 function formatTimestamp(dateString: string): string {
   const date = new Date(dateString);
