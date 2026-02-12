@@ -212,7 +212,8 @@ supabase
 ## Recent Commits
 
 ```
-39da960 Revert synthesis to Sonnet (Vercel Pro now active)
+c6c8ba9 Add detailed logging to snapshot generation for debugging
+10ac5ad Revert synthesis to Sonnet (Vercel Pro now active)
 fbc9417 Fix snapshot timeout: use Haiku + increase maxDuration
 215c44f Reduce token usage for snapshot generation
 ac28106 docs: auto-update MVP documentation [skip ci]
@@ -221,6 +222,5 @@ ac28106 docs: auto-update MVP documentation [skip ci]
 908f107 Fix: Only auto-send topic message when "Talk to Atlas" button is clicked
 8c22431 docs: auto-update MVP documentation [skip ci]
 a7129bb Auto-navigate content panel when AI captures input or changes domain
-b046a58 docs: auto-update MVP documentation [skip ci]
 ```
 <!-- /AUTO:RECENT_CHANGES -->

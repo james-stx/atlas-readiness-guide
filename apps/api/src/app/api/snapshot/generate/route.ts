@@ -68,6 +68,8 @@ const requestSchema = z.object({
 // POST /api/snapshot/generate - Generate readiness snapshot
 export async function POST(request: NextRequest) {
   try {
+    console.log('[Snapshot] Starting generation...');
+
     const body = await request.json();
     const validation = requestSchema.safeParse(body);
 
@@ -76,12 +78,15 @@ export async function POST(request: NextRequest) {
     }
 
     const { sessionId } = validation.data;
+    console.log('[Snapshot] Session ID:', sessionId);
 
     // Validate session
     const session = await getValidSession(sessionId);
+    console.log('[Snapshot] Session validated');
 
     // Get all inputs for the session
     const inputs = await getSessionInputs(sessionId);
+    console.log('[Snapshot] Inputs fetched:', inputs.length);
 
     if (inputs.length === 0) {
       throw new ValidationError('No inputs captured for this session');
@@ -89,14 +94,18 @@ export async function POST(request: NextRequest) {
 
     // Update session status to synthesizing
     await updateSessionStatus(sessionId, 'synthesizing');
+    console.log('[Snapshot] Status updated to synthesizing');
 
     // Calculate coverage summary
     const coverageSummary = calculateCoverageSummary(inputs);
+    console.log('[Snapshot] Coverage calculated');
 
     // Build the prompt
     const userPrompt = buildSynthesisUserPrompt(inputs);
+    console.log('[Snapshot] Prompt built, length:', userPrompt.length);
 
     // Generate structured snapshot using Claude
+    console.log('[Snapshot] Calling Claude API...');
     const { object: generatedSnapshot } = await generateObject({
       model: anthropic(models.synthesis),
       schema: snapshotSchema,
@@ -105,6 +114,7 @@ export async function POST(request: NextRequest) {
       maxTokens: modelConfig.synthesis.maxTokens,
       temperature: modelConfig.synthesis.temperature,
     });
+    console.log('[Snapshot] Claude API response received');
 
     // Transform coverage summary to match DB schema
     const dbCoverageSummary = {
@@ -175,6 +185,7 @@ export async function POST(request: NextRequest) {
     }));
 
     // Save snapshot to database
+    console.log('[Snapshot] Saving to database...');
     const { data: savedSnapshot, error: saveError } = await supabase
       .from('snapshots')
       .insert({
@@ -191,14 +202,22 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (saveError) {
+      console.error('[Snapshot] Database save error:', saveError);
       throw new Error(`Failed to save snapshot: ${saveError.message}`);
     }
 
     // Update session status to completed
     await updateSessionStatus(sessionId, 'completed');
+    console.log('[Snapshot] Complete! Snapshot ID:', savedSnapshot?.id);
 
     return NextResponse.json({ snapshot: savedSnapshot });
   } catch (error) {
+    console.error('[Snapshot] Error:', error);
+    // Log more details about the error
+    if (error instanceof Error) {
+      console.error('[Snapshot] Error message:', error.message);
+      console.error('[Snapshot] Error stack:', error.stack);
+    }
     return handleApiError(error);
   }
 }
