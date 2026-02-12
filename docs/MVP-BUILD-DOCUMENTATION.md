@@ -381,6 +381,12 @@ This separation allows users to browse content freely without accidentally trigg
 - Clear visual distinction between strengths/assumptions/gaps
 - Export buttons prominently displayed
 
+**Error Handling & Feedback**:
+- Error messages display in a red-bordered container with AlertCircle icon
+- Button provides immediate feedback with "Generating..." state
+- Disabled state prevents multiple simultaneous generation attempts
+- Local error state ensures immediate user feedback without waiting for global state updates
+
 ### Progress Visibility Components
 
 #### Progress Header
@@ -1387,6 +1393,24 @@ If something breaks:
 - If auto-message doesn't send, check that `isLoading` state is false and `selectedCategory` is properly set
 - Verify `sendMessage` function is available and not throwing errors
 
+### Snapshot Generation Debugging
+
+**Console Logging**: The InlineSnapshotCTA component now includes detailed console logging for snapshot generation:
+- `[Atlas] Starting snapshot generation...` - When generation begins
+- `[Atlas] Snapshot generated, navigating to /snapshot` - On successful completion
+- `[Atlas] Snapshot generation failed: [error]` - On failure with error details
+
+**Error States**: 
+- Errors are displayed inline with an AlertCircle icon in a red-bordered container
+- Button shows "Generating..." state during processing and is disabled
+- Local error state takes precedence over global error state for immediate feedback
+
+**Troubleshooting Snapshot Issues**:
+1. Check browser console for `[Atlas]` prefixed messages
+2. Look for error messages displayed above the snapshot generation button
+3. Verify the button state - it should be disabled during generation
+4. If generation fails, the error message will persist until the next attempt
+
 ### Common Issues & Fixes
 
 #### "Failed to fetch" error on start page
@@ -1621,61 +1645,4 @@ Key decisions made during development and why.
 
 **API Rate Limits**: The system is configured to use a maximum of 6 recent messages in conversation history to stay within token limits (~5000 tokens per request) and avoid rate limiting. This may affect conversation context for very long sessions.
 
-**Rate Limit Considerations**: Tool execution is limited to maxSteps:2 to stay within the 10k tokens/min rate limit. This was reduced from the original 5 steps after removing maxSteps entirely caused tool execution failures.
-
-### Potential Future Features
-
-#### Short Term
-- Input editing capability
-- Better progress saving
-- Improved error messages
-- Loading state improvements
-
-#### Medium Term
-- User authentication
-- Multiple assessments per user
-- Admin dashboard with analytics
-- Comparison between sessions
-
-#### Long Term
-- Team/organization features
-- Integration with other tools
-- AI-powered recommendations
-- Benchmark comparisons
-
-### Legal Compliance
-
-**Current State**:
-- Privacy Policy and Terms of Service implemented
-- Australian Privacy Act compliance measures in place
-- Victorian law jurisdiction established
-- Third-party service disclosures included
-
-**Future Considerations**:
-- Regular legal document reviews and updates
-- Potential GDPR compliance for international users
-- Cookie policy if tracking is implemented
-- Data portability features for enhanced user rights
-
----
-
-## 16. Maintenance Guide
-
-### Regular Tasks
-
-#### Weekly
-- Check Vercel deployment status
-- Review any error logs
-- Monitor API usage/costs
-
-#### Monthly
-- Update dependencies (`pnpm update`)
-- Review Supabase usage
-- Check Anthropic API usage
-
-#### As Needed
-- Rotate API keys if exposed
-- Scale resources if traffic grows
-- Address user-reported issues
-
-### Updating Dependencies
+**Rate Limit Considerations**: Tool execution is limited to maxSteps:2 to stay within the 10k tokens/min rate limit. This was reduced from the original 5 steps after removing maxSteps entirely caused tool execution failures
