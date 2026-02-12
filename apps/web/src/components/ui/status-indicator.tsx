@@ -36,17 +36,17 @@ const sizeConfig = {
 const confidenceColors = {
   high: {
     fill: '#35A552',
-    label: 'Strong',
+    label: 'High Confidence',
     textColor: 'text-[#0F7B6C]',
   },
   medium: {
     fill: '#CB7B3E',
-    label: 'Developing',
+    label: 'Medium Confidence',
     textColor: 'text-[#D9730D]',
   },
   low: {
     fill: '#E03E3E',
-    label: 'Needs attention',
+    label: 'Low Confidence',
     textColor: 'text-[#E03E3E]',
   },
 };

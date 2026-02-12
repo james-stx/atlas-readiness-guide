@@ -53,54 +53,34 @@ export function ContentDomainHeader({
           </p>
         </div>
 
-        {/* Confidence breakdown + Suggested next */}
+        {/* Suggested next action */}
         <div className="flex items-center justify-between pt-3 border-t border-[#E8E6E1]">
-          {/* Confidence dots */}
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1">
-              {Array(domainProgress.highConfidence)
-                .fill(0)
-                .map((_, i) => (
-                  <span
-                    key={`high-${i}`}
-                    className="h-2 w-2 rounded-full bg-[#37352F]"
-                  />
-                ))}
-              {Array(domainProgress.mediumConfidence)
-                .fill(0)
-                .map((_, i) => (
-                  <span
-                    key={`med-${i}`}
-                    className="h-2 w-2 rounded-full bg-[#9B9A97]"
-                  />
-                ))}
-              {Array(domainProgress.lowConfidence)
-                .fill(0)
-                .map((_, i) => (
-                  <span
-                    key={`low-${i}`}
-                    className="h-2 w-2 rounded-full bg-[#E03E3E]"
-                  />
-                ))}
-              {Array(count.total - count.current)
-                .fill(0)
-                .map((_, i) => (
-                  <span
-                    key={`empty-${i}`}
-                    className="h-2 w-2 rounded-full border border-[#D4D1CB]"
-                  />
-                ))}
-            </div>
+          {/* Confidence summary text */}
+          <div className="flex items-center gap-2">
             {count.current > 0 && (
-              <span className="text-[11px] text-[#9B9A97]">
-                {domainProgress.highConfidence > 0 && `${domainProgress.highConfidence} strong`}
-                {domainProgress.lowConfidence > 0 && ` · ${domainProgress.lowConfidence} needs work`}
+              <span className="text-[12px] text-[#9B9A97]">
+                {domainProgress.highConfidence > 0 && (
+                  <span className="text-[#0F7B6C]">{domainProgress.highConfidence} high</span>
+                )}
+                {domainProgress.mediumConfidence > 0 && (
+                  <span className="text-[#9A6700]">
+                    {domainProgress.highConfidence > 0 && ' · '}
+                    {domainProgress.mediumConfidence} medium
+                  </span>
+                )}
+                {domainProgress.lowConfidence > 0 && (
+                  <span className="text-[#E03E3E]">
+                    {(domainProgress.highConfidence > 0 || domainProgress.mediumConfidence > 0) && ' · '}
+                    {domainProgress.lowConfidence} low
+                  </span>
+                )}
+                <span className="text-[#9B9A97]"> confidence</span>
               </span>
             )}
           </div>
 
-          {/* Suggested next action */}
-          {suggestedTopic && (
+          {/* Suggested next action - only show if there are uncovered topics */}
+          {suggestedTopic ? (
             <button
               onClick={() => onTopicSelect(suggestedTopic.id)}
               className="flex items-center gap-1.5 text-[13px] font-medium text-[#2383E2] hover:text-[#1A6DC0] transition-colors"
@@ -108,13 +88,11 @@ export function ContentDomainHeader({
               Continue: {suggestedTopic.label}
               <ArrowRight className="h-3.5 w-3.5" />
             </button>
-          )}
-
-          {count.current === count.total && (
+          ) : count.current === count.total ? (
             <span className="text-[13px] font-medium text-[#0F7B6C]">
-              Domain complete
+              All topics covered
             </span>
-          )}
+          ) : null}
         </div>
       </div>
     </div>
@@ -125,28 +103,35 @@ function generateDomainAssessment(
   count: { current: number; total: number },
   progress: DomainProgress
 ): string {
+  const remaining = count.total - count.current;
+
   if (count.current === 0) {
     return "Start exploring this domain to uncover insights about your readiness.";
   }
 
-  const coverage = count.current / count.total;
-  const highRatio = progress.highConfidence / count.current;
+  const highRatio = count.current > 0 ? progress.highConfidence / count.current : 0;
 
-  if (coverage === 1) {
+  // Only say "all topics" if truly complete (no remaining)
+  if (remaining === 0) {
     if (highRatio >= 0.6) {
       return "Strong foundation across this domain. Your inputs show clear, data-backed thinking.";
     } else if (progress.lowConfidence > 0) {
-      return `All topics explored, but ${progress.lowConfidence} area${progress.lowConfidence > 1 ? 's' : ''} could use more specifics.`;
+      return `All topics covered, but ${progress.lowConfidence} area${progress.lowConfidence > 1 ? 's' : ''} could use more specifics.`;
     }
-    return "Good coverage of this domain. Consider revisiting medium-confidence areas.";
+    return "Good coverage of this domain. Consider strengthening medium-confidence areas.";
   }
 
-  if (coverage >= 0.6) {
+  // Still have topics remaining
+  if (remaining === 1) {
+    return `Almost there! ${remaining} topic remaining to complete this domain.`;
+  }
+
+  if (count.current >= 3) {
     if (highRatio >= 0.5) {
-      return `Solid progress with strong insights captured. ${count.total - count.current} topics remaining.`;
+      return `Good progress with solid insights. ${remaining} topics remaining.`;
     }
-    return `Making good progress. Strengthen your responses with specific data or examples.`;
+    return `Making progress. ${remaining} topics to go - strengthen responses with specifics.`;
   }
 
-  return `Early exploration phase. Keep going to build a complete picture of this domain.`;
+  return `Early exploration phase. ${remaining} topics remaining in this domain.`;
 }

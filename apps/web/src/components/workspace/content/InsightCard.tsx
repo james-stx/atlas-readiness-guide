@@ -17,9 +17,9 @@ interface InsightCardProps {
 type CardState = 'collapsed' | 'expanded' | 'editing';
 
 const confidenceLabels = {
-  high: { label: 'Strong', color: 'text-[#0F7B6C]' },
-  medium: { label: 'Developing', color: 'text-[#D9730D]' },
-  low: { label: 'Needs work', color: 'text-[#E03E3E]' },
+  high: { label: 'High Confidence', color: 'text-[#0F7B6C]' },
+  medium: { label: 'Medium Confidence', color: 'text-[#D9730D]' },
+  low: { label: 'Low Confidence', color: 'text-[#E03E3E]' },
 };
 
 export function InsightCard({

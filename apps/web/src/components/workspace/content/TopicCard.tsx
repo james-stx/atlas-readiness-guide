@@ -52,21 +52,21 @@ const confidenceConfig: Record<ConfidenceLevel, {
   description: string;
 }> = {
   high: {
-    label: 'Strong',
+    label: 'High Confidence',
     color: 'text-[#0F7B6C]',
     bgColor: 'bg-[#DBEDDB]',
     iconColor: 'text-[#0F7B6C]',
     description: 'Clear, specific, data-backed response',
   },
   medium: {
-    label: 'Developing',
+    label: 'Medium Confidence',
     color: 'text-[#9A6700]',
     bgColor: 'bg-[#FBF3DB]',
     iconColor: 'text-[#9A6700]',
     description: 'Good foundation, could be more specific',
   },
   low: {
-    label: 'Needs work',
+    label: 'Low Confidence',
     color: 'text-[#E03E3E]',
     bgColor: 'bg-[#FFE2DD]',
     iconColor: 'text-[#E03E3E]',
@@ -246,18 +246,7 @@ export function TopicCard({
             {label}
           </span>
 
-          {/* Status indicator - outlined with icon */}
-          <span className={cn(
-            'shrink-0 inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-medium',
-            statusCfg.borderColor,
-            statusCfg.bgColor,
-            statusCfg.color
-          )}>
-            <StatusIcon status={status} className="h-3 w-3" />
-            {statusCfg.label}
-          </span>
-
-          {/* Confidence rating - filled with star */}
+          {/* Confidence rating - appears to left of status (filled with star) */}
           {confidenceCfg && (
             <span className={cn(
               'shrink-0 inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium',
@@ -268,6 +257,17 @@ export function TopicCard({
               {confidenceCfg.label}
             </span>
           )}
+
+          {/* Status indicator - stays in fixed position (outlined with icon) */}
+          <span className={cn(
+            'shrink-0 inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-medium',
+            statusCfg.borderColor,
+            statusCfg.bgColor,
+            statusCfg.color
+          )}>
+            <StatusIcon status={status} className="h-3 w-3" />
+            {statusCfg.label}
+          </span>
 
           {/* Expand chevron */}
           <ChevronDown className="h-4 w-4 shrink-0 text-[#9B9A97]" />
@@ -286,18 +286,7 @@ export function TopicCard({
               {label}
             </span>
 
-            {/* Status indicator - outlined with icon */}
-            <span className={cn(
-              'shrink-0 inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-medium',
-              statusCfg.borderColor,
-              statusCfg.bgColor,
-              statusCfg.color
-            )}>
-              <StatusIcon status={status} className="h-3 w-3" />
-              {statusCfg.label}
-            </span>
-
-            {/* Confidence rating - filled with star */}
+            {/* Confidence rating - appears to left of status (filled with star) */}
             {confidenceCfg && (
               <span className={cn(
                 'shrink-0 inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium',
@@ -308,6 +297,17 @@ export function TopicCard({
                 {confidenceCfg.label}
               </span>
             )}
+
+            {/* Status indicator - stays in fixed position (outlined with icon) */}
+            <span className={cn(
+              'shrink-0 inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-medium',
+              statusCfg.borderColor,
+              statusCfg.bgColor,
+              statusCfg.color
+            )}>
+              <StatusIcon status={status} className="h-3 w-3" />
+              {statusCfg.label}
+            </span>
 
             <ChevronDown className="h-4 w-4 shrink-0 text-[#9B9A97] rotate-180" />
           </button>

@@ -212,7 +212,8 @@ supabase
 ## Recent Commits
 
 ```
-1fbe166 Upgrade to Claude 4.5 models (Sonnet + Haiku)
+7187a9a Fix UI issues: pill order, confidence labels, domain summary
+d7c9095 Upgrade to Claude 4.5 models (Sonnet + Haiku)
 796f2a6 Switch to Claude 3 Haiku for broader compatibility
 8748aab Improve error extraction for AI SDK errors
 38809f3 Improve error messages for credit/auth issues
@@ -221,6 +222,5 @@ e929d0f Fix invalid model ID and add debugging logs
 52898e0 Improve error handling for API connection issues
 28644de Fix inconsistent status indicators in WelcomeModal
 ca000f0 Improve visual distinction between status and rating pills
-3d44196 Unify card appearance with TopicCard component
 ```
 <!-- /AUTO:RECENT_CHANGES -->
