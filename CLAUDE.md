@@ -212,7 +212,8 @@ supabase
 ## Recent Commits
 
 ```
-3bf6175 Auto-send topic message when clicking 'Talk to Atlas'
+6b828fc Auto-navigate content panel when AI captures input or changes domain
+1fb7562 Auto-send topic message when clicking 'Talk to Atlas'
 8c8e097 Fix 'Talk to Atlas' button to focus chat and pre-fill topic prompt
 d551109 docs: auto-update MVP documentation [skip ci]
 4cfbd0d Add server-side validation to reject invalid questionIds
@@ -221,6 +222,5 @@ e4168d0 Fix AI behavior: don't revisit completed topics, require all topics befo
 9b0a640 Fix UI issues: pill order, confidence labels, domain summary
 e50ffe9 docs: auto-update MVP documentation [skip ci]
 d7c9095 Upgrade to Claude 4.5 models (Sonnet + Haiku)
-796f2a6 Switch to Claude 3 Haiku for broader compatibility
 ```
 <!-- /AUTO:RECENT_CHANGES -->

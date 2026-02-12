@@ -6,6 +6,7 @@ import {
   useReducer,
   useCallback,
   useEffect,
+  useRef,
   type ReactNode,
 } from 'react';
 import type { DomainType } from '@atlas/types';
@@ -206,6 +207,43 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       }));
     }
   }, [state.selectedDomain, state.expandedDomains]);
+
+  // Track inputs to auto-navigate when new ones are captured
+  const prevInputsLengthRef = useRef(inputs.length);
+  const prevDomainRef = useRef(session?.current_domain);
+
+  // Auto-navigate when a new input is captured
+  useEffect(() => {
+    if (inputs.length > prevInputsLengthRef.current) {
+      // New input was added - navigate to it
+      const newInput = inputs[inputs.length - 1];
+      if (newInput) {
+        dispatch({
+          type: 'SELECT_CATEGORY',
+          payload: { domain: newInput.domain, categoryId: newInput.question_id },
+        });
+        // Expand the domain if not already
+        if (!state.expandedDomains.includes(newInput.domain)) {
+          dispatch({ type: 'TOGGLE_DOMAIN_EXPAND', payload: newInput.domain });
+        }
+      }
+    }
+    prevInputsLengthRef.current = inputs.length;
+  }, [inputs, state.expandedDomains]);
+
+  // Auto-navigate when domain changes (AI transitions to next domain)
+  useEffect(() => {
+    const currentDomain = session?.current_domain;
+    if (currentDomain && currentDomain !== prevDomainRef.current) {
+      // Domain changed - navigate to it
+      dispatch({ type: 'SELECT_DOMAIN', payload: currentDomain });
+      // Expand the new domain
+      if (!state.expandedDomains.includes(currentDomain)) {
+        dispatch({ type: 'TOGGLE_DOMAIN_EXPAND', payload: currentDomain });
+      }
+    }
+    prevDomainRef.current = currentDomain;
+  }, [session?.current_domain, state.expandedDomains]);
 
   // Actions
   const selectDomain = useCallback((domain: DomainType) => {
