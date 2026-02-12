@@ -4,7 +4,7 @@ import { anthropic, models, modelConfig } from '../client';
 import { SYSTEM_PROMPT, WELCOME_MESSAGE } from '../prompts/system';
 import { getDomainConfig, getNextDomain } from '../prompts/domains';
 import { quickClassify } from '../confidence/classifier';
-import { saveInput } from '@/lib/db/inputs';
+import { saveInput, getDomainInputs } from '@/lib/db/inputs';
 import { saveMessage, getRecentMessages, formatMessagesForLLM } from '@/lib/db/messages';
 import { updateSessionDomain, updateSessionStatus } from '@/lib/db/session';
 import type { DomainType, ChatMessage } from '@atlas/types';
@@ -67,12 +67,31 @@ function createConversationTools(sessionId: string, currentDomain: DomainType) {
     }),
 
     transitionDomain: tool({
-      description: 'Transition to the next domain in the assessment. Call this when the key topics for the current domain have been sufficiently explored.',
+      description: 'Transition to the next domain in the assessment. Only call this when ALL topics in the current domain have been covered.',
       parameters: z.object({
         currentDomainSummary: z.string().describe('Brief summary of what was learned in the current domain'),
       }),
       execute: async ({ currentDomainSummary }) => {
         try {
+          // Check if all topics are covered before allowing transition
+          const domainConfig = getDomainConfig(currentDomain);
+          const existingInputs = await getDomainInputs(sessionId, currentDomain);
+          const completedTopicIds = existingInputs.map(input => input.question_id);
+          const totalTopics = domainConfig.keyQuestions.length;
+          const uncoveredTopics = domainConfig.keyQuestions
+            .filter(q => !completedTopicIds.includes(q.id))
+            .map(q => q.id);
+
+          // If there are still uncovered topics, don't allow transition
+          if (uncoveredTopics.length > 0) {
+            console.log('[Atlas] Transition blocked - uncovered topics:', uncoveredTopics);
+            return {
+              success: false,
+              error: `Cannot transition yet. ${uncoveredTopics.length} topic(s) still need to be covered: ${uncoveredTopics.join(', ')}. Please ask about these topics first.`,
+              uncoveredTopics,
+            };
+          }
+
           const nextDomain = getNextDomain(currentDomain);
 
           if (!nextDomain) {
@@ -89,6 +108,8 @@ function createConversationTools(sessionId: string, currentDomain: DomainType) {
           // Update session to next domain
           await updateSessionDomain(sessionId, nextDomain);
           const nextConfig = getDomainConfig(nextDomain);
+
+          console.log('[Atlas] Transitioning from', currentDomain, 'to', nextDomain);
 
           return {
             success: true,
@@ -160,16 +181,29 @@ export async function* streamConversation(
     // Get domain context
     const domainConfig = getDomainConfig(currentDomain);
 
+    // Get existing inputs for this domain to know which topics are already completed
+    const existingInputs = await getDomainInputs(sessionId, currentDomain);
+    const completedTopicIds = existingInputs.map(input => input.question_id);
+    const totalTopics = domainConfig.keyQuestions.length;
+    const remainingTopics = totalTopics - completedTopicIds.length;
+
+    console.log('[Atlas] Domain:', currentDomain, 'Completed:', completedTopicIds.length, '/', totalTopics);
+
     // Create tools with session context via closure
     const tools = createConversationTools(sessionId, currentDomain);
 
-    // maxSteps: 2 allows the model to call tools AND see results in a follow-up turn.
-    // This uses at most 2 API calls per message (~6,500 tokens total),
-    // safely within the 10,000 input tokens/min rate limit at conversational pace.
-    // Build explicit list of question IDs for this domain
+    // Build explicit list of question IDs for this domain, marking completed ones
     const questionIdList = domainConfig.keyQuestions
-      .map((q) => `- "${q.id}": ${q.question}`)
+      .map((q) => {
+        const isCompleted = completedTopicIds.includes(q.id);
+        return `- "${q.id}": ${q.question}${isCompleted ? ' [COMPLETED - do not ask again]' : ''}`;
+      })
       .join('\n');
+
+    // Build list of uncovered topics
+    const uncoveredTopics = domainConfig.keyQuestions
+      .filter(q => !completedTopicIds.includes(q.id))
+      .map(q => q.id);
 
     const result = await streamText({
       model: anthropic(models.conversation),
@@ -178,14 +212,19 @@ export async function* streamConversation(
 Current Domain: ${domainConfig.name}
 Domain Description: ${domainConfig.description}
 
-VALID QUESTION IDs FOR THIS DOMAIN (you MUST use these exact IDs when calling recordInput):
+TOPICS FOR THIS DOMAIN:
 ${questionIdList}
 
+DOMAIN PROGRESS: ${completedTopicIds.length}/${totalTopics} topics completed
+${uncoveredTopics.length > 0 ? `UNCOVERED TOPICS (focus on these): ${uncoveredTopics.join(', ')}` : 'ALL TOPICS COVERED - ready to transition'}
+
 CRITICAL INSTRUCTIONS:
-1. When the user provides information, call recordInput with the EXACT questionId from the list above. Do NOT make up new IDs.
-2. You MUST always respond with conversational text. Never just call tools without also providing a spoken response.
-3. After covering 3-4 topics in this domain, call transitionDomain to move to the next domain. Announce the transition naturally in your response.
-4. If the user's response covers multiple topics, you can call recordInput multiple times with different questionIds.`,
+1. DO NOT ask about topics marked [COMPLETED]. These have already been answered. Only discuss completed topics if the user explicitly brings them up.
+2. Focus your questions on the UNCOVERED TOPICS listed above.
+3. When the user provides information, call recordInput with the EXACT questionId from the list above.
+4. You MUST always respond with conversational text. Never just call tools without also providing a spoken response.
+5. Only call transitionDomain when ALL ${totalTopics} topics in this domain have been covered (currently ${remainingTopics} remaining).
+6. If the user's response covers multiple topics, you can call recordInput multiple times with different questionIds.`,
       messages: [
         ...formattedMessages,
         { role: 'user', content: userMessage },

@@ -212,7 +212,9 @@ supabase
 ## Recent Commits
 
 ```
-7187a9a Fix UI issues: pill order, confidence labels, domain summary
+df30682 Fix AI behavior: don't revisit completed topics, require all topics before transition
+9b0a640 Fix UI issues: pill order, confidence labels, domain summary
+e50ffe9 docs: auto-update MVP documentation [skip ci]
 d7c9095 Upgrade to Claude 4.5 models (Sonnet + Haiku)
 796f2a6 Switch to Claude 3 Haiku for broader compatibility
 8748aab Improve error extraction for AI SDK errors
@@ -220,7 +222,5 @@ d7c9095 Upgrade to Claude 4.5 models (Sonnet + Haiku)
 0e99268 Add detailed API route logging for debugging
 e929d0f Fix invalid model ID and add debugging logs
 52898e0 Improve error handling for API connection issues
-28644de Fix inconsistent status indicators in WelcomeModal
-ca000f0 Improve visual distinction between status and rating pills
 ```
 <!-- /AUTO:RECENT_CHANGES -->
