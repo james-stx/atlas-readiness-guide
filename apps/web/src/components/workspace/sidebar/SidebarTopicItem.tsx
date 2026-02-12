@@ -1,10 +1,13 @@
 'use client';
 
 import { cn } from '@/lib/utils';
+import { StatusIndicator } from '@/components/ui/status-indicator';
+import type { ConfidenceLevel } from '@atlas/types';
 
 interface SidebarTopicItemProps {
   label: string;
   covered: boolean;
+  confidence?: ConfidenceLevel;
   isSelected: boolean;
   onClick: () => void;
 }
@@ -12,9 +15,12 @@ interface SidebarTopicItemProps {
 export function SidebarTopicItem({
   label,
   covered,
+  confidence,
   isSelected,
   onClick,
 }: SidebarTopicItemProps) {
+  const status = covered ? 'complete' : 'not_started';
+
   return (
     <button
       onClick={onClick}
@@ -27,26 +33,10 @@ export function SidebarTopicItem({
       role="treeitem"
       aria-level={2}
     >
-      {/* Status indicator - Notion-style checkmark or empty circle */}
-      {covered ? (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
-          className="mr-2.5 shrink-0"
-          fill="none"
-        >
-          <path
-            d="M13 5L6.5 11.5L3 8"
-            stroke="#35A552"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      ) : (
-        <span className="h-[14px] w-[14px] mr-2.5 rounded-full border-[1.5px] border-[#CDCDCA] shrink-0" />
-      )}
+      {/* Status indicator */}
+      <div className="mr-2.5 shrink-0">
+        <StatusIndicator status={status} confidence={confidence} size="md" />
+      </div>
 
       {/* Topic label */}
       <span

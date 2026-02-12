@@ -5,6 +5,7 @@ import { ChevronDown, MessageSquare, Check, AlertTriangle, Circle, Pencil, X } f
 import { cn } from '@/lib/utils';
 import type { Input } from '@atlas/types';
 import { getTopicLabel } from '@/lib/progress';
+import { ConfidenceDots } from '@/components/ui/status-indicator';
 
 interface InsightCardProps {
   input: Input;
@@ -15,10 +16,10 @@ interface InsightCardProps {
 
 type CardState = 'collapsed' | 'expanded' | 'editing';
 
-const confidenceDots = {
-  high: { filled: 3, label: 'Strong', color: 'text-[#0F7B6C]' },
-  medium: { filled: 2, label: 'Developing', color: 'text-[#D9730D]' },
-  low: { filled: 1, label: 'Needs work', color: 'text-[#E03E3E]' },
+const confidenceLabels = {
+  high: { label: 'Strong', color: 'text-[#0F7B6C]' },
+  medium: { label: 'Developing', color: 'text-[#D9730D]' },
+  low: { label: 'Needs work', color: 'text-[#E03E3E]' },
 };
 
 export function InsightCard({
@@ -43,7 +44,7 @@ export function InsightCard({
   const keyInsight = extracted?.keyInsight || extracted?.summary || generateFallbackInsight(input);
   const strengths = extracted?.strengths || [];
   const considerations = extracted?.considerations || [];
-  const conf = confidenceDots[input.confidence_level];
+  const conf = confidenceLabels[input.confidence_level];
 
   // Categorize considerations
   const { assumptions, gaps } = categorizeConsiderations(considerations);
@@ -91,16 +92,8 @@ export function InsightCard({
           className="flex w-full items-start gap-3 p-4 text-left"
         >
           {/* Confidence indicator */}
-          <div className="flex items-center gap-0.5 shrink-0 pt-0.5" title={conf.label}>
-            {[1, 2, 3].map((i) => (
-              <span
-                key={i}
-                className={cn(
-                  'h-2 w-2 rounded-full',
-                  i <= conf.filled ? 'bg-[#37352F]' : 'border border-[#D4D1CB]'
-                )}
-              />
-            ))}
+          <div className="shrink-0 pt-0.5" title={conf.label}>
+            <ConfidenceDots level={input.confidence_level} size="md" />
           </div>
 
           {/* Insight preview */}

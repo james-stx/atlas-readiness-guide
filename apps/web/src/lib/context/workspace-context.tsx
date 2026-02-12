@@ -111,7 +111,7 @@ function workspaceReducer(
         selectedDomain: action.payload.domain,
         selectedCategory: action.payload.categoryId,
         chatDomain: action.payload.domain,
-        isChatOpen: true, // Category select opens chat
+        // Don't auto-open chat - user must explicitly click "Discuss" or "Talk to Atlas"
         expandedDomains: state.expandedDomains.includes(action.payload.domain)
           ? state.expandedDomains
           : [...state.expandedDomains, action.payload.domain],
@@ -177,7 +177,7 @@ interface WorkspaceContextValue extends WorkspaceState {
   progressState: ProgressState;
 
   // Domain topic helpers
-  getTopicsForDomain: (domain: DomainType) => { id: string; label: string; covered: boolean }[];
+  getTopicsForDomain: (domain: DomainType) => { id: string; label: string; covered: boolean; confidence?: import('@atlas/types').ConfidenceLevel }[];
   getDomainInputCount: (domain: DomainType) => { current: number; total: number };
 }
 
@@ -245,13 +245,18 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     (domain: DomainType) => {
       const topics = DOMAIN_TOPICS[domain] || [];
       const dp = progressState.domainProgress[domain];
-      return topics.map((t) => ({
-        id: t.id,
-        label: t.label,
-        covered: dp.coveredTopics.includes(t.id),
-      }));
+      return topics.map((t) => {
+        // Find the input for this topic to get confidence level
+        const input = inputs.find((i) => i.question_id === t.id && i.domain === domain);
+        return {
+          id: t.id,
+          label: t.label,
+          covered: dp.coveredTopics.includes(t.id),
+          confidence: input?.confidence_level,
+        };
+      });
     },
-    [progressState]
+    [progressState, inputs]
   );
 
   const getDomainInputCount = useCallback(

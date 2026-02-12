@@ -66,6 +66,7 @@ export function Sidebar() {
                       key={topic.id}
                       label={topic.label}
                       covered={topic.covered}
+                      confidence={topic.confidence}
                       isSelected={selectedCategory === topic.id}
                       onClick={() => selectCategory(domain.key, topic.id)}
                     />

@@ -1,10 +1,11 @@
 'use client';
 
-import { Compass, PanelRightOpen, PanelRightClose } from 'lucide-react';
+import { Compass, PanelRightOpen, PanelRightClose, MessageSquare } from 'lucide-react';
 import { useWorkspace } from '@/lib/context/workspace-context';
 import { useAssessment } from '@/lib/context/assessment-context';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import { cn } from '@/lib/utils';
 
 export function TopBar() {
   const router = useRouter();
@@ -67,13 +68,24 @@ export function TopBar() {
         {/* Chat toggle */}
         <button
           onClick={toggleChat}
-          className="hidden items-center justify-center rounded-lg p-2 text-[#9B9A97] transition-colors hover:bg-[#F7F6F3] hover:text-[#5C5A56] lg:flex"
+          className={cn(
+            'flex items-center gap-1.5 rounded-lg px-3 py-1.5 transition-colors',
+            isChatOpen
+              ? 'text-[#9B9A97] hover:bg-[#F7F6F3] hover:text-[#5C5A56]'
+              : 'bg-[#2383E2] text-white hover:bg-[#1A6DC0]'
+          )}
           aria-label={isChatOpen ? 'Close chat panel' : 'Open chat panel'}
         >
           {isChatOpen ? (
-            <PanelRightClose className="h-4 w-4" />
+            <>
+              <PanelRightClose className="h-4 w-4" />
+              <span className="hidden text-[13px] sm:inline">Close</span>
+            </>
           ) : (
-            <PanelRightOpen className="h-4 w-4" />
+            <>
+              <MessageSquare className="h-4 w-4" />
+              <span className="hidden text-[13px] font-medium sm:inline">Ask Atlas</span>
+            </>
           )}
         </button>
       </div>

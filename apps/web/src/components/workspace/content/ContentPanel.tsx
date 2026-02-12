@@ -71,6 +71,7 @@ export function ContentPanel() {
       domain: selectedDomain,
       user_response: response,
       confidence_level: 'medium', // Default confidence for direct writes
+      confidence_rationale: 'Direct user input without AI analysis',
       extracted_data: {
         keyInsight: 'Response provided directly by user.',
         summary: response.slice(0, 150) + (response.length > 150 ? '...' : ''),
@@ -78,7 +79,6 @@ export function ContentPanel() {
         considerations: ['Consider discussing with Atlas to develop this further.'],
       },
       created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
     };
 
     addInput(newInput);

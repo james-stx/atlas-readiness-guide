@@ -159,12 +159,12 @@ supabase/migrations/00001_initial_schema.sql
 
 ## Component Inventory (Web)
 
-- **components/workspace/** (2): TopBar,WorkspaceLayout
+- **components/workspace/** (3): TopBar,WelcomeModal,WorkspaceLayout
 - **components/workspace/sidebar/** (4): Sidebar,SidebarDomainItem,SidebarFooter,SidebarTopicItem
 - **components/workspace/content/** (7): CategoryCard,ContentDomainHeader,ContentPanel,EmptyState,InlineSnapshotCTA,InsightCard,NotStartedCard
 - **components/workspace/chat/** (4): ChatHeader,ChatPanel,InputCapturedIndicator,TopicTransitionBanner
 - **components/workspace/mobile/** (1): MobileTabBar
-- **components/ui/** (12): button,confidence-badge,confirm-dialog,error-card,input,network-banner,overflow-menu,progress-bar-mini,progress,skeleton-loader,skeleton,tooltip
+- **components/ui/** (13): button,confidence-badge,confirm-dialog,error-card,input,network-banner,overflow-menu,progress-bar-mini,progress,skeleton-loader,skeleton,status-indicator,tooltip
 - **components/snapshot/** (7): assumptions-section,coverage-overview,export-section,gaps-section,key-findings,next-steps-section,strengths-section
 
 <!-- /AUTO:COMPONENTS -->
@@ -212,7 +212,8 @@ supabase/migrations/00001_initial_schema.sql
 ## Recent Commits
 
 ```
-83fe58f Decouple card interactions from chat (P0 UX fix)
+388c08a Implement P1 UX improvements: chat default, status indicators, onboarding
+60d4764 Decouple card interactions from chat (P0 UX fix)
 b065842 Implement V3 workspace redesign with Notion-inspired UI
 727210a Add AGENTS.md registry and link from CLAUDE.md
 f0e6e87 Add post-commit hook to auto-update CLAUDE.md
@@ -221,6 +222,5 @@ c3a9db4 Redesign frontend to 3-panel workspace layout (V2)
 c668263 Fix question ID matching and domain transitions
 4c15a14 docs: auto-update MVP documentation [skip ci]
 9ccfcd7 Reduce token usage to avoid rate limits
-1a80329 docs: auto-update MVP documentation [skip ci]
 ```
 <!-- /AUTO:RECENT_CHANGES -->

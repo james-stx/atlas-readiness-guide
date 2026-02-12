@@ -2,12 +2,14 @@
 
 import { cn } from '@/lib/utils';
 import { useWorkspace } from '@/lib/context/workspace-context';
+import { useAssessment } from '@/lib/context/assessment-context';
 import { TopBar } from './TopBar';
 import { Sidebar } from './sidebar/Sidebar';
 import { ContentPanel } from './content/ContentPanel';
 import { ChatPanel } from './chat/ChatPanel';
 import { MobileTabBar } from './mobile/MobileTabBar';
 import { NetworkBanner } from '@/components/ui/network-banner';
+import { WelcomeModal } from './WelcomeModal';
 import { useEffect, useState } from 'react';
 
 export function WorkspaceLayout() {
@@ -15,9 +17,17 @@ export function WorkspaceLayout() {
     isChatOpen,
     isSidebarCollapsed,
     mobileTab,
+    openChat,
+    progressState,
   } = useWorkspace();
+  const { messages } = useAssessment();
 
   const [isMobile, setIsMobile] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  // Check if returning user (has existing messages)
+  const isReturningUser = messages.length > 1;
+  const progress = progressState.overallProgress;
 
   useEffect(() => {
     const checkBreakpoint = () => {
@@ -27,6 +37,25 @@ export function WorkspaceLayout() {
     window.addEventListener('resize', checkBreakpoint);
     return () => window.removeEventListener('resize', checkBreakpoint);
   }, []);
+
+  // Show welcome modal on mount
+  useEffect(() => {
+    // Small delay to prevent flash
+    const timer = setTimeout(() => {
+      setShowWelcome(true);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleChooseGuided = () => {
+    openChat();
+    setShowWelcome(false);
+  };
+
+  const handleChooseExplore = () => {
+    // Chat stays closed (default)
+    setShowWelcome(false);
+  };
 
   // ─── Mobile layout ───
   if (isMobile) {
@@ -44,6 +73,16 @@ export function WorkspaceLayout() {
           {mobileTab === 'chat' && <ChatPanel />}
         </div>
         <MobileTabBar />
+
+        {/* Welcome Modal */}
+        {showWelcome && (
+          <WelcomeModal
+            onChooseGuided={handleChooseGuided}
+            onChooseExplore={handleChooseExplore}
+            isReturningUser={isReturningUser}
+            progress={progress}
+          />
+        )}
       </div>
     );
   }
@@ -75,6 +114,16 @@ export function WorkspaceLayout() {
           </div>
         )}
       </div>
+
+      {/* Welcome Modal */}
+      {showWelcome && (
+        <WelcomeModal
+          onChooseGuided={handleChooseGuided}
+          onChooseExplore={handleChooseExplore}
+          isReturningUser={isReturningUser}
+          progress={progress}
+        />
+      )}
     </div>
   );
 }

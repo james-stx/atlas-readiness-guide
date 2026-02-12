@@ -3,6 +3,7 @@
 import { cn } from '@/lib/utils';
 import type { DomainType } from '@atlas/types';
 import type { DomainStatus } from '@/lib/progress';
+import { DomainStatusDot } from '@/components/ui/status-indicator';
 
 interface SidebarDomainItemProps {
   domain: DomainType;
@@ -14,12 +15,6 @@ interface SidebarDomainItemProps {
   onSelect: () => void;
   onToggleExpand: () => void;
 }
-
-const statusColors: Record<DomainStatus, string> = {
-  adequate: 'bg-[#35A552]',      // Green - complete
-  in_progress: 'bg-[#CB7B3E]',   // Orange - in progress
-  not_started: 'bg-[#91918E]',   // Gray - not started
-};
 
 export function SidebarDomainItem({
   label,
@@ -54,12 +49,9 @@ export function SidebarDomainItem({
         tabIndex={-1}
       >
         {/* Status dot - visible by default, hidden on hover */}
-        <span
-          className={cn(
-            'h-[8px] w-[8px] rounded-full transition-opacity duration-100',
-            'group-hover:opacity-0',
-            statusColors[status]
-          )}
+        <DomainStatusDot
+          status={status}
+          className="transition-opacity duration-100 group-hover:opacity-0"
         />
 
         {/* Chevron - hidden by default, visible on hover */}
