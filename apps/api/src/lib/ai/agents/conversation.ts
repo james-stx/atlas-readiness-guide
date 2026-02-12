@@ -33,6 +33,19 @@ function createConversationTools(sessionId: string, currentDomain: DomainType) {
       }),
       execute: async ({ questionId, userResponse, summary, keyInsight, strengths, considerations, confidenceAssessment, confidenceReason }) => {
         try {
+          // Validate questionId against the current domain's valid IDs
+          const domainConfig = getDomainConfig(currentDomain);
+          const validIds = domainConfig.keyQuestions.map(q => q.id);
+
+          if (!validIds.includes(questionId)) {
+            console.error(`[Atlas] Invalid questionId "${questionId}" for domain "${currentDomain}". Valid IDs: ${validIds.join(', ')}`);
+            return {
+              success: false,
+              error: `Invalid questionId "${questionId}". Must be one of: ${validIds.join(', ')}`,
+              validIds,
+            };
+          }
+
           // Use AI-provided confidence assessment, fallback to regex classifier
           const level = confidenceAssessment || quickClassify(userResponse) || 'medium';
 
