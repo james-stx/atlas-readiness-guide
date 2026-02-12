@@ -10,7 +10,9 @@ import { ChatPanel } from './chat/ChatPanel';
 import { MobileTabBar } from './mobile/MobileTabBar';
 import { NetworkBanner } from '@/components/ui/network-banner';
 import { WelcomeModal } from './WelcomeModal';
-import { useEffect, useState } from 'react';
+import { DOMAINS, DOMAIN_TOPICS } from '@/lib/progress';
+import { useEffect, useState, useMemo } from 'react';
+import type { DomainType } from '@atlas/types';
 
 export function WorkspaceLayout() {
   const {
@@ -19,8 +21,10 @@ export function WorkspaceLayout() {
     mobileTab,
     openChat,
     progressState,
+    selectedDomain,
+    selectDomain,
   } = useWorkspace();
-  const { messages } = useAssessment();
+  const { messages, session } = useAssessment();
 
   const [isMobile, setIsMobile] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
@@ -28,6 +32,36 @@ export function WorkspaceLayout() {
   // Check if returning user (has existing messages)
   const isReturningUser = messages.length > 1;
   const progress = progressState.overallProgress;
+
+  // Build domain summaries for returning user modal
+  const domainSummaries = useMemo(() => {
+    return DOMAINS.map((domain) => {
+      const dp = progressState.domainProgress[domain.key];
+      const topics = DOMAIN_TOPICS[domain.key] || [];
+      return {
+        key: domain.key,
+        label: domain.label,
+        status: dp.status,
+        covered: dp.coveredTopics.length,
+        total: topics.length,
+      };
+    });
+  }, [progressState]);
+
+  // Find the last domain with activity (in progress or has inputs)
+  const lastDomain = useMemo(() => {
+    const inProgressDomain = DOMAINS.find(
+      (d) => progressState.domainProgress[d.key].status === 'in_progress'
+    );
+    if (inProgressDomain) return inProgressDomain.label;
+
+    // Fall back to session's current domain
+    if (session?.current_domain) {
+      const domain = DOMAINS.find((d) => d.key === session.current_domain);
+      return domain?.label;
+    }
+    return undefined;
+  }, [progressState, session]);
 
   useEffect(() => {
     const checkBreakpoint = () => {
@@ -57,6 +91,18 @@ export function WorkspaceLayout() {
     setShowWelcome(false);
   };
 
+  const handleContinue = () => {
+    // Navigate to the in-progress domain and open chat
+    const inProgressDomain = DOMAINS.find(
+      (d) => progressState.domainProgress[d.key].status === 'in_progress'
+    );
+    if (inProgressDomain) {
+      selectDomain(inProgressDomain.key);
+    }
+    openChat();
+    setShowWelcome(false);
+  };
+
   // ─── Mobile layout ───
   if (isMobile) {
     return (
@@ -79,8 +125,11 @@ export function WorkspaceLayout() {
           <WelcomeModal
             onChooseGuided={handleChooseGuided}
             onChooseExplore={handleChooseExplore}
+            onContinue={handleContinue}
             isReturningUser={isReturningUser}
             progress={progress}
+            domainSummaries={domainSummaries}
+            lastDomain={lastDomain}
           />
         )}
       </div>
@@ -120,8 +169,11 @@ export function WorkspaceLayout() {
         <WelcomeModal
           onChooseGuided={handleChooseGuided}
           onChooseExplore={handleChooseExplore}
+          onContinue={handleContinue}
           isReturningUser={isReturningUser}
           progress={progress}
+          domainSummaries={domainSummaries}
+          lastDomain={lastDomain}
         />
       )}
     </div>

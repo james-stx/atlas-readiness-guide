@@ -9,6 +9,7 @@ import { InsightCard } from './InsightCard';
 import { NotStartedCard } from './NotStartedCard';
 import { InlineSnapshotCTA } from './InlineSnapshotCTA';
 import { useEffect, useRef, useCallback } from 'react';
+import { useSkippedTopics } from '@/lib/hooks/use-skipped-topics';
 import type { Input } from '@atlas/types';
 
 export function ContentPanel() {
@@ -21,6 +22,7 @@ export function ContentPanel() {
     progressState,
   } = useWorkspace();
   const { inputs, addInput, session } = useAssessment();
+  const { isSkipped, skipTopic, unskipTopic } = useSkippedTopics();
   const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   // Scroll to selected category
@@ -133,11 +135,11 @@ export function ContentPanel() {
                     key={topic.id}
                     label={topic.label}
                     topicId={topic.id}
+                    isSkipped={isSkipped(topic.id)}
                     onWriteResponse={(response) => handleWriteResponse(topic.id, response)}
                     onTalkToAtlas={() => handleDiscussTopic(topic.id)}
-                    onSkip={() => {
-                      // Skip just collapses the card - no action needed
-                    }}
+                    onSkip={() => skipTopic(topic.id)}
+                    onUnskip={() => unskipTopic(topic.id)}
                   />
                 ))}
             </div>

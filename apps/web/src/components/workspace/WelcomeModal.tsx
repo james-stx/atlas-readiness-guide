@@ -1,14 +1,27 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Compass, MessageSquare, LayoutGrid, Clock, Cloud, X } from 'lucide-react';
+import { Compass, MessageSquare, LayoutGrid, Clock, Cloud, X, Check, Circle, Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import type { DomainType } from '@atlas/types';
+import type { DomainProgress } from '@/lib/progress';
+
+interface DomainSummary {
+  key: DomainType;
+  label: string;
+  status: 'not_started' | 'in_progress' | 'adequate';
+  covered: number;
+  total: number;
+}
 
 interface WelcomeModalProps {
   onChooseGuided: () => void;
   onChooseExplore: () => void;
+  onContinue?: () => void;
   isReturningUser?: boolean;
   progress?: number;
+  domainSummaries?: DomainSummary[];
+  lastDomain?: string;
 }
 
 const STORAGE_KEY = 'atlas-onboarding-complete';
@@ -16,8 +29,11 @@ const STORAGE_KEY = 'atlas-onboarding-complete';
 export function WelcomeModal({
   onChooseGuided,
   onChooseExplore,
+  onContinue,
   isReturningUser = false,
   progress = 0,
+  domainSummaries = [],
+  lastDomain,
 }: WelcomeModalProps) {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -46,6 +62,20 @@ export function WelcomeModal({
     setIsVisible(false);
     onChooseExplore(); // Default to explore mode on dismiss
   };
+
+  const handleContinue = () => {
+    localStorage.setItem(STORAGE_KEY, 'true');
+    setIsVisible(false);
+    if (onContinue) {
+      onContinue();
+    } else {
+      onChooseExplore();
+    }
+  };
+
+  // Calculate remaining time estimate (roughly 4 min per topic, 25 topics total)
+  const remainingTopics = 25 - Math.round((progress / 100) * 25);
+  const remainingMinutes = remainingTopics * 4;
 
   if (!isVisible) return null;
 
@@ -108,12 +138,60 @@ export function WelcomeModal({
           </div>
         )}
 
+        {/* Progress overview (for returning users) */}
+        {isReturningUser && domainSummaries.length > 0 && (
+          <div className="px-6 py-4 border-b border-[#F1F0EC]">
+            {/* Progress bar */}
+            <div className="mb-4">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-[12px] font-medium text-[#5C5A56]">Overall Progress</span>
+                <span className="text-[12px] font-medium text-[#37352F]">{progress}%</span>
+              </div>
+              <div className="h-2 w-full overflow-hidden rounded-full bg-[#E8E6E1]">
+                <div
+                  className="h-full rounded-full bg-[#2383E2] transition-all duration-300"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+            </div>
+
+            {/* Domain status list */}
+            <div className="space-y-2">
+              {domainSummaries.map((domain) => (
+                <div
+                  key={domain.key}
+                  className="flex items-center justify-between py-1.5"
+                >
+                  <div className="flex items-center gap-2">
+                    {domain.status === 'adequate' ? (
+                      <Check className="h-4 w-4 text-[#35A552]" />
+                    ) : domain.status === 'in_progress' ? (
+                      <div className="h-4 w-4 rounded-full border-2 border-[#CB7B3E] border-t-transparent animate-spin" />
+                    ) : (
+                      <Circle className="h-4 w-4 text-[#CDCDCA]" />
+                    )}
+                    <span className={cn(
+                      'text-[13px]',
+                      domain.status === 'adequate' ? 'text-[#37352F]' : 'text-[#5C5A56]'
+                    )}>
+                      {domain.label}
+                    </span>
+                  </div>
+                  <span className="text-[12px] text-[#9B9A97]">
+                    {domain.covered}/{domain.total}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Info badges */}
         <div className="px-6 py-4 border-b border-[#F1F0EC]">
           <div className="flex justify-center gap-4">
             <div className="flex items-center gap-1.5 text-[12px] text-[#787774]">
               <Clock className="h-3.5 w-3.5" />
-              <span>20-30 min</span>
+              <span>{isReturningUser ? `~${remainingMinutes} min left` : '20-30 min'}</span>
             </div>
             <div className="flex items-center gap-1.5 text-[12px] text-[#787774]">
               <Cloud className="h-3.5 w-3.5" />
@@ -124,53 +202,81 @@ export function WelcomeModal({
 
         {/* Options */}
         <div className="p-6">
-          <p className="text-[13px] text-[#9B9A97] text-center mb-4">
-            How would you like to proceed?
-          </p>
+          {isReturningUser ? (
+            <>
+              {/* Continue button for returning users */}
+              <button
+                onClick={handleContinue}
+                className={cn(
+                  'w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg',
+                  'bg-[#2383E2] text-white font-medium hover:bg-[#1A6DC0] transition-colors'
+                )}
+              >
+                <Play className="h-4 w-4" />
+                Continue{lastDomain ? ` with ${lastDomain}` : ''}
+              </button>
 
-          <div className="grid grid-cols-2 gap-3">
-            {/* Guide me option */}
-            <button
-              onClick={handleGuided}
-              className={cn(
-                'flex flex-col items-center gap-3 p-4 rounded-lg border-2 transition-all',
-                'border-[#2383E2] bg-[#F7FBFF] hover:bg-[#EBF5FF]'
-              )}
-            >
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#2383E2]">
-                <MessageSquare className="h-5 w-5 text-white" />
-              </div>
-              <div className="text-center">
-                <span className="block text-[14px] font-medium text-[#37352F]">
-                  Guide me
-                </span>
-                <span className="block text-[11px] text-[#5C5A56] mt-0.5">
-                  Recommended
-                </span>
-              </div>
-            </button>
+              <p className="text-[12px] text-[#9B9A97] text-center mt-3">
+                or{' '}
+                <button
+                  onClick={handleExplore}
+                  className="text-[#2383E2] hover:underline"
+                >
+                  browse all topics
+                </button>
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="text-[13px] text-[#9B9A97] text-center mb-4">
+                How would you like to proceed?
+              </p>
 
-            {/* Explore option */}
-            <button
-              onClick={handleExplore}
-              className={cn(
-                'flex flex-col items-center gap-3 p-4 rounded-lg border-2 transition-all',
-                'border-[#E8E6E1] hover:border-[#D4D1CB] hover:bg-[#FAF9F7]'
-              )}
-            >
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#F7F6F3]">
-                <LayoutGrid className="h-5 w-5 text-[#5C5A56]" />
+              <div className="grid grid-cols-2 gap-3">
+                {/* Guide me option */}
+                <button
+                  onClick={handleGuided}
+                  className={cn(
+                    'flex flex-col items-center gap-3 p-4 rounded-lg border-2 transition-all',
+                    'border-[#2383E2] bg-[#F7FBFF] hover:bg-[#EBF5FF]'
+                  )}
+                >
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#2383E2]">
+                    <MessageSquare className="h-5 w-5 text-white" />
+                  </div>
+                  <div className="text-center">
+                    <span className="block text-[14px] font-medium text-[#37352F]">
+                      Guide me
+                    </span>
+                    <span className="block text-[11px] text-[#5C5A56] mt-0.5">
+                      Recommended
+                    </span>
+                  </div>
+                </button>
+
+                {/* Explore option */}
+                <button
+                  onClick={handleExplore}
+                  className={cn(
+                    'flex flex-col items-center gap-3 p-4 rounded-lg border-2 transition-all',
+                    'border-[#E8E6E1] hover:border-[#D4D1CB] hover:bg-[#FAF9F7]'
+                  )}
+                >
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#F7F6F3]">
+                    <LayoutGrid className="h-5 w-5 text-[#5C5A56]" />
+                  </div>
+                  <div className="text-center">
+                    <span className="block text-[14px] font-medium text-[#37352F]">
+                      Let me explore
+                    </span>
+                    <span className="block text-[11px] text-[#9B9A97] mt-0.5">
+                      Self-guided
+                    </span>
+                  </div>
+                </button>
               </div>
-              <div className="text-center">
-                <span className="block text-[14px] font-medium text-[#37352F]">
-                  Let me explore
-                </span>
-                <span className="block text-[11px] text-[#9B9A97] mt-0.5">
-                  Self-guided
-                </span>
-              </div>
-            </button>
-          </div>
+            </>
+          )}
         </div>
       </div>
     </div>

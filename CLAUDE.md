@@ -212,7 +212,8 @@ supabase/migrations/00001_initial_schema.sql
 ## Recent Commits
 
 ```
-388c08a Implement P1 UX improvements: chat default, status indicators, onboarding
+143c1ec Implement P2/P3 UX improvements: welcome back, time estimates, skip topics
+739e411 Implement P1 UX improvements: chat default, status indicators, onboarding
 60d4764 Decouple card interactions from chat (P0 UX fix)
 b065842 Implement V3 workspace redesign with Notion-inspired UI
 727210a Add AGENTS.md registry and link from CLAUDE.md
@@ -221,6 +222,5 @@ c3a9db4 Redesign frontend to 3-panel workspace layout (V2)
 408bf8a docs: auto-update MVP documentation [skip ci]
 c668263 Fix question ID matching and domain transitions
 4c15a14 docs: auto-update MVP documentation [skip ci]
-9ccfcd7 Reduce token usage to avoid rate limits
 ```
 <!-- /AUTO:RECENT_CHANGES -->

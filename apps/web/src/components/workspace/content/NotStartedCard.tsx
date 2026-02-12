@@ -1,16 +1,18 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronDown, MessageSquare, PenLine, SkipForward, Circle } from 'lucide-react';
+import { ChevronDown, MessageSquare, PenLine, SkipForward, Circle, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getTopicConfig } from '@/lib/progress';
 
 interface NotStartedCardProps {
   label: string;
   topicId?: string;
+  isSkipped?: boolean;
   onWriteResponse: (response: string) => void;
   onTalkToAtlas: () => void;
   onSkip?: () => void;
+  onUnskip?: () => void;
 }
 
 type CardState = 'collapsed' | 'expanded' | 'writing';
@@ -18,9 +20,11 @@ type CardState = 'collapsed' | 'expanded' | 'writing';
 export function NotStartedCard({
   label,
   topicId,
+  isSkipped = false,
   onWriteResponse,
   onTalkToAtlas,
   onSkip,
+  onUnskip,
 }: NotStartedCardProps) {
   const [cardState, setCardState] = useState<CardState>('collapsed');
   const [writeValue, setWriteValue] = useState('');
@@ -76,10 +80,20 @@ export function NotStartedCard({
           onClick={handleCardClick}
           className="flex w-full items-center gap-3 px-4 py-3 text-left"
         >
-          <Circle className="h-4 w-4 shrink-0 text-[#D4D1CB]" />
-          <span className="flex-1 text-[14px] text-[#787774]">
+          {isSkipped ? (
+            <SkipForward className="h-4 w-4 shrink-0 text-[#9B9A97]" />
+          ) : (
+            <Circle className="h-4 w-4 shrink-0 text-[#D4D1CB]" />
+          )}
+          <span className={cn(
+            'flex-1 text-[14px]',
+            isSkipped ? 'text-[#9B9A97] line-through' : 'text-[#787774]'
+          )}>
             {label}
           </span>
+          {isSkipped ? (
+            <span className="text-[11px] text-[#9B9A97] mr-2">Skipped</span>
+          ) : null}
           <ChevronDown className="h-4 w-4 shrink-0 text-[#9B9A97]" />
         </button>
       )}
@@ -139,16 +153,32 @@ export function NotStartedCard({
                 </span>
               </button>
 
-              {/* Skip for Now */}
-              <button
-                onClick={handleSkipClick}
-                className="flex flex-col items-center gap-2 p-3 rounded-lg border border-[#E8E6E1] hover:border-[#9B9A97] hover:bg-[#FAF9F7] transition-colors group"
-              >
-                <SkipForward className="h-5 w-5 text-[#9B9A97]" />
-                <span className="text-[12px] font-medium text-[#9B9A97]">
-                  Skip for now
-                </span>
-              </button>
+              {/* Skip / Unskip */}
+              {isSkipped ? (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onUnskip?.();
+                    setCardState('collapsed');
+                  }}
+                  className="flex flex-col items-center gap-2 p-3 rounded-lg border border-[#E8E6E1] hover:border-[#2383E2] hover:bg-[#F7FBFF] transition-colors group"
+                >
+                  <RotateCcw className="h-5 w-5 text-[#9B9A97] group-hover:text-[#2383E2]" />
+                  <span className="text-[12px] font-medium text-[#5C5A56] group-hover:text-[#2383E2]">
+                    Undo skip
+                  </span>
+                </button>
+              ) : (
+                <button
+                  onClick={handleSkipClick}
+                  className="flex flex-col items-center gap-2 p-3 rounded-lg border border-[#E8E6E1] hover:border-[#9B9A97] hover:bg-[#FAF9F7] transition-colors group"
+                >
+                  <SkipForward className="h-5 w-5 text-[#9B9A97]" />
+                  <span className="text-[12px] font-medium text-[#9B9A97]">
+                    Skip for now
+                  </span>
+                </button>
+              )}
             </div>
           </div>
         </div>

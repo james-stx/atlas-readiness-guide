@@ -1,10 +1,10 @@
 'use client';
 
-import { Compass, PanelRightOpen, PanelRightClose, MessageSquare } from 'lucide-react';
+import { Compass, PanelRightOpen, PanelRightClose, MessageSquare, Clock } from 'lucide-react';
 import { useWorkspace } from '@/lib/context/workspace-context';
 import { useAssessment } from '@/lib/context/assessment-context';
 import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 
 export function TopBar() {
@@ -14,6 +14,18 @@ export function TopBar() {
   const [showSnapshotCTA, setShowSnapshotCTA] = useState(false);
 
   const progress = progressState.overallProgress;
+
+  // Calculate remaining time (roughly 4 min per topic, 25 topics total)
+  const remainingTime = useMemo(() => {
+    const completedTopics = Math.round((progress / 100) * 25);
+    const remainingTopics = 25 - completedTopics;
+    const minutes = remainingTopics * 4;
+    if (minutes <= 0) return null;
+    if (minutes < 60) return `~${minutes} min`;
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return mins > 0 ? `~${hours}h ${mins}m` : `~${hours}h`;
+  }, [progress]);
 
   // Show snapshot CTA when progress >= 40%
   useEffect(() => {
@@ -50,6 +62,15 @@ export function TopBar() {
           <span className="text-[12px] tabular-nums text-[#9B9A97]">
             {progress}%
           </span>
+          {remainingTime && (
+            <>
+              <span className="text-[#D4D1CB]">·</span>
+              <span className="flex items-center gap-1 text-[12px] text-[#9B9A97]">
+                <Clock className="h-3 w-3" />
+                {remainingTime}
+              </span>
+            </>
+          )}
         </div>
       </div>
 
