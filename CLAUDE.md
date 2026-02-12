@@ -212,7 +212,8 @@ supabase
 ## Recent Commits
 
 ```
-1b095a0 Improve error handling for API connection issues
+845fd2f Fix invalid model ID and add debugging logs
+52898e0 Improve error handling for API connection issues
 28644de Fix inconsistent status indicators in WelcomeModal
 ca000f0 Improve visual distinction between status and rating pills
 3d44196 Unify card appearance with TopicCard component
@@ -221,6 +222,5 @@ ca000f0 Improve visual distinction between status and rating pills
 60d4764 Decouple card interactions from chat (P0 UX fix)
 b065842 Implement V3 workspace redesign with Notion-inspired UI
 727210a Add AGENTS.md registry and link from CLAUDE.md
-f0e6e87 Add post-commit hook to auto-update CLAUDE.md
 ```
 <!-- /AUTO:RECENT_CHANGES -->

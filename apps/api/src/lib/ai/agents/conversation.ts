@@ -140,6 +140,8 @@ export async function* streamConversation(
   input?: unknown;
   domain?: string;
 }> {
+  console.log('[Atlas] streamConversation called:', { sessionId, domain: currentDomain, messageLength: userMessage.length });
+
   try {
     // Save user message
     await saveMessage({
@@ -195,13 +197,18 @@ CRITICAL INSTRUCTIONS:
     });
 
     let fullText = '';
+    let partCount = 0;
+
+    console.log('[Atlas] Starting to stream response...');
 
     // Use fullStream to capture both text deltas and tool results
     for await (const part of result.fullStream) {
+      partCount++;
       if (part.type === 'text-delta') {
         fullText += part.textDelta;
         yield { type: 'text', content: part.textDelta };
       } else if (part.type === 'tool-result') {
+        console.log('[Atlas] Tool result:', part.toolName, part.result?.success);
         if (part.toolName === 'recordInput' && part.result?.success && part.result.input?.id) {
           yield { type: 'input', input: part.result.input };
         } else if (part.toolName === 'transitionDomain' && part.result?.success) {
@@ -209,13 +216,17 @@ CRITICAL INSTRUCTIONS:
             yield { type: 'domain_change', domain: part.result.nextDomain };
           }
         }
+      } else if (part.type === 'error') {
+        console.error('[Atlas] Stream error part:', part);
       }
     }
+
+    console.log('[Atlas] Stream complete. Parts:', partCount, 'Text length:', fullText.length);
 
     // If no text was generated (AI only used tools), make a follow-up call
     // without tools to force a conversational response
     if (!fullText.trim()) {
-      console.log('[Atlas] No text generated, making follow-up call for response');
+      console.log('[Atlas] No text generated after', partCount, 'parts, making follow-up call');
 
       const followUpResult = await streamText({
         model: anthropic(models.conversation),
@@ -234,12 +245,17 @@ You just recorded the user's input. Now acknowledge what they shared and continu
         // No tools - force text generation
       });
 
+      let followUpParts = 0;
       for await (const part of followUpResult.fullStream) {
+        followUpParts++;
         if (part.type === 'text-delta') {
           fullText += part.textDelta;
           yield { type: 'text', content: part.textDelta };
+        } else if (part.type === 'error') {
+          console.error('[Atlas] Follow-up stream error:', part);
         }
       }
+      console.log('[Atlas] Follow-up complete. Parts:', followUpParts, 'Text length:', fullText.length);
     }
 
     // Save and send the message

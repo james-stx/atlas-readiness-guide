@@ -9,10 +9,11 @@ export const anthropic = createAnthropic({
 });
 
 // Model configurations
+// Using Claude 3.5 Sonnet for reliability - can upgrade to Claude 4.5 when stable
 export const models = {
-  conversation: 'claude-sonnet-4-20250514',
+  conversation: 'claude-3-5-sonnet-20241022',
   classification: 'claude-3-5-haiku-20241022',
-  synthesis: 'claude-sonnet-4-20250514',
+  synthesis: 'claude-3-5-sonnet-20241022',
 } as const;
 
 export const modelConfig = {
