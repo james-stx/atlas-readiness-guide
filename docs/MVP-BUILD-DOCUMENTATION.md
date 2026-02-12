@@ -504,6 +504,10 @@ This separation allows users to browse content freely without accidentally trigg
 - Robust error recovery for both REST API and SSE streaming connections
 - Maximum 3 retry attempts with 1.5 second base delay
 
+#### AI/ML Pipeline
+
+The synthesis model configuration has been optimized with increased token limits (4096 tokens) to handle comprehensive snapshot generation. The snapshot schema includes fallback defaults for optional arrays (strengths, assumptions, gaps, nextSteps) to ensure graceful handling when AI generation approaches token limits.
+
 #### Conversation Agent
 The conversation agent uses Vercel AI SDK's `streamText()` with tool support:
 - **Tool Context**: Uses closure pattern to capture `sessionId` and `currentDomain` since AI SDK doesn't pass custom context to tool execute functions
@@ -984,6 +988,11 @@ The `recordInput` tool now includes server-side validation:
 POST /api/snapshot/generate
 ```
 Generates readiness snapshot from all inputs.
+
+**Model Configuration Updates:**
+- Synthesis operations now use 4096 max tokens (increased from 1024) for more comprehensive analysis
+- Snapshot generation includes robust error handling for partial completions
+- Optional response arrays (strengths, assumptions, gaps, nextSteps) default to empty arrays if not generated
 
 **Request Body**:
 ```json
@@ -1610,6 +1619,12 @@ Key decisions made during development and why.
 
 ## 15. Known Limitations & Future Roadmap
 
+### Recent Improvements
+
+**Recent Improvements:**
+- Enhanced snapshot generation reliability with increased token limits and graceful degradation for partial AI responses
+- Improved handling of edge cases where AI generation may be incomplete due to computational constraints
+
 ### Recent Fixes
 - ✅ Fixed question ID validation to prevent AI from generating invalid IDs
 - ✅ Improved domain transition automation for better conversation flow
@@ -1637,12 +1652,4 @@ Key decisions made during development and why.
 ### Current Debugging Measures
 - Debug logging has been added to SSE streams to help diagnose response freeze issues
 - Temporary console.log statements are in place for development troubleshooting
-- These debug logs should be removed or made configurable before production deployment
-
-**Assessment Sessions May Timeout**: Assessment sessions may timeout during extended periods of inactivity
-
-**Classification Accuracy During Chat**: The conversation tools use simplified regex-based classification instead of full LLM classification to maintain streaming performance. This may result in less accurate confidence level assessment for user inputs captured during real-time conversations, though it ensures responsive user experience.
-
-**API Rate Limits**: The system is configured to use a maximum of 6 recent messages in conversation history to stay within token limits (~5000 tokens per request) and avoid rate limiting. This may affect conversation context for very long sessions.
-
-**Rate Limit Considerations**: Tool execution is limited to maxSteps:2 to stay within the 10k tokens/min rate limit. This was reduced from the original 5 steps after removing maxSteps entirely caused tool execution failures
+- These debug logs should be removed or made configurable before
