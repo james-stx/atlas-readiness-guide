@@ -41,19 +41,19 @@ export function renderSnapshotEmail({ snapshot, email, downloadUrl }: SnapshotEm
     </div>
   `).join('');
 
-  const coverageRows = (Object.entries(snapshot.coverage_summary) as [DomainType, { high: number; medium: number; low: number }][])
+  const coverageRows = (Object.entries(snapshot.coverage_summary) as [DomainType, { high_confidence: number; medium_confidence: number; low_confidence: number }][])
     .map(([domain, levels]) => {
-      const total = levels.high + levels.medium + levels.low;
+      const total = levels.high_confidence + levels.medium_confidence + levels.low_confidence;
       return `
         <tr>
           <td style="padding: 8px 0; font-size: 14px; font-weight: 500; color: #0f172a; border-bottom: 1px solid #e2e8f0;">${DOMAIN_LABELS[domain]}</td>
           <td style="padding: 8px 12px; font-size: 14px; color: #64748b; border-bottom: 1px solid #e2e8f0; text-align: center;">${total} inputs</td>
           <td style="padding: 8px 0; font-size: 12px; border-bottom: 1px solid #e2e8f0; text-align: right;">
-            <span style="color: ${CONFIDENCE_COLORS.high};">${levels.high} high</span>
+            <span style="color: ${CONFIDENCE_COLORS.high};">${levels.high_confidence} high</span>
             /
-            <span style="color: ${CONFIDENCE_COLORS.medium};">${levels.medium} medium</span>
+            <span style="color: ${CONFIDENCE_COLORS.medium};">${levels.medium_confidence} medium</span>
             /
-            <span style="color: ${CONFIDENCE_COLORS.low};">${levels.low} low</span>
+            <span style="color: ${CONFIDENCE_COLORS.low};">${levels.low_confidence} low</span>
           </td>
         </tr>
       `;
@@ -172,10 +172,10 @@ COVERAGE SUMMARY
 ----------------
 `;
 
-  (Object.entries(snapshot.coverage_summary) as [DomainType, { high: number; medium: number; low: number }][]).forEach(
+  (Object.entries(snapshot.coverage_summary) as [DomainType, { high_confidence: number; medium_confidence: number; low_confidence: number }][]).forEach(
     ([domain, levels]) => {
-      const total = levels.high + levels.medium + levels.low;
-      text += `${DOMAIN_LABELS[domain]}: ${total} inputs (${levels.high} high / ${levels.medium} medium / ${levels.low} low)\n`;
+      const total = levels.high_confidence + levels.medium_confidence + levels.low_confidence;
+      text += `${DOMAIN_LABELS[domain]}: ${total} inputs (${levels.high_confidence} high / ${levels.medium_confidence} medium / ${levels.low_confidence} low)\n`;
     }
   );
 

@@ -168,11 +168,11 @@ function CoverageSection({ coverage }: { coverage: Snapshot['coverage_summary'] 
       </Text>
 
       <View style={styles.coverageGrid}>
-        {(Object.entries(coverage) as [DomainType, { high: number; medium: number; low: number }][]).map(
+        {(Object.entries(coverage) as [DomainType, { high_confidence: number; medium_confidence: number; low_confidence: number; questions_answered: number }][]).map(
           ([domain, levels]) => {
-            const total = levels.high + levels.medium + levels.low;
-            const highPct = total > 0 ? (levels.high / total) * 100 : 0;
-            const medPct = total > 0 ? (levels.medium / total) * 100 : 0;
+            const total = levels.high_confidence + levels.medium_confidence + levels.low_confidence;
+            const highPct = total > 0 ? (levels.high_confidence / total) * 100 : 0;
+            const medPct = total > 0 ? (levels.medium_confidence / total) * 100 : 0;
 
             return (
               <View key={domain} style={styles.coverageItem}>
