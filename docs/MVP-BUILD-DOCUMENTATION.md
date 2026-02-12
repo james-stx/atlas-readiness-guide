@@ -156,6 +156,13 @@ A reference for technical terms used throughout this documentation.
 2. Logo click returns to home page
 3. Current domain/progress visible in simplified header format
 
+*Topic Selection Behavior:*
+When user clicks 'Talk to Atlas' on a topic card:
+1. Chat panel opens automatically
+2. System automatically sends a message to Atlas: "Let's talk about: [Topic Name]"
+3. Atlas immediately responds with relevant information about the topic
+4. User can continue the conversation naturally
+
 #### 3. Snapshot Generation (`/snapshot`)
 - When all domains are covered, user triggers snapshot generation
 - AI synthesizes all inputs into:
@@ -310,6 +317,11 @@ If a user leaves and returns:
 - Quick response chips when relevant
 - Text input at bottom with send button
 - Loading indicators during AI responses
+
+**Topic Selection Behavior:**
+- Clicking 'Talk to Atlas' on any topic card automatically initiates a conversation
+- No manual input required - the system sends an introductory message on behalf of the user
+- Creates immediate engagement with relevant topic discussion
 
 **Chat Interface Components:**
 
@@ -1289,6 +1301,13 @@ If something breaks:
 3. Check readiness panel becomes full-screen on mobile
 4. Test touch interactions on domain pills and accordions
 
+**Testing Topic Selection:**
+1. Navigate to any domain with topic cards
+2. Click 'Talk to Atlas' on a topic
+3. Verify chat opens and automatically sends "Let's talk about: [Topic Name]"
+4. Verify Atlas responds immediately with topic-relevant content
+5. Test with different topics to ensure consistent behavior
+
 **Testing AI Response Consistency**: When testing conversations, verify that users always receive text responses even when the AI primarily uses tools. If you notice silent responses where only tool execution occurs, this should trigger the automatic fallback mechanism to generate a follow-up conversational response.
 
 ### Progress Tracking Issues
@@ -1313,6 +1332,10 @@ If something breaks:
 - **Symptom**: Conversations getting stuck in one domain without progressing
 - **Solution**: The AI now has explicit instructions to call `transitionDomain` after 3-4 topics are covered
 - **Verification**: Check that domain transitions occur naturally in conversation flow
+
+**Troubleshooting Topic Selection:**
+- If auto-message doesn't send, check that `isLoading` state is false and `selectedCategory` is properly set
+- Verify `sendMessage` function is available and not throwing errors
 
 ### Common Issues & Fixes
 
@@ -1670,27 +1693,4 @@ If something breaks:
 | `package.json` | Project dependencies and scripts |
 | `turbo.json` | Turborepo build configuration |
 | `pnpm-workspace.yaml` | Workspace packages definition |
-| `apps/*/next.config.js` | Next.js configuration |
-| `apps/*/tsconfig.json` | TypeScript configuration |
-| `apps/*/vercel.json` | Vercel deployment settings |
-
-### Important Source Files
-
-| File | Purpose |
-|------|---------|
-| `apps/api/src/lib/ai/agents/conversation.ts` | AI conversation logic |
-| `apps/api/src/lib/ai/prompts/system.ts` | AI system prompts |
-| `apps/api/src/lib/db/session.ts` | Session management |
-| `apps/web/src/lib/context/assessment-context.tsx` | Frontend state |
-| `apps/web/src/lib/api-client.ts` | API communication |
-| `packages/types/src/index.ts` | Shared type definitions |
-
----
-
-## Changelog
-
-### January 2026
-- Added automated documentation update workflow
-- Integrated Claude API for intelligent documentation analysis
-- Added GitHub Actions workflow for continuous documentation maintenance
-- Implemented Phase 1 Progress Visibility system with real-time progress
+| `apps
