@@ -64,7 +64,7 @@ Australian companies considering U.S. expansion often don't know what they don't
 | Frontend | What users see and interact with | Next.js (React) |
 | Backend/API | Processes requests, talks to AI | Next.js API Routes |
 | Database | Stores user sessions and responses | Supabase (PostgreSQL) |
-| AI | Powers the conversational assessment | Anthropic Claude |
+| AI | Powers the conversational assessment | Anthropic Claude 4.5 |
 | Email | Sends snapshot to users | Resend |
 | Hosting | Makes the app available on the internet | Vercel |
 
@@ -398,7 +398,7 @@ If a user leaves and returns:
                     ▼                           ▼                   ▼
            ┌───────────────┐          ┌───────────────┐    ┌───────────────┐
            │   Supabase    │          │   Anthropic   │    │    Resend     │
-           │  (Database)   │          │   (Claude AI) │    │   (Email)     │
+           │  (Database)   │          │ (Claude 4.5)  │    │   (Email)     │
            └───────────────┘          └───────────────┘    └───────────────┘
 ```
 
@@ -473,14 +473,18 @@ The conversation agent uses Vercel AI SDK's `streamText()` with tool support:
 
 **Automatic Domain Transitions**: The system now includes explicit instructions for the AI to automatically transition between assessment domains after covering 3-4 key topics, improving conversation flow and completion rates.
 
+The AI service layer utilizes Anthropic's Claude 4.5 models for different purposes:
+- **Sonnet 4.5**: Primary model for conversations and content synthesis (higher capability)
+- **Haiku 4.5**: Lightweight model for fast classification tasks (optimized for speed)
+
 #### Database (Supabase)
 - **Purpose**: Persistent data storage
 - **Technology**: PostgreSQL via Supabase
 - **Stores**: Sessions, messages, inputs, snapshots
 
-#### AI (Anthropic Claude)
+#### AI (Anthropic Claude 4.5)
 - **Purpose**: Conversational intelligence
-- **Model**: Claude 3.5 Sonnet
+- **Models**: Claude 4.5 Sonnet and Haiku
 - **Uses**: Conversation flow, input extraction, confidence classification, snapshot synthesis
 
 #### Email (Resend)
@@ -739,9 +743,12 @@ Stores generated readiness snapshots.
 - Classify confidence levels
 - Generate snapshot synthesis
 
-**Model**: Claude 3.5 Sonnet
-- Good balance of capability and speed
-- Supports streaming responses
+**AI Models (Anthropic Claude)**
+- **Conversation Model**: `claude-sonnet-4-5-20250929` - Used for natural language conversations with users
+- **Classification Model**: `claude-haiku-4-5-20251001` - Used for fast content classification and routing
+- **Synthesis Model**: `claude-sonnet-4-5-20250929` - Used for generating summaries and synthesized responses
+
+All models use Claude 4.5 architecture, providing improved performance and capabilities over previous versions.
 
 **Configuration**:
 - API Key from Anthropic Console
@@ -960,7 +967,7 @@ Both applications need environment variables to function. These are set differen
 | `SUPABASE_URL` | Your Supabase project URL | Supabase Dashboard → Settings → API |
 | `SUPABASE_ANON_KEY` | Public Supabase key | Supabase Dashboard → Settings → API |
 | `SUPABASE_SERVICE_ROLE_KEY` | Private Supabase key (keep secret!) | Supabase Dashboard → Settings → API |
-| `ANTHROPIC_API_KEY` | Claude AI API key | console.anthropic.com → API Keys |
+| `ANTHROPIC_API_KEY` | Required API key for accessing Claude 4.5 models (Sonnet and Haiku variants) | console.anthropic.com → API Keys |
 | `RESEND_API_KEY` | Email service key | resend.com → API Keys |
 
 #### Web Environment Variables
@@ -1681,11 +1688,4 @@ If something breaks:
 - Added error handling to prevent stream failures and ensure uninterrupted real-time text streaming
 - Enhanced SSE streaming reliability with better error handling, TCP packet boundary buffering, and null guards for tool results
 - Optimized AI token usage by switching from multi-step to single-step interactions, reducing conversation history to 10 messages, and trimming system prompts to stay within Anthropic's rate limits
-- Restored maxSteps:2 for tool execution to enable proper tool round-trips and prevent stream failures
-- Improved error handling for non-Error objects in stream iteration
-- Lazy-initialized Resend client to prevent build-time failures when API key is unavailable
-- Added Privacy Policy and Terms of Service pages with comprehensive legal documentation covering data handling, AI processing disclosure, user rights, service disclaimers, and liability limitations under Australian and Victorian law
-- **Major Design System Overhaul**: Implemented comprehensive design system updates with neutral color palette, teal accent system, enhanced typography, and standardized component patterns
-- **Enhanced Start Page**: Complete redesign with centered layout, session recovery integration, and improved form design with enhanced touch targets
-- **How It Works Page Updates**: Added timeline design, FAQ improvements, and domain card layouts
-- **UI Component System**: Updated input components with 44px touch targets, enhanced focus states
+- Restored
