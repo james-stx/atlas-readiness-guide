@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Compass, MessageSquare, LayoutGrid, Clock, Cloud, X, Check, Circle, Play } from 'lucide-react';
+import { Compass, MessageSquare, LayoutGrid, Clock, Cloud, X, Check, Circle, Play, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { DomainType } from '@atlas/types';
 import type { DomainProgress } from '@/lib/progress';
@@ -157,31 +157,49 @@ export function WelcomeModal({
 
             {/* Domain status list */}
             <div className="space-y-2">
-              {domainSummaries.map((domain) => (
-                <div
-                  key={domain.key}
-                  className="flex items-center justify-between py-1.5"
-                >
-                  <div className="flex items-center gap-2">
-                    {domain.status === 'adequate' ? (
-                      <Check className="h-4 w-4 text-[#35A552]" />
-                    ) : domain.status === 'in_progress' ? (
-                      <div className="h-4 w-4 rounded-full border-2 border-[#CB7B3E] border-t-transparent animate-spin" />
-                    ) : (
-                      <Circle className="h-4 w-4 text-[#CDCDCA]" />
-                    )}
+              {domainSummaries.map((domain) => {
+                // Determine status based on actual completion, not "adequate" threshold
+                const isComplete = domain.covered === domain.total && domain.total > 0;
+                const isInProgress = domain.covered > 0 && domain.covered < domain.total;
+                const isNotStarted = domain.covered === 0;
+
+                return (
+                  <div
+                    key={domain.key}
+                    className="flex items-center justify-between py-1.5"
+                  >
+                    <div className="flex items-center gap-2">
+                      {/* Status indicator - matches TopicCard styling */}
+                      <span className={cn(
+                        'inline-flex items-center justify-center h-5 w-5 rounded border',
+                        isComplete && 'border-[#0F7B6C] bg-transparent',
+                        isInProgress && 'border-[#E9B949] bg-transparent',
+                        isNotStarted && 'border-[#D4D1CB] bg-transparent'
+                      )}>
+                        {isComplete ? (
+                          <Check className="h-3 w-3 text-[#0F7B6C]" />
+                        ) : isInProgress ? (
+                          <Loader2 className="h-3 w-3 text-[#9A6700] animate-spin" />
+                        ) : (
+                          <Circle className="h-3 w-3 text-[#9B9A97]" />
+                        )}
+                      </span>
+                      <span className={cn(
+                        'text-[13px]',
+                        isComplete ? 'text-[#37352F] font-medium' : 'text-[#5C5A56]'
+                      )}>
+                        {domain.label}
+                      </span>
+                    </div>
                     <span className={cn(
-                      'text-[13px]',
-                      domain.status === 'adequate' ? 'text-[#37352F]' : 'text-[#5C5A56]'
+                      'text-[12px]',
+                      isComplete ? 'text-[#0F7B6C] font-medium' : 'text-[#9B9A97]'
                     )}>
-                      {domain.label}
+                      {domain.covered}/{domain.total}
                     </span>
                   </div>
-                  <span className="text-[12px] text-[#9B9A97]">
-                    {domain.covered}/{domain.total}
-                  </span>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
