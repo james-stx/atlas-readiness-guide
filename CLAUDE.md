@@ -212,7 +212,8 @@ supabase
 ## Recent Commits
 
 ```
-46370f0 Add detailed API route logging for debugging
+3d98275 Improve error messages for credit/auth issues
+0e99268 Add detailed API route logging for debugging
 e929d0f Fix invalid model ID and add debugging logs
 52898e0 Improve error handling for API connection issues
 28644de Fix inconsistent status indicators in WelcomeModal
@@ -221,6 +222,5 @@ ca000f0 Improve visual distinction between status and rating pills
 1667a13 Implement P2/P3 UX improvements: welcome back, time estimates, skip topics
 739e411 Implement P1 UX improvements: chat default, status indicators, onboarding
 60d4764 Decouple card interactions from chat (P0 UX fix)
-b065842 Implement V3 workspace redesign with Notion-inspired UI
 ```
 <!-- /AUTO:RECENT_CHANGES -->

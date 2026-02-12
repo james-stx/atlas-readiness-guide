@@ -297,9 +297,13 @@ You just recorded the user's input. Now acknowledge what they shared and continu
         || JSON.stringify(error);
     }
 
-    // Make rate limit errors more user-friendly
+    // Make common errors more user-friendly
     if (message.toLowerCase().includes('rate limit') || message.includes('10,000 input tokens')) {
       message = "I'm receiving a lot of requests right now. Please wait about 30 seconds before sending your next message.";
+    } else if (message.toLowerCase().includes('credit balance') || message.toLowerCase().includes('insufficient_quota')) {
+      message = "The AI service is temporarily unavailable. Please contact support or try again later.";
+    } else if (message.toLowerCase().includes('invalid api key') || message.toLowerCase().includes('authentication')) {
+      message = "There's a configuration issue with the AI service. Please contact support.";
     }
 
     yield {
