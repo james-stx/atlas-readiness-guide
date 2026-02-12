@@ -177,6 +177,14 @@ When user clicks 'Talk to Atlas' on a topic card:
 - **Download PDF** - Professional formatted document
 - **Send Email** - Snapshot delivered to inbox with PDF link
 
+### Auto-Navigation Behavior
+
+**Auto-Navigation Behavior:**
+- When AI captures new input, the content panel automatically navigates to the relevant topic
+- When AI transitions to a new domain, the content panel navigates to that domain
+- The sidebar automatically expands collapsed domains when navigation occurs
+- This provides seamless context switching between AI interactions and content exploration
+
 ### Session Recovery Flow
 
 If a user leaves and returns:
@@ -243,6 +251,14 @@ If a user leaves and returns:
 3. **Clear Progress** - Always know where you are in the assessment
 4. **Mobile-First** - Works well on phones (where many founders are)
 5. **Minimal Friction** - Email-only signup, no passwords
+
+### Auto-Navigation Features
+
+**Auto-Navigation Features:**
+- Content panel automatically syncs with AI conversation context
+- Domains auto-expand in sidebar when referenced by AI
+- Smooth transitions between AI-driven topic changes
+- Reduces manual navigation overhead for users
 
 ### Design System Updates
 
@@ -502,6 +518,14 @@ The AI service layer utilizes Anthropic's Claude 4.5 models for different purpos
 #### Email (Resend)
 - **Purpose**: Transactional email delivery
 - **Features**: HTML emails with PDF download links
+
+### Workspace Context Auto-Navigation
+
+**Workspace Context Auto-Navigation:**
+- Workspace context now includes auto-navigation logic that responds to AI state changes
+- Integration between assessment context and workspace navigation
+- Automatic domain expansion and content panel synchronization
+- Event-driven navigation updates based on AI conversation flow
 
 ### Progress Context System
 
@@ -1670,27 +1694,4 @@ Supabase handles most maintenance automatically. For manual tasks:
 
 | Service | Free Tier Limit | How to Check |
 |---------|-----------------|--------------|
-| Vercel | 100GB bandwidth | Vercel Dashboard → Usage |
-| Supabase | 500MB database | Supabase Dashboard → Usage |
-| Anthropic | Pay-per-use | Anthropic Console → Usage |
-| Resend | 100 emails/day | Resend Dashboard |
-
-### Emergency Contacts
-
-If something breaks:
-1. Check Vercel status: status.vercel.com
-2. Check Supabase status: status.supabase.com
-3. Check Anthropic status: status.anthropic.com
-
----
-
-## Appendix: File Reference
-
-### Key Configuration Files
-
-| File | Purpose |
-|------|---------|
-| `package.json` | Project dependencies and scripts |
-| `turbo.json` | Turborepo build configuration |
-| `pnpm-workspace.yaml` | Workspace packages definition |
-| `apps
+| Vercel | 100GB
