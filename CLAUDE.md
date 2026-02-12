@@ -212,7 +212,9 @@ supabase
 ## Recent Commits
 
 ```
-ff2e691 Fix: Only auto-send topic message when "Talk to Atlas" button is clicked
+fdeb186 Improve snapshot generation error handling and feedback
+908f107 Fix: Only auto-send topic message when "Talk to Atlas" button is clicked
+8c22431 docs: auto-update MVP documentation [skip ci]
 a7129bb Auto-navigate content panel when AI captures input or changes domain
 b046a58 docs: auto-update MVP documentation [skip ci]
 1fb7562 Auto-send topic message when clicking 'Talk to Atlas'
@@ -220,7 +222,5 @@ b046a58 docs: auto-update MVP documentation [skip ci]
 d551109 docs: auto-update MVP documentation [skip ci]
 4cfbd0d Add server-side validation to reject invalid questionIds
 0c0886d Fix domain progress to only count valid question IDs
-e4168d0 Fix AI behavior: don't revisit completed topics, require all topics before transition
-9b0a640 Fix UI issues: pill order, confidence labels, domain summary
 ```
 <!-- /AUTO:RECENT_CHANGES -->
