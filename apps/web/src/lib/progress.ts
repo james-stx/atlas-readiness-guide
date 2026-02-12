@@ -196,22 +196,27 @@ export function calculateDomainProgress(
   domain: DomainType
 ): DomainProgress {
   const domainInputs = inputs.filter((i) => i.domain === domain);
-  const highConfidence = domainInputs.filter((i) => i.confidence_level === 'high').length;
-  const mediumConfidence = domainInputs.filter((i) => i.confidence_level === 'medium').length;
-  const lowConfidence = domainInputs.filter((i) => i.confidence_level === 'low').length;
-  const coveredTopics = [...new Set(domainInputs.map((i) => i.question_id))];
+
+  // Only count topics that match valid question IDs for this domain
+  const validTopicIds = DOMAIN_TOPICS[domain].map((t) => t.id);
+  const validInputs = domainInputs.filter((i) => validTopicIds.includes(i.question_id));
+
+  const highConfidence = validInputs.filter((i) => i.confidence_level === 'high').length;
+  const mediumConfidence = validInputs.filter((i) => i.confidence_level === 'medium').length;
+  const lowConfidence = validInputs.filter((i) => i.confidence_level === 'low').length;
+  const coveredTopics = [...new Set(validInputs.map((i) => i.question_id))];
 
   let status: DomainStatus = 'not_started';
-  if (domainInputs.length === 0) {
+  if (validInputs.length === 0) {
     status = 'not_started';
-  } else if (domainInputs.length >= 3 && highConfidence >= 1) {
+  } else if (validInputs.length >= 3 && highConfidence >= 1) {
     status = 'adequate';
   } else {
     status = 'in_progress';
   }
 
   return {
-    inputCount: domainInputs.length,
+    inputCount: validInputs.length,
     highConfidence,
     mediumConfidence,
     lowConfidence,
@@ -226,7 +231,8 @@ export function calculateOverallProgress(
   const domains = Object.values(domainProgress);
   const totalProgress = domains.reduce((sum, domain) => {
     // Each domain contributes up to 20% (100% / 5 domains)
-    const domainCompletion = Math.min(domain.inputCount / TOPICS_PER_DOMAIN, 1);
+    // Use coveredTopics.length for unique topics, not inputCount (which can have duplicates)
+    const domainCompletion = Math.min(domain.coveredTopics.length / TOPICS_PER_DOMAIN, 1);
     return sum + domainCompletion * 20;
   }, 0);
 

@@ -212,7 +212,8 @@ supabase
 ## Recent Commits
 
 ```
-df30682 Fix AI behavior: don't revisit completed topics, require all topics before transition
+ff01826 Fix domain progress to only count valid question IDs
+e4168d0 Fix AI behavior: don't revisit completed topics, require all topics before transition
 9b0a640 Fix UI issues: pill order, confidence labels, domain summary
 e50ffe9 docs: auto-update MVP documentation [skip ci]
 d7c9095 Upgrade to Claude 4.5 models (Sonnet + Haiku)
@@ -221,6 +222,5 @@ d7c9095 Upgrade to Claude 4.5 models (Sonnet + Haiku)
 38809f3 Improve error messages for credit/auth issues
 0e99268 Add detailed API route logging for debugging
 e929d0f Fix invalid model ID and add debugging logs
-52898e0 Improve error handling for API connection issues
 ```
 <!-- /AUTO:RECENT_CHANGES -->
