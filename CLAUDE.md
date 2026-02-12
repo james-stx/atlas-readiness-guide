@@ -212,7 +212,8 @@ supabase
 ## Recent Commits
 
 ```
-3cee6a4 Improve error extraction for AI SDK errors
+7b48a70 Switch to Claude 3 Haiku for broader compatibility
+8748aab Improve error extraction for AI SDK errors
 38809f3 Improve error messages for credit/auth issues
 0e99268 Add detailed API route logging for debugging
 e929d0f Fix invalid model ID and add debugging logs
@@ -221,6 +222,5 @@ e929d0f Fix invalid model ID and add debugging logs
 ca000f0 Improve visual distinction between status and rating pills
 3d44196 Unify card appearance with TopicCard component
 1667a13 Implement P2/P3 UX improvements: welcome back, time estimates, skip topics
-739e411 Implement P1 UX improvements: chat default, status indicators, onboarding
 ```
 <!-- /AUTO:RECENT_CHANGES -->
