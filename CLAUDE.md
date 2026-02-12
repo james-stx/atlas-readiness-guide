@@ -212,7 +212,9 @@ supabase
 ## Recent Commits
 
 ```
-fdeb186 Improve snapshot generation error handling and feedback
+ae669fb Reduce token usage for snapshot generation
+10febb6 Improve snapshot generation error handling and feedback
+4163268 docs: auto-update MVP documentation [skip ci]
 908f107 Fix: Only auto-send topic message when "Talk to Atlas" button is clicked
 8c22431 docs: auto-update MVP documentation [skip ci]
 a7129bb Auto-navigate content panel when AI captures input or changes domain
@@ -220,7 +222,5 @@ b046a58 docs: auto-update MVP documentation [skip ci]
 1fb7562 Auto-send topic message when clicking 'Talk to Atlas'
 8c8e097 Fix 'Talk to Atlas' button to focus chat and pre-fill topic prompt
 d551109 docs: auto-update MVP documentation [skip ci]
-4cfbd0d Add server-side validation to reject invalid questionIds
-0c0886d Fix domain progress to only count valid question IDs
 ```
 <!-- /AUTO:RECENT_CHANGES -->
