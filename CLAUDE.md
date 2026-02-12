@@ -72,6 +72,7 @@ apps/api/.env.example
 apps/api/.env.local
 apps/api/.eslintrc.json
 apps/api/.next
+apps/api/.turbo
 apps/api/next-env.d.ts
 apps/api/next.config.js
 apps/api/node_modules
@@ -88,6 +89,7 @@ apps/web/.env.example
 apps/web/.env.local
 apps/web/.eslintrc.json
 apps/web/.next
+apps/web/.turbo
 apps/web/next-env.d.ts
 apps/web/next.config.js
 apps/web/node_modules
@@ -135,8 +137,6 @@ scripts
 scripts/update-claude-context.sh
 scripts/update-docs.ts
 supabase
-supabase/migrations
-supabase/migrations/00001_initial_schema.sql
 ```
 <!-- /AUTO:STRUCTURE -->
 
@@ -161,7 +161,7 @@ supabase/migrations/00001_initial_schema.sql
 
 - **components/workspace/** (3): TopBar,WelcomeModal,WorkspaceLayout
 - **components/workspace/sidebar/** (4): Sidebar,SidebarDomainItem,SidebarFooter,SidebarTopicItem
-- **components/workspace/content/** (7): CategoryCard,ContentDomainHeader,ContentPanel,EmptyState,InlineSnapshotCTA,InsightCard,NotStartedCard
+- **components/workspace/content/** (8): CategoryCard,ContentDomainHeader,ContentPanel,EmptyState,InlineSnapshotCTA,InsightCard,NotStartedCard,TopicCard
 - **components/workspace/chat/** (4): ChatHeader,ChatPanel,InputCapturedIndicator,TopicTransitionBanner
 - **components/workspace/mobile/** (1): MobileTabBar
 - **components/ui/** (13): button,confidence-badge,confirm-dialog,error-card,input,network-banner,overflow-menu,progress-bar-mini,progress,skeleton-loader,skeleton,status-indicator,tooltip
@@ -212,7 +212,8 @@ supabase/migrations/00001_initial_schema.sql
 ## Recent Commits
 
 ```
-143c1ec Implement P2/P3 UX improvements: welcome back, time estimates, skip topics
+352172d Unify card appearance with TopicCard component
+1667a13 Implement P2/P3 UX improvements: welcome back, time estimates, skip topics
 739e411 Implement P1 UX improvements: chat default, status indicators, onboarding
 60d4764 Decouple card interactions from chat (P0 UX fix)
 b065842 Implement V3 workspace redesign with Notion-inspired UI
@@ -221,6 +222,5 @@ f0e6e87 Add post-commit hook to auto-update CLAUDE.md
 c3a9db4 Redesign frontend to 3-panel workspace layout (V2)
 408bf8a docs: auto-update MVP documentation [skip ci]
 c668263 Fix question ID matching and domain transitions
-4c15a14 docs: auto-update MVP documentation [skip ci]
 ```
 <!-- /AUTO:RECENT_CHANGES -->

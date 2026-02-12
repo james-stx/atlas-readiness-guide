@@ -5,10 +5,9 @@ import { useAssessment } from '@/lib/context/assessment-context';
 import { DOMAIN_TOPICS } from '@/lib/progress';
 import { EmptyState } from './EmptyState';
 import { ContentDomainHeader } from './ContentDomainHeader';
-import { InsightCard } from './InsightCard';
-import { NotStartedCard } from './NotStartedCard';
+import { TopicCard } from './TopicCard';
 import { InlineSnapshotCTA } from './InlineSnapshotCTA';
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useMemo } from 'react';
 import { useSkippedTopics } from '@/lib/hooks/use-skipped-topics';
 import type { Input } from '@atlas/types';
 
@@ -101,50 +100,32 @@ export function ContentPanel() {
           onTopicSelect={handleTopicSelect}
         />
 
-        {/* Insight Cards - Topics with inputs */}
-        {domainInputs.length > 0 && (
-          <div className="space-y-3 mb-6">
-            {domainInputs.map((input) => (
+        {/* All Topics - Unified cards */}
+        <div className="space-y-3">
+          {topics.map((topic) => {
+            const input = domainInputs.find((i) => i.question_id === topic.id);
+            return (
               <div
-                key={input.id}
+                key={topic.id}
                 ref={(el) => {
-                  categoryRefs.current[input.question_id] = el;
+                  categoryRefs.current[topic.id] = el;
                 }}
               >
-                <InsightCard
+                <TopicCard
+                  topicId={topic.id}
+                  label={topic.label}
                   input={input}
-                  isHighlighted={selectedCategory === input.question_id}
-                  onDiscuss={() => handleDiscussTopic(input.question_id)}
+                  isSkipped={isSkipped(topic.id)}
+                  isHighlighted={selectedCategory === topic.id}
+                  onWriteResponse={(response) => handleWriteResponse(topic.id, response)}
+                  onTalkToAtlas={() => handleDiscussTopic(topic.id)}
+                  onSkip={() => skipTopic(topic.id)}
+                  onUnskip={() => unskipTopic(topic.id)}
                 />
               </div>
-            ))}
-          </div>
-        )}
-
-        {/* Not Yet Explored - Topics without inputs */}
-        {topics.filter((t) => !domainInputs.find((i) => i.question_id === t.id)).length > 0 && (
-          <div className="mt-6">
-            <h3 className="text-[11px] font-medium uppercase tracking-wide text-[#9B9A97] mb-3">
-              Not Yet Explored
-            </h3>
-            <div className="space-y-2">
-              {topics
-                .filter((topic) => !domainInputs.find((i) => i.question_id === topic.id))
-                .map((topic) => (
-                  <NotStartedCard
-                    key={topic.id}
-                    label={topic.label}
-                    topicId={topic.id}
-                    isSkipped={isSkipped(topic.id)}
-                    onWriteResponse={(response) => handleWriteResponse(topic.id, response)}
-                    onTalkToAtlas={() => handleDiscussTopic(topic.id)}
-                    onSkip={() => skipTopic(topic.id)}
-                    onUnskip={() => unskipTopic(topic.id)}
-                  />
-                ))}
-            </div>
-          </div>
-        )}
+            );
+          })}
+        </div>
 
         {/* Snapshot CTA */}
         {showSnapshotCTA && (
