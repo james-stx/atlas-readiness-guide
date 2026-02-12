@@ -1,8 +1,6 @@
 'use client';
 
-import { Compass, Settings, PanelRightOpen, PanelRightClose } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { ProgressBarMini } from '@/components/ui/progress-bar-mini';
+import { Compass, PanelRightOpen, PanelRightClose } from 'lucide-react';
 import { useWorkspace } from '@/lib/context/workspace-context';
 import { useAssessment } from '@/lib/context/assessment-context';
 import { useRouter } from 'next/navigation';
@@ -13,7 +11,6 @@ export function TopBar() {
   const { progressState, toggleChat, isChatOpen } = useWorkspace();
   const { session } = useAssessment();
   const [showSnapshotCTA, setShowSnapshotCTA] = useState(false);
-  const [hasAnimated, setHasAnimated] = useState(false);
 
   const progress = progressState.overallProgress;
 
@@ -25,49 +22,52 @@ export function TopBar() {
   }, [progress, showSnapshotCTA]);
 
   return (
-    <header className="flex h-12 items-center justify-between border-b border-warm-200 bg-white px-4 z-50">
+    <header className="flex h-12 items-center justify-between border-b border-[#E8E6E1] bg-white px-4 z-50">
       {/* Left: Logo + Title */}
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
-          <div className="flex h-6 w-6 items-center justify-center rounded-md bg-accent">
-            <Compass className="h-3.5 w-3.5 text-white" />
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#37352F]">
+            <Compass className="h-4 w-4 text-white" />
           </div>
-          <span className="text-ws-body font-semibold text-warm-900">Atlas</span>
+          <span className="text-[14px] font-semibold text-[#37352F]">Atlas</span>
         </div>
-        <span className="hidden text-ws-body-sm text-warm-400 sm:block">|</span>
-        <span className="hidden max-w-[200px] truncate text-ws-body-sm text-warm-600 sm:block">
-          {session?.email ? 'My Readiness Assessment' : 'Readiness Assessment'}
+        <span className="hidden text-[#D4D1CB] sm:block">·</span>
+        <span className="hidden max-w-[200px] truncate text-[13px] text-[#787671] sm:block">
+          {session?.email ? 'My Assessment' : 'Readiness Assessment'}
         </span>
       </div>
 
-      {/* Right: Progress + Actions */}
-      <div className="flex items-center gap-3">
-        {/* Progress */}
-        <div className="hidden items-center gap-2 sm:flex">
-          <ProgressBarMini
-            value={progress}
-            width="120px"
-            showLabel
-          />
+      {/* Center: Progress */}
+      <div className="hidden items-center gap-3 sm:flex">
+        <div className="flex items-center gap-2">
+          <div className="h-1.5 w-[120px] overflow-hidden rounded-full bg-[#E8E6E1]">
+            <div
+              className="h-full rounded-full bg-[#2383E2] transition-all duration-300"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <span className="text-[12px] tabular-nums text-[#9B9A97]">
+            {progress}%
+          </span>
         </div>
+      </div>
 
+      {/* Right: Actions */}
+      <div className="flex items-center gap-2">
         {/* Snapshot CTA */}
         {showSnapshotCTA && (
-          <Button
-            variant="outline"
-            size="sm"
+          <button
             onClick={() => router.push('/snapshot')}
-            className={!hasAnimated ? 'animate-pulse-once' : ''}
-            onAnimationEnd={() => setHasAnimated(true)}
+            className="rounded-lg border border-[#E8E6E1] bg-white px-3 py-1.5 text-[13px] font-medium text-[#37352F] transition-colors hover:bg-[#F7F6F3]"
           >
             Snapshot
-          </Button>
+          </button>
         )}
 
         {/* Chat toggle */}
         <button
           onClick={toggleChat}
-          className="hidden items-center justify-center rounded-lg p-1.5 text-warm-400 transition-colors duration-fast hover:bg-warm-150 hover:text-warm-600 lg:flex"
+          className="hidden items-center justify-center rounded-lg p-2 text-[#9B9A97] transition-colors hover:bg-[#F7F6F3] hover:text-[#5C5A56] lg:flex"
           aria-label={isChatOpen ? 'Close chat panel' : 'Open chat panel'}
         >
           {isChatOpen ? (
@@ -75,14 +75,6 @@ export function TopBar() {
           ) : (
             <PanelRightOpen className="h-4 w-4" />
           )}
-        </button>
-
-        {/* Settings */}
-        <button
-          className="flex items-center justify-center rounded-lg p-1.5 text-warm-400 transition-colors duration-fast hover:bg-warm-150 hover:text-warm-600"
-          aria-label="Settings"
-        >
-          <Settings className="h-4 w-4" />
         </button>
       </div>
     </header>

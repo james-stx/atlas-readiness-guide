@@ -20,27 +20,36 @@ import type { DomainType, ChatMessage } from '@atlas/types';
 function createConversationTools(sessionId: string, currentDomain: DomainType) {
   return {
     recordInput: tool({
-      description: 'Record a captured input from the user. IMPORTANT: The questionId MUST be one of the exact IDs listed in the system prompt for the current domain (e.g., market_driver, target_segment, product_description, etc.). Do NOT create new IDs.',
+      description: 'Record a captured input from the user with AI-generated insights. IMPORTANT: The questionId MUST be one of the exact IDs listed in the system prompt for the current domain.',
       parameters: z.object({
         questionId: z.string().describe('MUST be an exact questionId from the current domain list (e.g., market_driver, target_segment, competition, product_description, us_product_fit, localization, competitive_advantage, product_validation, gtm_strategy, etc.)'),
         userResponse: z.string().describe('The user response to capture'),
         summary: z.string().describe('Brief summary of what was captured'),
+        keyInsight: z.string().describe('One-sentence key insight or takeaway from this response'),
+        strengths: z.array(z.string()).describe('1-2 strengths or positive aspects identified in the response'),
+        considerations: z.array(z.string()).describe('0-2 areas that could be strengthened or explored further'),
+        confidenceAssessment: z.enum(['high', 'medium', 'low']).describe('Confidence level: high = specific, data-backed; medium = clear but general; low = vague or uncertain'),
+        confidenceReason: z.string().describe('Brief explanation of why this confidence level was assigned'),
       }),
-      execute: async ({ questionId, userResponse, summary }) => {
+      execute: async ({ questionId, userResponse, summary, keyInsight, strengths, considerations, confidenceAssessment, confidenceReason }) => {
         try {
-          // Use fast regex-based classification only (no API calls)
-          // to avoid blocking the SSE stream for seconds
-          const level = quickClassify(userResponse) || 'medium';
+          // Use AI-provided confidence assessment, fallback to regex classifier
+          const level = confidenceAssessment || quickClassify(userResponse) || 'medium';
 
-          // Save to database
+          // Save to database with rich extracted data
           const input = await saveInput({
             sessionId,
             domain: currentDomain,
             questionId,
             userResponse,
-            extractedData: { summary },
+            extractedData: {
+              summary,
+              keyInsight,
+              strengths,
+              considerations,
+            },
             confidenceLevel: level,
-            confidenceRationale: 'Classified based on language patterns',
+            confidenceRationale: confidenceReason || 'Classified based on response characteristics',
           });
 
           return {

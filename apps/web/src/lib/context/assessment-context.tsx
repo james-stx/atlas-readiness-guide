@@ -450,18 +450,22 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
   // Generate snapshot
   const generateSnapshotAction = useCallback(async () => {
     if (!state.session) {
+      console.error('[Atlas] generateSnapshot called without session');
       throw new Error('No active session');
     }
 
+    console.log('[Atlas] generateSnapshot starting for session:', state.session.id);
     dispatch({ type: 'SET_LOADING', payload: true });
     dispatch({ type: 'SET_ERROR', payload: null });
     dispatch({ type: 'UPDATE_STATUS', payload: 'synthesizing' });
 
     try {
       const { snapshot } = await api.generateSnapshot(state.session.id);
+      console.log('[Atlas] Snapshot received:', snapshot?.id);
       dispatch({ type: 'SET_SNAPSHOT', payload: snapshot });
       dispatch({ type: 'UPDATE_STATUS', payload: 'completed' });
     } catch (error) {
+      console.error('[Atlas] Snapshot generation error:', error);
       dispatch({
         type: 'SET_ERROR',
         payload:

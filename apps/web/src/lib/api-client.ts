@@ -174,6 +174,36 @@ export async function sendSnapshotEmail(
 }
 
 // ============================================
+// Domain API
+// ============================================
+
+export interface DomainSummary {
+  domain: string;
+  topicsCovered: number;
+  totalTopics: number;
+  confidenceBreakdown: {
+    high: number;
+    medium: number;
+    low: number;
+  };
+  keyThemes: string[];
+  suggestedFocus: string | null;
+  overallAssessment: string;
+}
+
+export async function getDomainSummary(
+  sessionId: string,
+  domain: string
+): Promise<{ summary: DomainSummary }> {
+  const response = await fetch(`${API_URL}/api/domain/summary`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sessionId, domain }),
+  });
+  return handleResponse<{ summary: DomainSummary }>(response);
+}
+
+// ============================================
 // Utilities
 // ============================================
 

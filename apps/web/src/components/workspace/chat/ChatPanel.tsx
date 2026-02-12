@@ -6,15 +6,17 @@ import { useWorkspace } from '@/lib/context/workspace-context';
 import { useAssessment } from '@/lib/context/assessment-context';
 import { ChatHeader } from './ChatHeader';
 import { InputCapturedIndicator } from './InputCapturedIndicator';
+import { TopicTransitionBanner } from './TopicTransitionBanner';
 import { Compass, Send, Loader2 } from 'lucide-react';
 import type { ChatMessage, Input } from '@atlas/types';
+import { DOMAINS } from '@/lib/progress';
 
 const isMac =
   typeof navigator !== 'undefined' &&
   /Mac|iPod|iPhone|iPad/.test(navigator.userAgent);
 
 export function ChatPanel() {
-  const { isChatOpen, closeChat, chatDomain, selectCategory } = useWorkspace();
+  const { isChatOpen, closeChat, chatDomain, selectedCategory, selectCategory } = useWorkspace();
   const {
     messages,
     inputs,
@@ -27,8 +29,25 @@ export function ChatPanel() {
   } = useAssessment();
 
   const [inputValue, setInputValue] = useState('');
+  const [lastFocusedTopic, setLastFocusedTopic] = useState<string | null>(null);
+  const [domainTransitions, setDomainTransitions] = useState<{ messageIndex: number; toDomain: string }[]>([]);
+  const [lastKnownDomain, setLastKnownDomain] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Track domain changes to show transition banners
+  useEffect(() => {
+    if (session?.current_domain && session.current_domain !== lastKnownDomain) {
+      if (lastKnownDomain && messages.length > 0) {
+        // Domain changed - record transition at current message index
+        setDomainTransitions(prev => [
+          ...prev,
+          { messageIndex: messages.length - 1, toDomain: session.current_domain }
+        ]);
+      }
+      setLastKnownDomain(session.current_domain);
+    }
+  }, [session?.current_domain, lastKnownDomain, messages.length]);
 
   // Initialize chat on mount
   useEffect(() => {
@@ -36,6 +55,14 @@ export function ChatPanel() {
       initChat().catch(() => {});
     }
   }, [session, messages.length, initChat]);
+
+  // Track which topic is focused (but don't auto-send messages)
+  // User explicitly clicks "Discuss with Atlas" to start conversation about a topic
+  useEffect(() => {
+    if (selectedCategory && selectedCategory !== lastFocusedTopic) {
+      setLastFocusedTopic(selectedCategory);
+    }
+  }, [selectedCategory, lastFocusedTopic]);
 
   // Auto-scroll
   useEffect(() => {
@@ -103,6 +130,9 @@ export function ChatPanel() {
               inputs
             );
 
+            // Check if there's a domain transition after this message
+            const transition = domainTransitions.find(t => t.messageIndex === index);
+
             return (
               <div key={message.id}>
                 <ChatBubble message={message} />
@@ -120,6 +150,13 @@ export function ChatPanel() {
                       />
                     </div>
                   ))}
+
+                {/* Domain transition banner */}
+                {transition && (
+                  <TopicTransitionBanner
+                    toDomain={transition.toDomain as import('@atlas/types').DomainType}
+                  />
+                )}
               </div>
             );
           })}

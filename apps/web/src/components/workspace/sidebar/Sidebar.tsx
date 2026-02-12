@@ -9,6 +9,7 @@ import { SidebarFooter } from './SidebarFooter';
 export function Sidebar() {
   const {
     selectedDomain,
+    selectedCategory,
     expandedDomains,
     progressState,
     selectDomain,
@@ -20,55 +21,60 @@ export function Sidebar() {
 
   return (
     <nav
-      className="flex h-full w-sidebar flex-col border-r border-warm-200 bg-warm-100"
+      className="flex h-full w-[260px] flex-col bg-[#F7F6F3]"
+      style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif' }}
       aria-label="Assessment navigation"
     >
-      {/* Section header */}
-      <div className="px-4 pt-4 pb-2">
-        <span className="text-ws-caption-sm uppercase tracking-wider text-warm-500">
+      {/* Section header - Notion style */}
+      <div className="px-3 pt-4 pb-1">
+        <span className="text-[11px] font-medium text-[#91918E] tracking-[0.02em] uppercase">
           Assessment
         </span>
       </div>
 
       {/* Domain list */}
       <div
-        className="flex-1 overflow-y-auto px-2 scrollbar-thin"
+        className="flex-1 overflow-y-auto"
         role="tree"
         aria-label="Assessment domains"
       >
-        <div className="space-y-0.5">
-          {DOMAINS.map((domain) => {
-            const dp = progressState.domainProgress[domain.key];
-            const topics = getTopicsForDomain(domain.key);
-            const count = getDomainInputCount(domain.key);
+        {DOMAINS.map((domain) => {
+          const dp = progressState.domainProgress[domain.key];
+          const topics = getTopicsForDomain(domain.key);
+          const count = getDomainInputCount(domain.key);
+          const isSelected = selectedDomain === domain.key;
+          const isExpanded = expandedDomains.includes(domain.key);
 
-            return (
+          return (
+            <div key={domain.key}>
               <SidebarDomainItem
-                key={domain.key}
                 domain={domain.key}
                 label={domain.label}
                 status={dp.status}
-                isSelected={selectedDomain === domain.key}
-                isExpanded={expandedDomains.includes(domain.key)}
+                isSelected={isSelected}
+                isExpanded={isExpanded}
                 count={count}
                 onSelect={() => selectDomain(domain.key)}
                 onToggleExpand={() => toggleDomainExpand(domain.key)}
-              >
-                <div className="ml-2">
-                  {topics.map((topic, i) => (
+              />
+
+              {/* Expanded topics */}
+              {isExpanded && (
+                <div>
+                  {topics.map((topic) => (
                     <SidebarTopicItem
                       key={topic.id}
                       label={topic.label}
                       covered={topic.covered}
-                      isLast={i === topics.length - 1}
+                      isSelected={selectedCategory === topic.id}
                       onClick={() => selectCategory(domain.key, topic.id)}
                     />
                   ))}
                 </div>
-              </SidebarDomainItem>
-            );
-          })}
-        </div>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       {/* Footer */}

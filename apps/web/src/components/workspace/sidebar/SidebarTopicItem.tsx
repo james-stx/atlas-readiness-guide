@@ -1,51 +1,58 @@
 'use client';
 
-import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface SidebarTopicItemProps {
   label: string;
   covered: boolean;
-  isLast: boolean;
+  isSelected: boolean;
   onClick: () => void;
 }
 
 export function SidebarTopicItem({
   label,
   covered,
-  isLast,
+  isSelected,
   onClick,
 }: SidebarTopicItemProps) {
   return (
     <button
       onClick={onClick}
       className={cn(
-        'relative flex w-full items-center gap-2 rounded-lg py-1 pl-8 pr-2 text-left',
-        'transition-colors duration-fast hover:bg-warm-150',
-        'tree-branch'
+        'flex items-center w-full h-[32px] mx-1 pl-[28px] pr-2 rounded-[3px] text-left',
+        'transition-colors duration-75',
+        isSelected ? 'bg-[#EBEBEA]' : 'hover:bg-[#EBEBEA]'
       )}
+      style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif' }}
       role="treeitem"
       aria-level={2}
     >
-      {/* Tree line */}
-      {!isLast && (
-        <span className="absolute left-[23px] top-1/2 bottom-0 w-px bg-warm-200" />
-      )}
-
-      {/* Status icon */}
+      {/* Status indicator - Notion-style checkmark or empty circle */}
       {covered ? (
-        <span className="flex h-4 w-4 shrink-0 items-center justify-center">
-          <Check className="h-3 w-3 text-confidence-high animate-checkmark-draw" />
-        </span>
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          className="mr-2.5 shrink-0"
+          fill="none"
+        >
+          <path
+            d="M13 5L6.5 11.5L3 8"
+            stroke="#35A552"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
       ) : (
-        <span className="flex h-3 w-3 shrink-0 rounded-full border border-warm-300" />
+        <span className="h-[14px] w-[14px] mr-2.5 rounded-full border-[1.5px] border-[#CDCDCA] shrink-0" />
       )}
 
       {/* Topic label */}
       <span
         className={cn(
-          'truncate text-ws-body-sm',
-          covered ? 'text-warm-700' : 'text-warm-600'
+          'text-[14px] leading-[1.2] truncate',
+          covered ? 'text-[#37352F]' : 'text-[#787774]'
         )}
       >
         {label}

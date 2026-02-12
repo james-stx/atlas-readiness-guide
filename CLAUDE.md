@@ -64,6 +64,7 @@ All agents, hooks, and automations are documented in **`AGENTS.md`** at the proj
 .github/workflows/update-docs.yml
 .gitignore
 .prettierrc
+.turbo
 AGENTS.md
 apps
 apps/api
@@ -80,6 +81,7 @@ apps/api/src/app
 apps/api/src/lib
 apps/api/src/middleware.ts
 apps/api/tsconfig.json
+apps/api/tsconfig.tsbuildinfo
 apps/api/vercel.json
 apps/web
 apps/web/.env.example
@@ -97,6 +99,7 @@ apps/web/src/components
 apps/web/src/lib
 apps/web/tailwind.config.ts
 apps/web/tsconfig.json
+apps/web/tsconfig.tsbuildinfo
 apps/web/vercel.json
 CLAUDE.md
 docs
@@ -106,7 +109,11 @@ docs/DESIGN-SYSTEM-V3.md
 docs/FOUNDER-FEEDBACK-V3-PLAN.md
 docs/MVP-BUILD-DOCUMENTATION.md
 docs/PRD-Progress-Visibility-Feature.md
+docs/product
+docs/product/central-console-feedback-v1.md
+docs/ux
 docs/UX-UI-Design-Specifications.md
+docs/ux/comprehensive-ux-audit-v1.md
 node_modules
 package.json
 packages
@@ -130,8 +137,6 @@ scripts/update-docs.ts
 supabase
 supabase/migrations
 supabase/migrations/00001_initial_schema.sql
-tsconfig.json
-turbo.json
 ```
 <!-- /AUTO:STRUCTURE -->
 
@@ -156,8 +161,8 @@ turbo.json
 
 - **components/workspace/** (2): TopBar,WorkspaceLayout
 - **components/workspace/sidebar/** (4): Sidebar,SidebarDomainItem,SidebarFooter,SidebarTopicItem
-- **components/workspace/content/** (6): CategoryCard,ContentDomainHeader,ContentPanel,EmptyState,InlineSnapshotCTA,NotStartedCard
-- **components/workspace/chat/** (3): ChatHeader,ChatPanel,InputCapturedIndicator
+- **components/workspace/content/** (7): CategoryCard,ContentDomainHeader,ContentPanel,EmptyState,InlineSnapshotCTA,InsightCard,NotStartedCard
+- **components/workspace/chat/** (4): ChatHeader,ChatPanel,InputCapturedIndicator,TopicTransitionBanner
 - **components/workspace/mobile/** (1): MobileTabBar
 - **components/ui/** (12): button,confidence-badge,confirm-dialog,error-card,input,network-banner,overflow-menu,progress-bar-mini,progress,skeleton-loader,skeleton,tooltip
 - **components/snapshot/** (7): assumptions-section,coverage-overview,export-section,gaps-section,key-findings,next-steps-section,strengths-section
@@ -170,6 +175,7 @@ turbo.json
 
 - /api/chat/init — apps/api/src/app/api/chat/init/route.ts
 - /api/chat — apps/api/src/app/api/chat/route.ts
+- /api/domain/summary — apps/api/src/app/api/domain/summary/route.ts
 - /api/export/pdf/[sessionId] — apps/api/src/app/api/export/pdf/[sessionId]/route.ts
 - /api/export/send/[sessionId] — apps/api/src/app/api/export/send/[sessionId]/route.ts
 - /api/health — apps/api/src/app/api/health/route.ts
@@ -206,7 +212,8 @@ turbo.json
 ## Recent Commits
 
 ```
-2666642 Implement V3 workspace redesign with Notion-inspired UI
+83fe58f Decouple card interactions from chat (P0 UX fix)
+b065842 Implement V3 workspace redesign with Notion-inspired UI
 727210a Add AGENTS.md registry and link from CLAUDE.md
 f0e6e87 Add post-commit hook to auto-update CLAUDE.md
 c3a9db4 Redesign frontend to 3-panel workspace layout (V2)
@@ -215,6 +222,5 @@ c668263 Fix question ID matching and domain transitions
 4c15a14 docs: auto-update MVP documentation [skip ci]
 9ccfcd7 Reduce token usage to avoid rate limits
 1a80329 docs: auto-update MVP documentation [skip ci]
-7b6f923 Add fallback API call when AI generates no text
 ```
 <!-- /AUTO:RECENT_CHANGES -->
