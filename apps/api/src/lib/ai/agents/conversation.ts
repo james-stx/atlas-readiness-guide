@@ -283,17 +283,27 @@ You just recorded the user's input. Now acknowledge what they shared and continu
     }
   } catch (error) {
     console.error('Conversation error:', error);
+    console.error('Error type:', typeof error);
+    console.error('Error constructor:', error?.constructor?.name);
+    if (error instanceof Error) {
+      console.error('Error message:', error.message);
+      console.error('Error cause:', error.cause);
+    }
 
     // Extract a meaningful message from any error type.
     // The AI SDK can throw non-Error objects (API response objects, strings).
     let message = 'An unexpected error occurred. Please try again.';
     if (error instanceof Error) {
-      message = error.message;
+      // AI SDK errors often have nested cause with actual message
+      const cause = error.cause as Record<string, unknown> | undefined;
+      message = cause?.message as string || cause?.error as string || error.message;
     } else if (typeof error === 'string') {
       message = error;
     } else if (error && typeof error === 'object') {
-      message = (error as Record<string, unknown>).message as string
-        || (error as Record<string, unknown>).error as string
+      const errObj = error as Record<string, unknown>;
+      message = errObj.message as string
+        || errObj.error as string
+        || errObj.text as string
         || JSON.stringify(error);
     }
 
