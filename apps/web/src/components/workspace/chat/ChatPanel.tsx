@@ -9,7 +9,7 @@ import { InputCapturedIndicator } from './InputCapturedIndicator';
 import { TopicTransitionBanner } from './TopicTransitionBanner';
 import { Compass, Send, Loader2 } from 'lucide-react';
 import type { ChatMessage, Input } from '@atlas/types';
-import { DOMAINS } from '@/lib/progress';
+import { DOMAINS, getTopicLabel } from '@/lib/progress';
 
 const isMac =
   typeof navigator !== 'undefined' &&
@@ -56,13 +56,25 @@ export function ChatPanel() {
     }
   }, [session, messages.length, initChat]);
 
-  // Track which topic is focused (but don't auto-send messages)
-  // User explicitly clicks "Discuss with Atlas" to start conversation about a topic
+  // When user clicks "Talk to Atlas" on a topic, focus input and pre-fill a prompt
   useEffect(() => {
-    if (selectedCategory && selectedCategory !== lastFocusedTopic) {
+    if (selectedCategory && selectedCategory !== lastFocusedTopic && isChatOpen) {
       setLastFocusedTopic(selectedCategory);
+
+      // Get topic label for a helpful prompt
+      const topicLabel = getTopicLabel(selectedCategory);
+
+      // Pre-fill the input with a topic-specific prompt
+      setInputValue(`I'd like to discuss: ${topicLabel}`);
+
+      // Focus the textarea after a brief delay to ensure it's rendered
+      setTimeout(() => {
+        textareaRef.current?.focus();
+        // Select the text so user can easily replace it
+        textareaRef.current?.select();
+      }, 100);
     }
-  }, [selectedCategory, lastFocusedTopic]);
+  }, [selectedCategory, lastFocusedTopic, isChatOpen]);
 
   // Auto-scroll
   useEffect(() => {

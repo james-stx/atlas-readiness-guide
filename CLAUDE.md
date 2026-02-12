@@ -212,7 +212,8 @@ supabase
 ## Recent Commits
 
 ```
-f778964 Add server-side validation to reject invalid questionIds
+b8996a1 Fix 'Talk to Atlas' button to focus chat and pre-fill topic prompt
+4cfbd0d Add server-side validation to reject invalid questionIds
 0c0886d Fix domain progress to only count valid question IDs
 e4168d0 Fix AI behavior: don't revisit completed topics, require all topics before transition
 9b0a640 Fix UI issues: pill order, confidence labels, domain summary
@@ -221,6 +222,5 @@ d7c9095 Upgrade to Claude 4.5 models (Sonnet + Haiku)
 796f2a6 Switch to Claude 3 Haiku for broader compatibility
 8748aab Improve error extraction for AI SDK errors
 38809f3 Improve error messages for credit/auth issues
-0e99268 Add detailed API route logging for debugging
 ```
 <!-- /AUTO:RECENT_CHANGES -->
