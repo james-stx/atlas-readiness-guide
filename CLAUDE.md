@@ -213,7 +213,8 @@ scripts
 ## Recent Commits
 
 ```
-0a83129 Fix DB schema mismatch - remove key_stats column
+70baa3a Fix DB schema - remove all V2 columns from insert
+286e495 Fix DB schema mismatch - remove key_stats column
 70c6aee Fix Haiku schema validation - simplify and add defaults
 f4cb6a8 docs: auto-update MVP documentation [skip ci]
 2d7d305 Speed up snapshot generation to avoid 60s timeout
@@ -222,6 +223,5 @@ cad0271 Fix API timeout by removing redundant V2 generation call
 42091e3 Implement V3 Readiness Report with structured topic analysis
 3ade314 Add Readiness Report V3 redesign spec
 c2cf905 Implement Readiness Report V2
-2b1429e Add Readiness Report V2 spec and wireframes
 ```
 <!-- /AUTO:RECENT_CHANGES -->
