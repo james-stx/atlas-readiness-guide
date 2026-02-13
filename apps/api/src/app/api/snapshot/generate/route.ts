@@ -310,6 +310,7 @@ export async function POST(request: NextRequest) {
     };
 
     // Save snapshot to database
+    // Note: key_stats is included in raw_output, not as a separate column
     console.log('[Snapshot] Saving to database...');
     const { data: savedSnapshot, error: saveError } = await supabase
       .from('snapshots')
@@ -321,11 +322,10 @@ export async function POST(request: NextRequest) {
         assumptions: dbAssumptions,
         gaps: dbGaps,
         next_steps: dbNextSteps,
-        raw_output: JSON.stringify({ v3: generatedV3Snapshot }),
+        raw_output: JSON.stringify({ v3: generatedV3Snapshot, key_stats: dbKeyStats }),
         // V2 fields (derived from V3)
         readiness_level: generatedV3Snapshot.readinessLevel || 'not_ready',
         verdict_summary: generatedV3Snapshot.verdictSummary || 'Assessment incomplete',
-        key_stats: dbKeyStats,
       })
       .select()
       .single();
@@ -339,9 +339,10 @@ export async function POST(request: NextRequest) {
     await updateSessionStatus(sessionId, 'completed');
     console.log('[Snapshot] Complete! Snapshot ID:', savedSnapshot?.id);
 
-    // Add V3 data to response
+    // Add V3 data and key_stats to response
     const responseSnapshot = {
       ...savedSnapshot,
+      key_stats: dbKeyStats,
       v3: v3Data,
     };
 

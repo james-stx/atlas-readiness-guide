@@ -213,7 +213,9 @@ scripts
 ## Recent Commits
 
 ```
-3851901 Fix Haiku schema validation - simplify and add defaults
+0a83129 Fix DB schema mismatch - remove key_stats column
+70c6aee Fix Haiku schema validation - simplify and add defaults
+f4cb6a8 docs: auto-update MVP documentation [skip ci]
 2d7d305 Speed up snapshot generation to avoid 60s timeout
 cad0271 Fix API timeout by removing redundant V2 generation call
 98517e9 Refactor report: Verdict → Actions → Evidence structure
@@ -221,7 +223,5 @@ cad0271 Fix API timeout by removing redundant V2 generation call
 3ade314 Add Readiness Report V3 redesign spec
 c2cf905 Implement Readiness Report V2
 2b1429e Add Readiness Report V2 spec and wireframes
-537c284 Update snapshot UI to Notion-inspired design system
-f9303f7 Fix PDF download by using correct coverage property names
 ```
 <!-- /AUTO:RECENT_CHANGES -->
