@@ -115,6 +115,7 @@ docs/product
 docs/product/central-console-feedback-v1.md
 docs/READINESS-REPORT-V2-SPEC.md
 docs/READINESS-REPORT-V2-WIREFRAMES.md
+docs/READINESS-REPORT-V3-REDESIGN.md
 docs/ux
 docs/UX-UI-Design-Specifications.md
 docs/ux/comprehensive-ux-audit-v1.md
@@ -136,7 +137,6 @@ packages/types/tsconfig.json
 pnpm-lock.yaml
 pnpm-workspace.yaml
 scripts
-scripts/update-claude-context.sh
 ```
 <!-- /AUTO:STRUCTURE -->
 
@@ -212,7 +212,8 @@ scripts/update-claude-context.sh
 ## Recent Commits
 
 ```
-eed22f9 Implement Readiness Report V2
+1ab73ba Add Readiness Report V3 redesign spec
+c2cf905 Implement Readiness Report V2
 2b1429e Add Readiness Report V2 spec and wireframes
 537c284 Update snapshot UI to Notion-inspired design system
 f9303f7 Fix PDF download by using correct coverage property names
@@ -221,6 +222,5 @@ f283025 Fix snapshot: increase maxTokens to 4096, make arrays optional with defa
 8e38e6a Fix error logging and add specific AI error handling
 c174a65 Add detailed logging to snapshot generation for debugging
 10ac5ad Revert synthesis to Sonnet (Vercel Pro now active)
-fbc9417 Fix snapshot timeout: use Haiku + increase maxDuration
 ```
 <!-- /AUTO:RECENT_CHANGES -->
