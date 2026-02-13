@@ -165,7 +165,7 @@ scripts/update-claude-context.sh
 - **components/workspace/chat/** (4): ChatHeader,ChatPanel,InputCapturedIndicator,TopicTransitionBanner
 - **components/workspace/mobile/** (1): MobileTabBar
 - **components/ui/** (13): button,confidence-badge,confirm-dialog,error-card,input,network-banner,overflow-menu,progress-bar-mini,progress,skeleton-loader,skeleton,status-indicator,tooltip
-- **components/snapshot/** (7): assumptions-section,coverage-overview,export-section,gaps-section,key-findings,next-steps-section,strengths-section
+- **components/snapshot/** (11): ActionPlanSection,assumptions-section,AttentionSection,coverage-overview,export-section,gaps-section,key-findings,next-steps-section,ReadinessOverview,strengths-section,ValidatedSection
 
 <!-- /AUTO:COMPONENTS -->
 
@@ -212,7 +212,8 @@ scripts/update-claude-context.sh
 ## Recent Commits
 
 ```
-8fe5745 Add Readiness Report V2 spec and wireframes
+eed22f9 Implement Readiness Report V2
+2b1429e Add Readiness Report V2 spec and wireframes
 537c284 Update snapshot UI to Notion-inspired design system
 f9303f7 Fix PDF download by using correct coverage property names
 d4fb889 docs: auto-update MVP documentation [skip ci]
@@ -221,6 +222,5 @@ f283025 Fix snapshot: increase maxTokens to 4096, make arrays optional with defa
 c174a65 Add detailed logging to snapshot generation for debugging
 10ac5ad Revert synthesis to Sonnet (Vercel Pro now active)
 fbc9417 Fix snapshot timeout: use Haiku + increase maxDuration
-215c44f Reduce token usage for snapshot generation
 ```
 <!-- /AUTO:RECENT_CHANGES -->

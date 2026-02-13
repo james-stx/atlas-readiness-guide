@@ -6,6 +6,7 @@ import {
   SYNTHESIS_SYSTEM_PROMPT,
   buildSynthesisUserPrompt,
   calculateCoverageSummary,
+  calculateKeyStats,
 } from '@/lib/ai/prompts/synthesis';
 import { getValidSession, updateSessionStatus } from '@/lib/db/session';
 import { getSessionInputs } from '@/lib/db/inputs';
@@ -15,9 +16,12 @@ import { handleApiError, ValidationError } from '@/lib/errors';
 // Increase timeout for this route (Vercel Pro: up to 300s, Hobby: 10s max)
 export const maxDuration = 60;
 
-// Snapshot schema for structured generation
-// Using .default([]) for arrays that might not be generated if AI hits token limit
+// Snapshot schema for structured generation - V2
 const snapshotSchema = z.object({
+  // V2 fields
+  readinessLevel: z.enum(['ready', 'ready_with_caveats', 'not_ready']),
+  verdictSummary: z.string(),
+
   keyFindings: z.array(
     z.object({
       domain: z.enum(['market', 'product', 'gtm', 'operations', 'financials']),
@@ -31,6 +35,7 @@ const snapshotSchema = z.object({
       domain: z.enum(['market', 'product', 'gtm', 'operations', 'financials']),
       item: z.string(),
       evidence: z.string(),
+      userQuote: z.string().optional(),
     })
   ).default([]),
 
@@ -49,15 +54,18 @@ const snapshotSchema = z.object({
       item: z.string(),
       importance: z.enum(['critical', 'important', 'nice-to-have']),
       recommendation: z.string(),
+      researchAction: z.string().optional(),
+      executionAction: z.string().optional(),
     })
   ).default([]),
 
   nextSteps: z.array(
     z.object({
-      priority: z.number().min(1).max(5),
+      priority: z.number().min(1).max(8),
       action: z.string(),
       domain: z.enum(['market', 'product', 'gtm', 'operations', 'financials']),
       rationale: z.string(),
+      week: z.number().min(1).max(4).optional(),
     })
   ).default([]),
 });
@@ -101,6 +109,10 @@ export async function POST(request: NextRequest) {
     const coverageSummary = calculateCoverageSummary(inputs);
     console.log('[Snapshot] Coverage calculated');
 
+    // Calculate key stats
+    const keyStats = calculateKeyStats(inputs);
+    console.log('[Snapshot] Key stats calculated');
+
     // Build the prompt
     const userPrompt = buildSynthesisUserPrompt(inputs);
     console.log('[Snapshot] Prompt built, length:', userPrompt.length);
@@ -124,6 +136,9 @@ export async function POST(request: NextRequest) {
       console.error('[Snapshot] Claude API error:', msg);
       throw new Error(`AI generation failed: ${msg}`);
     }
+
+    // Count critical gaps for key stats
+    const criticalGapsCount = generatedSnapshot.gaps.filter(g => g.importance === 'critical').length;
 
     // Transform coverage summary to match DB schema
     const dbCoverageSummary = {
@@ -170,6 +185,7 @@ export async function POST(request: NextRequest) {
       domain: s.domain,
       item: s.item,
       evidence: s.evidence,
+      user_quote: s.userQuote,
     }));
 
     const dbAssumptions = generatedSnapshot.assumptions.map((a) => ({
@@ -184,6 +200,8 @@ export async function POST(request: NextRequest) {
       item: g.item,
       importance: g.importance,
       recommendation: g.recommendation,
+      research_action: g.researchAction,
+      execution_action: g.executionAction,
     }));
 
     const dbNextSteps = generatedSnapshot.nextSteps.map((n) => ({
@@ -191,7 +209,16 @@ export async function POST(request: NextRequest) {
       action: n.action,
       domain: n.domain,
       rationale: n.rationale,
+      week: n.week,
     }));
+
+    // Key stats with actual critical gaps count
+    const dbKeyStats = {
+      topics_covered: keyStats.topicsCovered,
+      total_topics: keyStats.totalTopics,
+      high_confidence_inputs: keyStats.highConfidenceInputs,
+      critical_gaps_count: criticalGapsCount,
+    };
 
     // Save snapshot to database
     console.log('[Snapshot] Saving to database...');
@@ -206,6 +233,10 @@ export async function POST(request: NextRequest) {
         gaps: dbGaps,
         next_steps: dbNextSteps,
         raw_output: JSON.stringify(generatedSnapshot),
+        // V2 fields
+        readiness_level: generatedSnapshot.readinessLevel,
+        verdict_summary: generatedSnapshot.verdictSummary,
+        key_stats: dbKeyStats,
       })
       .select()
       .single();

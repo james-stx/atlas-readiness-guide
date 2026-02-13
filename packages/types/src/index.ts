@@ -23,6 +23,8 @@ export type MessageRole = 'system' | 'assistant' | 'user';
 
 export type GapImportance = 'critical' | 'important' | 'nice-to-have';
 
+export type ReadinessLevel = 'ready' | 'ready_with_caveats' | 'not_ready';
+
 // ============================================
 // Database Row Types
 // ============================================
@@ -60,6 +62,13 @@ export interface ChatMessage {
   created_at: string;
 }
 
+export interface KeyStats {
+  topics_covered: number;
+  total_topics: number;
+  high_confidence_inputs: number;
+  critical_gaps_count: number;
+}
+
 export interface Snapshot {
   id: string;
   session_id: string;
@@ -71,6 +80,10 @@ export interface Snapshot {
   gaps: Gap[];
   next_steps: NextStep[];
   raw_output: string | null;
+  // V2 fields
+  readiness_level?: ReadinessLevel;
+  verdict_summary?: string;
+  key_stats?: KeyStats;
 }
 
 // ============================================
@@ -102,6 +115,7 @@ export interface Strength {
   domain: DomainType;
   item: string;
   evidence: string;
+  user_quote?: string;
 }
 
 export interface Assumption {
@@ -116,6 +130,8 @@ export interface Gap {
   item: string;
   importance: GapImportance;
   recommendation: string;
+  research_action?: string;
+  execution_action?: string;
 }
 
 export interface NextStep {
@@ -123,6 +139,7 @@ export interface NextStep {
   action: string;
   domain: DomainType;
   rationale: string;
+  week?: 1 | 2 | 3 | 4;
 }
 
 // ============================================

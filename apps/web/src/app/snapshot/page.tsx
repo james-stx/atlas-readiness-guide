@@ -5,12 +5,10 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAssessment } from '@/lib/context/assessment-context';
 import { getSnapshot } from '@/lib/api-client';
-import { CoverageOverview } from '@/components/snapshot/coverage-overview';
-import { KeyFindings } from '@/components/snapshot/key-findings';
-import { StrengthsSection } from '@/components/snapshot/strengths-section';
-import { AssumptionsSection } from '@/components/snapshot/assumptions-section';
-import { GapsSection } from '@/components/snapshot/gaps-section';
-import { NextStepsSection } from '@/components/snapshot/next-steps-section';
+import { ReadinessOverview } from '@/components/snapshot/ReadinessOverview';
+import { ValidatedSection } from '@/components/snapshot/ValidatedSection';
+import { AttentionSection } from '@/components/snapshot/AttentionSection';
+import { ActionPlanSection } from '@/components/snapshot/ActionPlanSection';
 import { ExportSection } from '@/components/snapshot/export-section';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, Loader2, Compass } from 'lucide-react';
@@ -78,23 +76,20 @@ export default function SnapshotPage() {
           <div className="text-center mb-12">
             <Loader2 className="w-8 h-8 animate-spin text-[#37352F] mx-auto mb-4" />
             <h1 className="text-2xl font-semibold text-[#37352F] mb-2">
-              {isGenerating ? 'Generating Your Snapshot...' : 'Loading...'}
+              {isGenerating ? 'Generating Your Report...' : 'Loading...'}
             </h1>
             {isGenerating && (
               <p className="text-[14px] text-[#5C5A56]">
-                Analyzing your responses and synthesizing insights
+                Analyzing your responses and creating actionable insights
               </p>
             )}
           </div>
 
           {/* Skeleton loading state */}
           <div className="space-y-6">
-            <Skeleton className="h-40 w-full rounded-lg" />
-            <Skeleton className="h-32 w-full rounded-lg" />
-            <div className="grid md:grid-cols-2 gap-6">
-              <Skeleton className="h-48 rounded-lg" />
-              <Skeleton className="h-48 rounded-lg" />
-            </div>
+            <Skeleton className="h-64 w-full rounded-lg" />
+            <Skeleton className="h-48 w-full rounded-lg" />
+            <Skeleton className="h-48 w-full rounded-lg" />
           </div>
         </div>
       </div>
@@ -120,7 +115,7 @@ export default function SnapshotPage() {
     return (
       <div className="min-h-screen bg-[#FAF9F7] flex items-center justify-center">
         <div className="text-center">
-          <p className="text-[#5C5A56] mb-4">No snapshot available yet.</p>
+          <p className="text-[#5C5A56] mb-4">No report available yet.</p>
           <Link href="/workspace" className="text-[#2383E2] hover:underline">
             Complete your assessment in workspace
           </Link>
@@ -153,43 +148,50 @@ export default function SnapshotPage() {
             <Compass className="w-6 h-6 text-white" />
           </div>
           <h1 className="text-[24px] font-semibold text-[#37352F] mb-2">
-            Your Readiness Snapshot
+            Your Readiness Report
           </h1>
           <p className="text-[14px] text-[#5C5A56]">
-            A summary of what you know vs. what you&apos;re assuming about U.S. expansion
+            Where you stand today and what to do next
           </p>
         </div>
 
-        {/* Snapshot sections */}
+        {/* Report sections */}
         <div className="space-y-6">
-          {/* Coverage Overview */}
-          <CoverageOverview coverage={snapshot.coverage_summary} />
+          {/* Section 1: Readiness Overview */}
+          <ReadinessOverview
+            readinessLevel={snapshot.readiness_level}
+            verdictSummary={snapshot.verdict_summary}
+            coverage={snapshot.coverage_summary}
+            keyStats={snapshot.key_stats}
+          />
 
-          {/* Key Findings */}
-          <KeyFindings findings={snapshot.key_findings} />
+          {/* Section 2: What You've Validated */}
+          <ValidatedSection strengths={snapshot.strengths} />
 
-          {/* Two-column layout for Strengths and Assumptions */}
-          <div className="grid md:grid-cols-2 gap-6">
-            <StrengthsSection strengths={snapshot.strengths} />
-            <AssumptionsSection assumptions={snapshot.assumptions} />
-          </div>
+          {/* Section 3: What Needs Attention */}
+          <AttentionSection
+            gaps={snapshot.gaps}
+            assumptions={snapshot.assumptions}
+          />
 
-          {/* Gaps */}
-          <GapsSection gaps={snapshot.gaps} />
+          {/* Section 4: 30-Day Action Plan */}
+          <ActionPlanSection steps={snapshot.next_steps} />
 
-          {/* Next Steps */}
-          <NextStepsSection steps={snapshot.next_steps} />
-
-          {/* Export */}
-          <ExportSection sessionId={session.id} email={session.email} />
+          {/* Section 5: Share & Export */}
+          <ExportSection
+            sessionId={session.id}
+            email={session.email}
+            keyStats={snapshot.key_stats}
+            readinessLevel={snapshot.readiness_level}
+          />
         </div>
 
         {/* Footer */}
         <footer className="mt-12 pt-8 border-t border-[#E8E6E1] text-center">
           <p className="text-[11px] text-[#9B9A97]">
-            Generated by Atlas Readiness Guide | This snapshot reflects your self-reported information.
+            Generated by Atlas Readiness Guide | Based on your self-reported information.
             <br />
-            It is not a score or recommendation to expand.
+            This report is a planning tool, not a recommendation to expand.
           </p>
         </footer>
       </main>
