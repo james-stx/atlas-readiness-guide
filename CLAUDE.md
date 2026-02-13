@@ -113,6 +113,8 @@ docs/MVP-BUILD-DOCUMENTATION.md
 docs/PRD-Progress-Visibility-Feature.md
 docs/product
 docs/product/central-console-feedback-v1.md
+docs/READINESS-REPORT-V2-SPEC.md
+docs/READINESS-REPORT-V2-WIREFRAMES.md
 docs/ux
 docs/UX-UI-Design-Specifications.md
 docs/ux/comprehensive-ux-audit-v1.md
@@ -135,8 +137,6 @@ pnpm-lock.yaml
 pnpm-workspace.yaml
 scripts
 scripts/update-claude-context.sh
-scripts/update-docs.ts
-supabase
 ```
 <!-- /AUTO:STRUCTURE -->
 
@@ -212,7 +212,8 @@ supabase
 ## Recent Commits
 
 ```
-df01f96 Update snapshot UI to Notion-inspired design system
+8fe5745 Add Readiness Report V2 spec and wireframes
+537c284 Update snapshot UI to Notion-inspired design system
 f9303f7 Fix PDF download by using correct coverage property names
 d4fb889 docs: auto-update MVP documentation [skip ci]
 f283025 Fix snapshot: increase maxTokens to 4096, make arrays optional with defaults
@@ -221,6 +222,5 @@ c174a65 Add detailed logging to snapshot generation for debugging
 10ac5ad Revert synthesis to Sonnet (Vercel Pro now active)
 fbc9417 Fix snapshot timeout: use Haiku + increase maxDuration
 215c44f Reduce token usage for snapshot generation
-ac28106 docs: auto-update MVP documentation [skip ci]
 ```
 <!-- /AUTO:RECENT_CHANGES -->
