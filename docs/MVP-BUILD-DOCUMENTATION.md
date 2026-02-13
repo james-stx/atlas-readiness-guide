@@ -156,6 +156,27 @@ A reference for technical terms used throughout this documentation.
 2. Logo click returns to home page
 3. Current domain/progress visible in simplified header format
 
+### Readiness Report Review Flow
+
+1. **Assessment Overview**: Users see overall readiness status with:
+   - Executive readiness level (Ready/Ready with Caveats/Not Ready)
+   - Coverage metrics (X/Y topics covered)
+   - Domain-level confidence indicators
+   - Executive summary bullets
+
+2. **Domain Deep Dive**: For each domain, users can review:
+   - Structured topic cards with key insights
+   - Requirements display with visual status indicators
+   - Confidence levels with dot visualization
+   - Uncovered topics shown with dashed borders
+
+3. **Action Planning**: Three-tier action system:
+   - **Critical Actions**: Must address before investment
+   - **Assumptions to Validate**: Research and validation tasks
+   - **30-Day Plan**: Week-organized roadmap with unblock information
+
+4. **Source Traceability**: All action items include domain → topic source attribution
+
 #### 3. Snapshot Generation (`/snapshot`)
 - When all domains are covered, user triggers snapshot generation
 - AI synthesizes all inputs into:
@@ -310,6 +331,29 @@ If a user leaves and returns:
 - **Focus States**: Teal focus rings (`focus-visible:ring-accent-500`)
 - **Hover States**: Subtle border color transitions on form elements
 - **Icons**: Integrated Lucide React icons for consistent iconography
+
+## V3 Readiness Report Design System
+
+The readiness report implements a comprehensive visual design system:
+
+### Color System
+- **Semantic Colors**: Uses Notion-inspired color palette for confidence levels and status indicators
+- **Theme Colors**: 
+  - Critical Actions: Red theme (#E03E3E, #FBE4E4)
+  - Assumptions: Amber theme (#D9730D, #FAEBDD) 
+  - Action Plans: Blue theme
+  - Success States: Green theme (#0F7B6C, #DDEDEA)
+
+### Typography Scale
+- Headers: 11px uppercase with tracking
+- Body text: 13-14px
+- Secondary text: 12px (#9B9A97)
+
+### Visual Indicators
+- **Confidence Dots**: Visual representation using filled/empty circles (●●●●○)
+- **Status Icons**: ✓ addressed, △ partial, ○ not addressed
+- **Progress Bars**: Coverage visualization with dual metrics
+- **Card Styles**: Solid borders for covered topics, dashed borders for uncovered
 
 ### Page-Specific Design Updates
 
@@ -685,6 +729,25 @@ atlas-readiness-guide/
 └── docs/                       # Documentation
 ```
 
+### Snapshot Components
+
+```
+apps/web/src/components/snapshot/
+├── ActionPlanUnified.tsx       # Unified action plan with 3-tier structure
+├── AssessmentOverview.tsx      # Executive summary with confidence indicators
+├── DomainDetailSection.tsx     # Structured domain analysis with topic cards
+└── ...
+```
+
+**ActionPlanUnified**: Implements three-section action plan:
+- Critical Actions (red theme, numbered priority)
+- Assumptions to Validate (amber theme, validation steps)
+- 30-Day Plan (blue theme, week organization)
+
+**AssessmentOverview**: Dual-metric display with coverage bars and confidence dots, executive summary generation
+
+**DomainDetailSection**: Structured topic cards with requirement status indicators, confidence visualization, and uncovered topic handling
+
 ### UI Component Updates
 
 #### Input Component (`/components/ui/input.tsx`)
@@ -783,6 +846,43 @@ Stores generated readiness snapshots.
 | `gaps` | JSONB | Low confidence items |
 | `next_steps` | JSONB | Recommended actions |
 | `created_at` | TIMESTAMP | When generated |
+
+### V3 Readiness Report Data Structure
+
+The V3 redesign introduces enhanced data structures:
+
+```typescript
+interface CriticalAction {
+  title: string;
+  description: string;
+  source_domain: DomainType;
+  source_topic: string;
+  source_status: string;
+  impact?: string;
+}
+
+interface AssumptionV3 {
+  title: string;
+  description: string;
+  validation_steps: string[];
+  source_domain: DomainType;
+  source_topic: string;
+}
+
+interface ActionPlanItem {
+  title: string;
+  description: string;
+  week: number;
+  unblocks?: string;
+  source_domain: DomainType;
+  source_topic: string;
+}
+```
+
+**Key Features**:
+- Source traceability: All items track originating domain and topic
+- Structured validation: Assumptions include specific validation steps
+- Timeline organization: Action items organized by week with unblock information
 
 ### Data Lifecycle
 
@@ -1550,115 +1650,3 @@ The system now handles API rate limits and temporary service unavailability auto
 
 **Solution**: The system now includes:
 - 60-second timeout on stream read operations
-- Automatic retry logic for timeout and connection errors
-- Improved error handling to distinguish between retryable stream errors and JSON parsing errors
-
-**How to Test**: Start a chat conversation and verify responses stream properly without hanging. If issues persist, check browser network tab for SSE connection status.
-
-**Chat Request Timeouts**
-
-*Issue*: Chat requests hanging or taking too long
-*Expected Behavior*: Requests automatically timeout after 90 seconds with clear error message
-*Troubleshooting*:
-- Check network connectivity and API server status
-- Verify the 90-second timeout is working as expected
-- Confirm streaming message state is properly cleared after timeout
-- Test that users can retry after timeout without UI issues
-
-**Invalid questionId errors**:
-
-If you see errors about invalid questionId values:
-1. Check the console logs for the exact error message showing valid IDs
-2. Verify the current domain has the expected question configuration
-3. The AI should automatically retry with a valid questionId from the error response
-4. If persistent, check that the domain configuration matches the questionIds being used
-
-### Viewing Logs
-
-#### Local
-Logs appear in the terminal running `pnpm dev`
-
-#### Vercel
-1. Go to project → Deployments
-2. Click a deployment
-3. Click **Functions** tab
-4. Select a function to view logs
-
----
-
-## 14. Decision Log
-
-Key decisions made during development and why.
-
-### Branding Revert
-**Branding Revert** (Current commit): Reverted homepage header and headline to original branding - restored 'Atlas by STX Labs' with gradient in header and 'Your Readiness. Revealed.' headline with gradient styling
-
-### Monorepo Structure
-**Decision**: Use a monorepo with Turborepo
-**Why**:
-- Shared types between frontend and backend
-- Single repository to manage
-- Easier dependency management
-- Coordinated deployments
-
-### Next.js for Both Apps
-**Decision**: Use Next.js for both web and API
-**Why**:
-- Consistent technology stack
-- API routes are simple to create
-- Both deploy well to Vercel
-- TypeScript support built-in
-
-### Supabase over Firebase
-**Decision**: Use Supabase for database
-**Why**:
-- PostgreSQL is more familiar
-- Better for relational data
-- Good free tier
-- Direct SQL access
-
-### Claude over GPT-4
-**Decision**: Use Anthropic Claude
-**Why**:
-- Better at following complex instructions
-- More consistent structured output
-- Good streaming support
-- Competitive pricing
-
-### Email-Only Auth
-**Decision**: No passwords, just email
-**Why**:
-- Reduces friction
-- MVP doesn't need accounts
-- Recovery token provides continuity
-- Can add auth later if needed
-
-### Vercel for Hosting
-**Decision**: Deploy to Vercel
-**Why**:
-- Native Next.js support
-- Free tier sufficient for MVP
-- Easy environment variables
-- Automatic HTTPS
-
-### Server-Sent Events (SSE) for Streaming
-**Decision**: Use SSE instead of WebSockets
-**Why**:
-- Simpler to implement
-- Works through Vercel
-- One-directional is sufficient
-- Better browser support
-
-### 2025 - AI Token Usage Optimization
-**Decision**: Switched from multi-step to single-step AI interactions to reduce API token usage from ~15,000 to ~2,000 tokens per message. Reduced conversation history from 20 to 10 messages and trimmed system prompts to stay within Anthropic's rate limits.
-**Why**:
-- Reduced API costs significantly
-- Stayed within rate limit constraints
-- Maintained assessment quality with optimized prompts
-- Improved response times
-
----
-
-## 15. Known Limitations & Future Roadmap
-
-### Recent
