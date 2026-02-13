@@ -204,36 +204,37 @@ export function buildSynthesisV3UserPrompt(inputs: Input[]): string {
     financials: 'Financials',
   };
 
-  // Build compact topic coverage map
-  const coveredTopics = new Set(inputs.map(i => i.question_id));
-  const allTopicIds: string[] = [];
+  // Build topic list with coverage status
+  let prompt = `# Topics to Analyze\n\n`;
   for (const domain of domains) {
-    for (const topic of TOPIC_DEFINITIONS[domain]) {
-      allTopicIds.push(topic.id);
-    }
-  }
-
-  let prompt = `# Assessment Summary\n`;
-  prompt += `Topics covered: ${coveredTopics.size}/25\n`;
-  prompt += `Covered: ${[...coveredTopics].join(', ')}\n`;
-  prompt += `Not covered: ${allTopicIds.filter(id => !coveredTopics.has(id)).join(', ')}\n\n`;
-
-  prompt += `# User Inputs\n\n`;
-
-  for (const domain of domains) {
-    const domainInputs = inputs.filter((i) => i.domain === domain);
-    if (domainInputs.length === 0) continue;
-
     prompt += `## ${domainLabels[domain]}\n`;
-
-    for (const input of domainInputs) {
-      const response = truncate(input.user_response, 300);
-      prompt += `**${input.question_id}** [${input.confidence_level.toUpperCase()}]: ${response}\n`;
+    for (const topic of TOPIC_DEFINITIONS[domain]) {
+      const input = inputs.find(i => i.question_id === topic.id);
+      if (input) {
+        const response = truncate(input.user_response, 250);
+        prompt += `- ${topic.id} "${topic.label}" [${input.confidence_level.toUpperCase()}]: "${response}"\n`;
+      } else {
+        prompt += `- ${topic.id} "${topic.label}": NOT COVERED\n`;
+      }
     }
     prompt += `\n`;
   }
 
-  prompt += `Generate the V3 report. Be conservative - mark unclear info as LOW confidence.`;
+  // Calculate stats
+  const coveredCount = inputs.length;
+  const coveragePercent = Math.round((coveredCount / 25) * 100);
+
+  prompt += `# Summary\n`;
+  prompt += `Coverage: ${coveredCount}/25 topics (${coveragePercent}%)\n\n`;
+
+  prompt += `# Instructions\n`;
+  prompt += `Generate a readiness report with:\n`;
+  prompt += `1. topicResults: Array with one entry per COVERED topic (topicId, topicLabel, domain, status="covered", confidence, keyInsight)\n`;
+  prompt += `2. criticalActions: Array of blockers (priority 1-5, title, sourceDomain, sourceTopic, sourceStatus, description, action)\n`;
+  prompt += `3. assumptions: Array of things to validate (title, sourceDomain, sourceTopic, description, validation)\n`;
+  prompt += `4. actionPlan: 30-day plan items (week 1-4, action, sourceDomain, sourceTopic, unblocks)\n`;
+  prompt += `5. readinessLevel: "ready", "ready_with_caveats", or "not_ready" (if ${coveragePercent}% >= 60)\n`;
+  prompt += `6. verdictSummary: One sentence summary\n`;
 
   return prompt;
 }

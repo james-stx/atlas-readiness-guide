@@ -28,7 +28,7 @@ const snapshotV3Schema = z.object({
   readinessLevel: z.enum(['ready', 'ready_with_caveats', 'not_ready']).optional(),
   verdictSummary: z.string().optional(),
 
-  // Topic-level results (for all 25 topics)
+  // Topic-level results (for covered topics only - simpler for Haiku)
   topicResults: z.array(
     z.object({
       topicId: z.string(),
@@ -37,15 +37,8 @@ const snapshotV3Schema = z.object({
       status: z.enum(['covered', 'not_covered']),
       confidence: z.enum(['high', 'medium', 'low']).optional(),
       keyInsight: z.string().optional(),
-      requirements: z.array(
-        z.object({
-          requirementId: z.string(),
-          label: z.string(),
-          status: z.enum(['addressed', 'partial', 'not_addressed']),
-        })
-      ),
     })
-  ),
+  ).default([]),
 
   // Critical actions with source traceability
   criticalActions: z.array(
@@ -153,7 +146,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Count critical actions for key stats (derived from V3)
-    const criticalGapsCount = generatedV3Snapshot.criticalActions.length;
+    const criticalGapsCount = (generatedV3Snapshot.criticalActions || []).length;
 
     // Transform coverage summary to match DB schema
     const dbCoverageSummary = {
@@ -190,8 +183,13 @@ export async function POST(request: NextRequest) {
     };
 
     // Transform V3 data to V2-compatible DB schema for backwards compatibility
+    const topicResults = generatedV3Snapshot.topicResults || [];
+    const criticalActions = generatedV3Snapshot.criticalActions || [];
+    const assumptions = generatedV3Snapshot.assumptions || [];
+    const actionPlan = generatedV3Snapshot.actionPlan || [];
+
     // Key findings: derive from V3 topic results that have key insights
-    const dbKeyFindings = generatedV3Snapshot.topicResults
+    const dbKeyFindings = topicResults
       .filter((t: { keyInsight?: string }) => t.keyInsight)
       .slice(0, 5)
       .map((t: { domain: DomainType; keyInsight?: string; confidence?: ConfidenceLevel }) => ({
@@ -201,7 +199,7 @@ export async function POST(request: NextRequest) {
       }));
 
     // Strengths: derive from high-confidence covered topics
-    const dbStrengths = generatedV3Snapshot.topicResults
+    const dbStrengths = topicResults
       .filter((t: { status: string; confidence?: ConfidenceLevel }) => t.status === 'covered' && t.confidence === 'high')
       .slice(0, 5)
       .map((t: { domain: DomainType; topicLabel: string; keyInsight?: string }) => ({
@@ -212,7 +210,7 @@ export async function POST(request: NextRequest) {
       }));
 
     // Assumptions: derive from V3 assumptions
-    const dbAssumptions = generatedV3Snapshot.assumptions.map((a: { sourceDomain: DomainType; title: string; description: string; validation: string }) => ({
+    const dbAssumptions = assumptions.map((a: { sourceDomain: DomainType; title: string; description: string; validation: string }) => ({
       domain: a.sourceDomain,
       item: a.title,
       risk: a.description,
@@ -220,7 +218,7 @@ export async function POST(request: NextRequest) {
     }));
 
     // Gaps: derive from V3 critical actions
-    const dbGaps = generatedV3Snapshot.criticalActions.map((ca: { sourceDomain: DomainType; title: string; description: string; action: string }) => ({
+    const dbGaps = criticalActions.map((ca: { sourceDomain: DomainType; title: string; description: string; action: string }) => ({
       domain: ca.sourceDomain,
       item: ca.title,
       importance: 'critical' as const,
@@ -230,7 +228,7 @@ export async function POST(request: NextRequest) {
     }));
 
     // Next steps: derive from V3 action plan
-    const dbNextSteps = generatedV3Snapshot.actionPlan.map((ap: { week: number; action: string; sourceDomain: DomainType; unblocks: string }, index: number) => ({
+    const dbNextSteps = actionPlan.map((ap: { week: number; action: string; sourceDomain: DomainType; unblocks: string }, index: number) => ({
       priority: index + 1,
       action: ap.action,
       domain: ap.sourceDomain,
@@ -259,7 +257,7 @@ export async function POST(request: NextRequest) {
           const dr = domainResults[domain];
           const topicDefs = TOPIC_DEFINITIONS[domain];
           const topics = topicDefs.map((td) => {
-            const topicResult = generatedV3Snapshot.topicResults.find(
+            const topicResult = (generatedV3Snapshot.topicResults || []).find(
               (tr: { topicId: string }) => tr.topicId === td.id
             );
             return {
@@ -268,14 +266,11 @@ export async function POST(request: NextRequest) {
               status: topicResult?.status || 'not_covered',
               confidence: topicResult?.confidence,
               key_insight: topicResult?.keyInsight,
-              requirements: topicResult?.requirements.map((r: { requirementId: string; label: string; status: string }) => ({
-                requirement_id: r.requirementId,
-                label: r.label,
-                status: r.status,
-              })) || td.requirements.map((req, idx) => ({
+              // Requirements now derived from topic definitions (simplified schema)
+              requirements: td.requirements.map((req, idx) => ({
                 requirement_id: `${td.id}_req_${idx}`,
                 label: req,
-                status: 'not_addressed',
+                status: topicResult ? 'addressed' : 'not_addressed',
               })),
             };
           });
@@ -289,7 +284,7 @@ export async function POST(request: NextRequest) {
           }];
         })
       ),
-      critical_actions: generatedV3Snapshot.criticalActions.map((ca: { priority: number; title: string; sourceDomain: DomainType; sourceTopic: string; sourceStatus: string; description: string; action: string }) => ({
+      critical_actions: (generatedV3Snapshot.criticalActions || []).map((ca: { priority: number; title: string; sourceDomain: DomainType; sourceTopic: string; sourceStatus: string; description: string; action: string }) => ({
         priority: ca.priority,
         title: ca.title,
         source_domain: ca.sourceDomain,
@@ -298,14 +293,14 @@ export async function POST(request: NextRequest) {
         description: ca.description,
         action: ca.action,
       })),
-      assumptions: generatedV3Snapshot.assumptions.map((a: { title: string; sourceDomain: DomainType; sourceTopic: string; description: string; validation: string }) => ({
+      assumptions: (generatedV3Snapshot.assumptions || []).map((a: { title: string; sourceDomain: DomainType; sourceTopic: string; description: string; validation: string }) => ({
         title: a.title,
         source_domain: a.sourceDomain,
         source_topic: a.sourceTopic,
         description: a.description,
         validation: a.validation,
       })),
-      action_plan: generatedV3Snapshot.actionPlan.map((ap: { week: number; action: string; sourceDomain: DomainType; sourceTopic: string; unblocks: string }) => ({
+      action_plan: (generatedV3Snapshot.actionPlan || []).map((ap: { week: number; action: string; sourceDomain: DomainType; sourceTopic: string; unblocks: string }) => ({
         week: ap.week,
         action: ap.action,
         source_domain: ap.sourceDomain,
