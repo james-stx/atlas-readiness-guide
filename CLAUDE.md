@@ -165,7 +165,7 @@ pnpm-workspace.yaml
 - **components/workspace/chat/** (4): ChatHeader,ChatPanel,InputCapturedIndicator,TopicTransitionBanner
 - **components/workspace/mobile/** (1): MobileTabBar
 - **components/ui/** (13): button,confidence-badge,confirm-dialog,error-card,input,network-banner,overflow-menu,progress-bar-mini,progress,skeleton-loader,skeleton,status-indicator,tooltip
-- **components/snapshot/** (16): ActionPlanSection,ActionPlanSectionV3,ActionPlanUnified,AssessmentOverview,assumptions-section,AttentionSection,coverage-overview,CriticalActionsSection,DomainDetailSection,export-section,gaps-section,key-findings,next-steps-section,ReadinessOverview,strengths-section,ValidatedSection
+- **components/snapshot/** (17): ActionPlanSection,ActionPlanSectionV3,ActionPlanUnified,AssessmentOverview,assumptions-section,AttentionSection,coverage-overview,CriticalActionsSection,DomainDetailSection,export-section,gaps-section,key-findings,next-steps-section,PreliminaryInsights,ReadinessOverview,strengths-section,ValidatedSection
 
 <!-- /AUTO:COMPONENTS -->
 
@@ -213,7 +213,9 @@ pnpm-workspace.yaml
 ## Recent Commits
 
 ```
-4bd19d9 Emergency fix: Compact report layout for incomplete assessments
+a145120 Compact report layout: dots instead of bars, add preliminary insights
+b6306e3 Emergency fix: Compact report layout for incomplete assessments
+39ec257 docs: auto-update MVP documentation [skip ci]
 a26daa9 Implement V3 Readiness Report per design spec
 28d021d docs: auto-update MVP documentation [skip ci]
 86d8078 Fix report showing no topic details
@@ -221,7 +223,5 @@ a26daa9 Implement V3 Readiness Report per design spec
 286e495 Fix DB schema mismatch - remove key_stats column
 70c6aee Fix Haiku schema validation - simplify and add defaults
 f4cb6a8 docs: auto-update MVP documentation [skip ci]
-2d7d305 Speed up snapshot generation to avoid 60s timeout
-cad0271 Fix API timeout by removing redundant V2 generation call
 ```
 <!-- /AUTO:RECENT_CHANGES -->

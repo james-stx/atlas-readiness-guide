@@ -7,6 +7,7 @@ import { useAssessment } from '@/lib/context/assessment-context';
 import { getSnapshot } from '@/lib/api-client';
 import { AssessmentOverview } from '@/components/snapshot/AssessmentOverview';
 import { ActionPlanUnified } from '@/components/snapshot/ActionPlanUnified';
+import { PreliminaryInsights } from '@/components/snapshot/PreliminaryInsights';
 import { ExportSection } from '@/components/snapshot/export-section';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, Loader2, Compass } from 'lucide-react';
@@ -211,7 +212,12 @@ export default function SnapshotPage() {
             domains={v3.domains}
           />
 
-          {/* Action Plan - Only for complete assessments */}
+          {/* For incomplete: show preliminary insights */}
+          {isIncomplete && (
+            <PreliminaryInsights domains={v3.domains} />
+          )}
+
+          {/* For complete: show full action plan */}
           {!isIncomplete && (
             <ActionPlanUnified
               criticalActions={v3.critical_actions}
