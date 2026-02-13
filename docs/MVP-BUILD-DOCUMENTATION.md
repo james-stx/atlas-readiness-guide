@@ -504,9 +504,19 @@ This separation allows users to browse content freely without accidentally trigg
 - Robust error recovery for both REST API and SSE streaming connections
 - Maximum 3 retry attempts with 1.5 second base delay
 
-#### AI/ML Pipeline
+#### AI/LLM Integration
 
 The synthesis model configuration has been optimized with increased token limits (4096 tokens) to handle comprehensive snapshot generation. The snapshot schema includes fallback defaults for optional arrays (strengths, assumptions, gaps, nextSteps) to ensure graceful handling when AI generation approaches token limits.
+
+**AI Model Configuration:**
+- Conversation: Claude Sonnet 4.5 (high capability)
+- Classification: Claude Haiku 4.5 (fast, deterministic)
+- Synthesis: Claude Haiku 4.5 (optimized for speed, 10-20s generation time vs 40-60s with Sonnet)
+
+**Performance Considerations:**
+- Synthesis uses Haiku model to avoid 60-second timeouts
+- Token limits optimized per use case (synthesis: 2048 tokens, classification: 256 tokens)
+- V3 synthesis prompt simplified for faster processing
 
 #### Conversation Agent
 The conversation agent uses Vercel AI SDK's `streamText()` with tool support:
@@ -1074,6 +1084,22 @@ Both applications need environment variables to function. These are set differen
 
 **AI Interaction Mode**: Single-step execution to minimize API calls
 
+**AI Model Settings:**
+```typescript
+models: {
+  conversation: 'claude-sonnet-4-5-20250929',
+  classification: 'claude-haiku-4-5-20251001', 
+  synthesis: 'claude-haiku-4-5-20251001' // Fast model for timeout avoidance
+}
+
+modelConfig: {
+  synthesis: {
+    maxTokens: 2048, // Reduced for performance
+    temperature: 0.3
+  }
+}
+```
+
 ### Email Configuration
 
 **Build-time Environment Variables**: The Resend email client is now lazy-initialized to prevent build failures when RESEND_API_KEY is not available during the build process. The client is only instantiated when actually sending emails, not at module load time.
@@ -1638,18 +1664,4 @@ Key decisions made during development and why.
 | Limitation | Impact | Future Solution |
 |------------|--------|-----------------|
 | No user accounts | Can't access from new device | Add authentication |
-| Single session per email | Can't have multiple assessments | Add session selection |
-| No editing inputs | Can't correct mistakes | Add edit functionality |
-| English only | Limited audience | Add i18n |
-| No admin dashboard | Can't view analytics | Build admin panel |
-| Basic error handling | Some errors unclear | Improve error messages |
-| No offline support | Requires internet | Add PWA features |
-| ~~Chat becomes unresponsive when hitting API rate limits~~ | ~~Service unavailable during high load~~ | ✅ **RESOLVED**: Added retry logic with exponential backoff |
-| Fixed 90-second timeout for all chat requests | No dynamic adjustment based on request complexity | Implement adaptive timeout logic |
-| No retry logic implemented | Users must manually retry failed requests | Add automatic retry functionality |
-| Single timeout value may not be optimal | May not suit all types of chat interactions | Add request-type-specific timeouts |
-
-### Current Debugging Measures
-- Debug logging has been added to SSE streams to help diagnose response freeze issues
-- Temporary console.log statements are in place for development troubleshooting
-- These debug logs should be removed or made configurable before
+| Single
