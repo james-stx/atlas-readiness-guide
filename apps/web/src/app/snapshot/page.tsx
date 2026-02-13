@@ -228,23 +228,24 @@ export default function SnapshotPage() {
             />
           )}
 
-          {/* Section 3: Domain Evidence (Detailed Findings) */}
-          {!isIncomplete && (
-            <div>
-              <h3 className="text-[11px] font-medium uppercase tracking-wide text-[#9B9A97] mb-4 px-1">
-                Detailed Findings by Domain
-              </h3>
-              <div className="space-y-4">
-                {DOMAIN_ORDER.map((domain) => (
-                  <DomainDetailSection
-                    key={domain}
-                    domain={domain}
-                    domainResult={v3.domains[domain]}
-                  />
-                ))}
-              </div>
+          {/* Section 3: Domain Evidence (show even for incomplete to display covered topics) */}
+          <div>
+            <h3 className="text-[11px] font-medium uppercase tracking-wide text-[#9B9A97] mb-4 px-1">
+              {isIncomplete ? 'Topics Covered So Far' : 'Detailed Findings by Domain'}
+            </h3>
+            <div className="space-y-4">
+              {DOMAIN_ORDER.filter((domain) =>
+                // For incomplete, only show domains with covered topics
+                !isIncomplete || v3.domains[domain].topics_covered > 0
+              ).map((domain) => (
+                <DomainDetailSection
+                  key={domain}
+                  domain={domain}
+                  domainResult={v3.domains[domain]}
+                />
+              ))}
             </div>
-          )}
+          </div>
 
           {/* Section 4: Share & Export */}
           <ExportSection

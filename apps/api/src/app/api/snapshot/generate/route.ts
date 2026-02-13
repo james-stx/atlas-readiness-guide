@@ -256,21 +256,31 @@ export async function POST(request: NextRequest) {
         (['market', 'product', 'gtm', 'operations', 'financials'] as DomainType[]).map((domain) => {
           const dr = domainResults[domain];
           const topicDefs = TOPIC_DEFINITIONS[domain];
+          const domainInputs = inputs.filter(i => i.domain === domain);
+
           const topics = topicDefs.map((td) => {
+            // Check AI response first
             const topicResult = (generatedV3Snapshot.topicResults || []).find(
               (tr: { topicId: string }) => tr.topicId === td.id
             );
+            // Fallback: check if we have an actual input for this topic
+            const hasInput = domainInputs.some(i => i.question_id === td.id);
+            const matchingInput = domainInputs.find(i => i.question_id === td.id);
+
+            // Determine status: use AI result, or fallback to input presence
+            const isCovered = topicResult?.status === 'covered' || hasInput;
+
             return {
               topic_id: td.id,
               topic_label: td.label,
-              status: topicResult?.status || 'not_covered',
-              confidence: topicResult?.confidence,
-              key_insight: topicResult?.keyInsight,
-              // Requirements now derived from topic definitions (simplified schema)
+              status: isCovered ? 'covered' : 'not_covered',
+              confidence: topicResult?.confidence || (matchingInput?.confidence_level as ConfidenceLevel | undefined),
+              key_insight: topicResult?.keyInsight || (matchingInput ? `User provided input on this topic.` : undefined),
+              // Requirements derived from topic definitions
               requirements: td.requirements.map((req, idx) => ({
                 requirement_id: `${td.id}_req_${idx}`,
                 label: req,
-                status: topicResult ? 'addressed' : 'not_addressed',
+                status: isCovered ? 'addressed' : 'not_addressed',
               })),
             };
           });
