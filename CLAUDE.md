@@ -213,7 +213,8 @@ scripts
 ## Recent Commits
 
 ```
-c3863ab Fix report showing no topic details
+7331416 Implement V3 Readiness Report per design spec
+86d8078 Fix report showing no topic details
 22d615a Fix DB schema - remove all V2 columns from insert
 286e495 Fix DB schema mismatch - remove key_stats column
 70c6aee Fix Haiku schema validation - simplify and add defaults
@@ -222,6 +223,5 @@ f4cb6a8 docs: auto-update MVP documentation [skip ci]
 cad0271 Fix API timeout by removing redundant V2 generation call
 98517e9 Refactor report: Verdict → Actions → Evidence structure
 42091e3 Implement V3 Readiness Report with structured topic analysis
-3ade314 Add Readiness Report V3 redesign spec
 ```
 <!-- /AUTO:RECENT_CHANGES -->

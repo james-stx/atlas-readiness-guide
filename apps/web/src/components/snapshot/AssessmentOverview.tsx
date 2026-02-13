@@ -255,6 +255,23 @@ function ReadinessStatus({
   );
 }
 
+// Render confidence dots: ●●●●○ for HIGH, ●●●○○ for MEDIUM, ●○○○○ for LOW
+function ConfidenceDots({ level, total = 5 }: { level: 'high' | 'medium' | 'low'; total?: number }) {
+  const filledCount = level === 'high' ? 4 : level === 'medium' ? 2 : 1;
+  const colors = {
+    high: 'text-[#0F7B6C]',
+    medium: 'text-[#D9730D]',
+    low: 'text-[#E03E3E]',
+  };
+
+  return (
+    <span className={cn('text-[12px] tracking-tight', colors[level])}>
+      {'●'.repeat(filledCount)}
+      <span className="text-[#D4D1CB]">{'○'.repeat(total - filledCount)}</span>
+    </span>
+  );
+}
+
 function DomainRow({
   label,
   topicsCovered,
@@ -276,7 +293,7 @@ function DomainRow({
 
   return (
     <div className="bg-[#FAF9F7] rounded-lg p-4">
-      {/* Row 1: Domain name and topic count */}
+      {/* Row 1: Domain name */}
       <div className="flex items-center justify-between mb-2">
         <span className={cn(
           'text-[14px] font-medium',
@@ -284,33 +301,36 @@ function DomainRow({
         )}>
           {label}
         </span>
-        <span className="text-[13px] text-[#5C5A56]">
-          {topicsCovered}/{topicsTotal} topics
-        </span>
       </div>
 
-      {/* Row 2: Progress bar */}
-      <div className="h-1.5 bg-[#E8E6E1] rounded-full overflow-hidden mb-2">
-        <div
-          className="h-full bg-[#37352F] rounded-full transition-all duration-300"
-          style={{ width: `${coveragePercent}%` }}
-        />
-      </div>
+      {/* Row 2: Dual metrics - Coverage (left) | Confidence (right) */}
+      <div className="flex items-center gap-4">
+        {/* Coverage section */}
+        <div className="flex-1">
+          <div className="h-1.5 bg-[#E8E6E1] rounded-full overflow-hidden mb-1">
+            <div
+              className="h-full bg-[#37352F] rounded-full transition-all duration-300"
+              style={{ width: `${coveragePercent}%` }}
+            />
+          </div>
+          <span className="text-[11px] text-[#5C5A56]">
+            {topicsCovered}/{topicsTotal} topics
+          </span>
+        </div>
 
-      {/* Row 3: Confidence and gap info */}
-      <div className="flex items-center justify-between text-[12px]">
-        {isIncomplete && needsWork ? (
-          <span className="text-[#D9730D]">Need 2+ topics</span>
-        ) : (
-          <span className={confConfig.color}>
-            {confConfig.label} confidence
-          </span>
-        )}
-        {gapCount > 0 && !isIncomplete && (
-          <span className="text-[#9B9A97]">
-            {gapCount} gap{gapCount !== 1 ? 's' : ''}
-          </span>
-        )}
+        {/* Confidence section */}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {isIncomplete && needsWork ? (
+            <span className="text-[11px] text-[#D9730D]">Need 2+ topics</span>
+          ) : (
+            <>
+              <ConfidenceDots level={confidenceLevel} />
+              <span className={cn('text-[11px] font-medium', confConfig.color)}>
+                {confConfig.label}
+              </span>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
