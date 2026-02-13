@@ -506,7 +506,16 @@ This separation allows users to browse content freely without accidentally trigg
 
 #### AI/LLM Integration
 
-The synthesis model configuration has been optimized with increased token limits (4096 tokens) to handle comprehensive snapshot generation. The snapshot schema includes fallback defaults for optional arrays (strengths, assumptions, gaps, nextSteps) to ensure graceful handling when AI generation approaches token limits.
+The synthesis model configuration has been optimized with increased token limits (4096 tokens) to handle comprehensive snapshot generation. The snapshot generation includes a **fallback mechanism** for handling incomplete AI responses:
+
+1. **Primary Path**: AI generates structured topic analysis with insights
+2. **Fallback Path**: When AI returns empty topicResults:
+   - System checks for actual user input on each topic
+   - Uses input's confidence_level as topic confidence
+   - Displays generic "User provided input on this topic" insight
+   - Ensures all covered topics are shown regardless of AI response completeness
+
+This dual-path approach ensures report reliability even when the AI model (Haiku) has processing issues.
 
 **AI Model Configuration:**
 - Conversation: Claude Sonnet 4.5 (high capability)
@@ -1482,6 +1491,13 @@ If something breaks:
 - Tool execution errors are now caught and logged to prevent silent stream failures
 - Expected behavior: Text should continue streaming even during input recording and domain transitions
 
+#### Report Shows No Topic Details
+- **Symptoms**: Topics appear without insights or confidence levels
+- **Cause**: AI model returned empty topicResults array
+- **Resolution**: System now automatically falls back to input data
+- **Verification**: Topics should display with user's original confidence level and "User provided input on this topic" message
+- **Additional Notes**: This fallback ensures reports remain useful even during AI processing issues
+
 ### SSE Streaming Issues
 - SSE streams now buffer incomplete chunks across TCP packet boundaries
 - API streaming errors are surfaced to users instead of being silently dropped
@@ -1645,23 +1661,4 @@ Key decisions made during development and why.
 
 ## 15. Known Limitations & Future Roadmap
 
-### Recent Improvements
-
-**Recent Improvements:**
-- Enhanced snapshot generation reliability with increased token limits and graceful degradation for partial AI responses
-- Improved handling of edge cases where AI generation may be incomplete due to computational constraints
-
-### Recent Fixes
-- ✅ Fixed question ID validation to prevent AI from generating invalid IDs
-- ✅ Improved domain transition automation for better conversation flow
-- ✅ Resolved progress tracking issues caused by ID mismatches
-
-### Recently Resolved
-- ✅ **Chat Stream Hanging** (Fixed): SSE streams could hang indefinitely causing chat freeze - now includes timeout handling and improved error recovery
-
-### Current Limitations
-
-| Limitation | Impact | Future Solution |
-|------------|--------|-----------------|
-| No user accounts | Can't access from new device | Add authentication |
-| Single
+### Recent
