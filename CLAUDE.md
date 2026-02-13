@@ -165,7 +165,7 @@ scripts
 - **components/workspace/chat/** (4): ChatHeader,ChatPanel,InputCapturedIndicator,TopicTransitionBanner
 - **components/workspace/mobile/** (1): MobileTabBar
 - **components/ui/** (13): button,confidence-badge,confirm-dialog,error-card,input,network-banner,overflow-menu,progress-bar-mini,progress,skeleton-loader,skeleton,status-indicator,tooltip
-- **components/snapshot/** (11): ActionPlanSection,assumptions-section,AttentionSection,coverage-overview,export-section,gaps-section,key-findings,next-steps-section,ReadinessOverview,strengths-section,ValidatedSection
+- **components/snapshot/** (15): ActionPlanSection,ActionPlanSectionV3,AssessmentOverview,assumptions-section,AttentionSection,coverage-overview,CriticalActionsSection,DomainDetailSection,export-section,gaps-section,key-findings,next-steps-section,ReadinessOverview,strengths-section,ValidatedSection
 
 <!-- /AUTO:COMPONENTS -->
 
@@ -191,6 +191,7 @@ scripts
 - lib/ai/client.ts
 - lib/ai/confidence/classifier.ts
 - lib/ai/prompts/domains.ts
+- lib/ai/prompts/synthesis-v3.ts
 - lib/ai/prompts/synthesis.ts
 - lib/ai/prompts/system.ts
 - lib/db/index.ts
@@ -212,7 +213,8 @@ scripts
 ## Recent Commits
 
 ```
-1ab73ba Add Readiness Report V3 redesign spec
+245a9ad Implement V3 Readiness Report with structured topic analysis
+3ade314 Add Readiness Report V3 redesign spec
 c2cf905 Implement Readiness Report V2
 2b1429e Add Readiness Report V2 spec and wireframes
 537c284 Update snapshot UI to Notion-inspired design system
@@ -221,6 +223,5 @@ d4fb889 docs: auto-update MVP documentation [skip ci]
 f283025 Fix snapshot: increase maxTokens to 4096, make arrays optional with defaults
 8e38e6a Fix error logging and add specific AI error handling
 c174a65 Add detailed logging to snapshot generation for debugging
-10ac5ad Revert synthesis to Sonnet (Vercel Pro now active)
 ```
 <!-- /AUTO:RECENT_CHANGES -->

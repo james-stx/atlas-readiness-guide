@@ -5,14 +5,16 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAssessment } from '@/lib/context/assessment-context';
 import { getSnapshot } from '@/lib/api-client';
-import { ReadinessOverview } from '@/components/snapshot/ReadinessOverview';
-import { ValidatedSection } from '@/components/snapshot/ValidatedSection';
-import { AttentionSection } from '@/components/snapshot/AttentionSection';
-import { ActionPlanSection } from '@/components/snapshot/ActionPlanSection';
+import { AssessmentOverview } from '@/components/snapshot/AssessmentOverview';
+import { DomainDetailSection } from '@/components/snapshot/DomainDetailSection';
+import { CriticalActionsSection } from '@/components/snapshot/CriticalActionsSection';
+import { ActionPlanSectionV3 } from '@/components/snapshot/ActionPlanSectionV3';
 import { ExportSection } from '@/components/snapshot/export-section';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, Loader2, Compass } from 'lucide-react';
-import type { Snapshot } from '@atlas/types';
+import type { Snapshot, DomainType, SnapshotV3 } from '@atlas/types';
+
+const DOMAIN_ORDER: DomainType[] = ['market', 'product', 'gtm', 'operations', 'financials'];
 
 export default function SnapshotPage() {
   const router = useRouter();
@@ -124,10 +126,57 @@ export default function SnapshotPage() {
     );
   }
 
+  // Check if V3 data is available
+  const v3 = snapshot.v3 as SnapshotV3 | undefined;
+
+  // If no V3 data, show fallback
+  if (!v3) {
+    return (
+      <div className="min-h-screen bg-[#FAF9F7]">
+        <header className="flex h-12 items-center justify-between border-b border-[#E8E6E1] bg-white px-4 sticky top-0 z-50">
+          <Link
+            href="/workspace"
+            className="flex items-center gap-2 text-[#5C5A56] hover:text-[#37352F] transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span className="text-[13px]">Back to Workspace</span>
+          </Link>
+          <div className="text-[13px] text-[#9B9A97]">{session.email}</div>
+        </header>
+
+        <main className="max-w-[720px] mx-auto px-6 py-8">
+          <div className="text-center mb-8">
+            <div className="w-12 h-12 bg-[#37352F] rounded-lg flex items-center justify-center mx-auto mb-4">
+              <Compass className="w-6 h-6 text-white" />
+            </div>
+            <h1 className="text-[24px] font-semibold text-[#37352F] mb-2">
+              Your Readiness Report
+            </h1>
+            <p className="text-[14px] text-[#5C5A56]">
+              Generating enhanced report format...
+            </p>
+          </div>
+
+          <div className="bg-white rounded-lg border border-[#E8E6E1] p-6 text-center">
+            <p className="text-[14px] text-[#5C5A56]">
+              Please regenerate your report to see the enhanced V3 format with detailed topic analysis.
+            </p>
+            <button
+              onClick={() => generateSnapshot()}
+              className="mt-4 px-4 py-2 bg-[#2383E2] text-white rounded-md text-[14px] font-medium hover:bg-[#1A6DC0] transition-colors"
+            >
+              Regenerate Report
+            </button>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#FAF9F7]">
       {/* Header */}
-      <header className="flex h-12 items-center justify-between border-b border-[#E8E6E1] bg-white px-4 sticky top-0 z-50">
+      <header className="flex h-12 items-center justify-between border-b border-[#E8E6E1] bg-white px-4 sticky top-0 z-50 print:hidden">
         <Link
           href="/workspace"
           className="flex items-center gap-2 text-[#5C5A56] hover:text-[#37352F] transition-colors"
@@ -157,32 +206,41 @@ export default function SnapshotPage() {
 
         {/* Report sections */}
         <div className="space-y-6">
-          {/* Section 1: Readiness Overview */}
-          <ReadinessOverview
-            readinessLevel={snapshot.readiness_level}
-            verdictSummary={snapshot.verdict_summary}
-            coverage={snapshot.coverage_summary}
-            keyStats={snapshot.key_stats}
+          {/* Section 1: Assessment Overview */}
+          <AssessmentOverview
+            assessmentStatus={v3.assessment_status}
+            coveragePercentage={v3.coverage_percentage}
+            topicsCovered={v3.topics_covered}
+            topicsTotal={v3.topics_total}
+            readinessLevel={v3.readiness_level}
+            verdictSummary={v3.verdict_summary}
+            domains={v3.domains}
           />
 
-          {/* Section 2: What You've Validated */}
-          <ValidatedSection strengths={snapshot.strengths} />
+          {/* Section 2: Domain Details (all 5 domains) */}
+          {DOMAIN_ORDER.map((domain) => (
+            <DomainDetailSection
+              key={domain}
+              domain={domain}
+              domainResult={v3.domains[domain]}
+            />
+          ))}
 
-          {/* Section 3: What Needs Attention */}
-          <AttentionSection
-            gaps={snapshot.gaps}
-            assumptions={snapshot.assumptions}
+          {/* Section 3: Critical Actions & Assumptions */}
+          <CriticalActionsSection
+            criticalActions={v3.critical_actions}
+            assumptions={v3.assumptions}
           />
 
           {/* Section 4: 30-Day Action Plan */}
-          <ActionPlanSection steps={snapshot.next_steps} />
+          <ActionPlanSectionV3 actionPlan={v3.action_plan} />
 
           {/* Section 5: Share & Export */}
           <ExportSection
             sessionId={session.id}
             email={session.email}
             keyStats={snapshot.key_stats}
-            readinessLevel={snapshot.readiness_level}
+            readinessLevel={v3.readiness_level}
           />
         </div>
 

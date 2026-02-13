@@ -25,6 +25,12 @@ export type GapImportance = 'critical' | 'important' | 'nice-to-have';
 
 export type ReadinessLevel = 'ready' | 'ready_with_caveats' | 'not_ready';
 
+export type AssessmentStatus = 'incomplete' | 'assessable';
+
+export type TopicStatus = 'covered' | 'not_covered';
+
+export type RequirementStatus = 'addressed' | 'partial' | 'not_addressed';
+
 // ============================================
 // Database Row Types
 // ============================================
@@ -84,6 +90,8 @@ export interface Snapshot {
   readiness_level?: ReadinessLevel;
   verdict_summary?: string;
   key_stats?: KeyStats;
+  // V3 structured data
+  v3?: SnapshotV3;
 }
 
 // ============================================
@@ -140,6 +148,79 @@ export interface NextStep {
   domain: DomainType;
   rationale: string;
   week?: 1 | 2 | 3 | 4;
+}
+
+// ============================================
+// V3 Snapshot Types
+// ============================================
+
+export interface TopicRequirementResult {
+  requirement_id: string;
+  label: string;
+  status: RequirementStatus;
+}
+
+export interface TopicResult {
+  topic_id: string;
+  topic_label: string;
+  status: TopicStatus;
+  confidence?: ConfidenceLevel;
+  key_insight?: string;
+  requirements: TopicRequirementResult[];
+}
+
+export interface DomainResult {
+  topics_covered: number;
+  topics_total: number;
+  confidence_level: ConfidenceLevel;
+  confidence_breakdown: { high: number; medium: number; low: number };
+  topics: TopicResult[];
+}
+
+export interface CriticalAction {
+  priority: number;
+  title: string;
+  source_domain: DomainType;
+  source_topic: string;
+  source_status: string;
+  description: string;
+  action: string;
+}
+
+export interface AssumptionV3 {
+  title: string;
+  source_domain: DomainType;
+  source_topic: string;
+  description: string;
+  validation: string;
+}
+
+export interface ActionPlanItem {
+  week: 1 | 2 | 3 | 4;
+  action: string;
+  source_domain: DomainType;
+  source_topic: string;
+  unblocks: string;
+}
+
+export interface SnapshotV3 {
+  // Assessment status
+  assessment_status: AssessmentStatus;
+  coverage_percentage: number;
+  topics_covered: number;
+  topics_total: number;
+
+  // Only populated if assessable
+  readiness_level?: ReadinessLevel;
+  verdict_summary?: string;
+
+  // Domain details (structured)
+  domains: Record<DomainType, DomainResult>;
+
+  // Actions (derived from structured analysis)
+  critical_actions: CriticalAction[];
+  assumptions: AssumptionV3[];
+  action_plan: ActionPlanItem[];
 }
 
 // ============================================
