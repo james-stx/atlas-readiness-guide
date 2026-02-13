@@ -8,7 +8,6 @@ import type {
   AssessmentStatus,
   ReadinessLevel,
   DomainResult,
-  CriticalAction,
 } from '@atlas/types';
 
 interface AssessmentOverviewProps {
@@ -19,7 +18,6 @@ interface AssessmentOverviewProps {
   readinessLevel?: ReadinessLevel;
   verdictSummary?: string;
   domains: Record<DomainType, DomainResult>;
-  criticalActions?: CriticalAction[];
   className?: string;
 }
 
@@ -59,12 +57,12 @@ const READINESS_CONFIG: Record<ReadinessLevel, {
   },
 };
 
-const CONFIDENCE_LABELS: Record<'high' | 'medium' | 'low', {
+const CONFIDENCE_CONFIG: Record<'high' | 'medium' | 'low', {
   label: string;
   color: string;
 }> = {
   high: { label: 'HIGH', color: 'text-[#0F7B6C]' },
-  medium: { label: 'MEDIUM', color: 'text-[#D9730D]' },
+  medium: { label: 'MED', color: 'text-[#D9730D]' },
   low: { label: 'LOW', color: 'text-[#E03E3E]' },
 };
 
@@ -76,17 +74,13 @@ export function AssessmentOverview({
   readinessLevel,
   verdictSummary,
   domains,
-  criticalActions = [],
   className,
 }: AssessmentOverviewProps) {
   const isIncomplete = assessmentStatus === 'incomplete';
 
-  // Generate executive summary bullets
-  const summaryBullets = generateSummaryBullets(domains, criticalActions, isIncomplete);
-
   return (
-    <div className={cn('bg-white rounded-lg border border-[#E8E6E1] p-6', className)}>
-      {/* Assessment Status Card */}
+    <div className={cn('bg-white rounded-lg border border-[#E8E6E1] p-5', className)}>
+      {/* Assessment Status */}
       {isIncomplete ? (
         <IncompleteStatus
           coveragePercentage={coveragePercentage}
@@ -101,53 +95,9 @@ export function AssessmentOverview({
           coveragePercentage={coveragePercentage}
           topicsCovered={topicsCovered}
           topicsTotal={topicsTotal}
+          domains={domains}
         />
       )}
-
-      {/* Executive Summary */}
-      {!isIncomplete && summaryBullets.length > 0 && (
-        <div className="mt-6 pt-6 border-t border-[#E8E6E1]">
-          <h4 className="text-[11px] font-medium uppercase tracking-wide text-[#9B9A97] mb-3">
-            Summary
-          </h4>
-          <ul className="space-y-2">
-            {summaryBullets.map((bullet, index) => (
-              <li key={index} className="flex items-start gap-2">
-                <span className="text-[#9B9A97] mt-0.5">•</span>
-                <span className={cn(
-                  'text-[13px]',
-                  bullet.isBlocker ? 'text-[#E03E3E] font-medium' : 'text-[#5C5A56]'
-                )}>
-                  {bullet.text}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* Domain Breakdown - Simplified stacked layout */}
-      <div className="mt-6 pt-6 border-t border-[#E8E6E1]">
-        <h4 className="text-[11px] font-medium uppercase tracking-wide text-[#9B9A97] mb-4">
-          By Domain
-        </h4>
-        <div className="space-y-4">
-          {DOMAIN_ORDER.map((domainKey) => {
-            const domain = domains[domainKey];
-            return (
-              <DomainRow
-                key={domainKey}
-                label={DOMAIN_LABELS[domainKey]}
-                topicsCovered={domain.topics_covered}
-                topicsTotal={domain.topics_total}
-                confidenceLevel={domain.confidence_level}
-                gapCount={domain.topics_total - domain.topics_covered}
-                isIncomplete={isIncomplete}
-              />
-            );
-          })}
-        </div>
-      </div>
     </div>
   );
 }
@@ -163,42 +113,64 @@ function IncompleteStatus({
   topicsTotal: number;
   domains: Record<DomainType, DomainResult>;
 }) {
-  const domainsNeedingWork = DOMAIN_ORDER.filter(
-    (d) => domains[d].topics_covered < 2
-  );
-
   return (
-    <div className="bg-[#FAF9F7] rounded-lg p-5 border border-[#E8E6E1]">
+    <div>
+      {/* Status header */}
       <div className="flex items-start gap-3 mb-4">
-        <span className="text-[20px] text-[#9B9A97]">○</span>
-        <div>
-          <h4 className="text-[16px] font-semibold text-[#37352F] mb-1">
+        <span className="text-[18px] text-[#9B9A97]">○</span>
+        <div className="flex-1">
+          <h3 className="text-[16px] font-semibold text-[#37352F]">
             Incomplete Assessment
-          </h4>
-          <p className="text-[14px] text-[#5C5A56]">
+          </h3>
+          <p className="text-[13px] text-[#5C5A56] mt-1">
             You've covered {topicsCovered} of {topicsTotal} topics ({coveragePercentage}%).
-            Complete at least 15 topics (60%) with coverage in all domains to receive
-            a readiness assessment.
+            Complete at least 15 topics (60%) with coverage in all domains.
           </p>
         </div>
       </div>
 
-      {domainsNeedingWork.length > 0 && (
-        <p className="text-[13px] text-[#5C5A56] mb-4 ml-8">
-          <span className="font-medium">Needs more coverage: </span>
-          {domainsNeedingWork.map((d) => DOMAIN_LABELS[d]).join(', ')}
-        </p>
-      )}
+      {/* Compact domain progress */}
+      <div className="space-y-2 mb-4">
+        {DOMAIN_ORDER.map((domainKey) => {
+          const domain = domains[domainKey];
+          const needsWork = domain.topics_covered < 2;
+          const coveragePercent = (domain.topics_covered / domain.topics_total) * 100;
 
-      <div className="ml-8">
-        <Link
-          href="/workspace"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-[#2383E2] text-white rounded-md text-[14px] font-medium hover:bg-[#1A6DC0] transition-colors"
-        >
-          Continue Assessment
-          <ArrowRight className="w-4 h-4" />
-        </Link>
+          return (
+            <div key={domainKey} className="flex items-center gap-3 text-[13px]">
+              <span className={cn(
+                'w-24 flex-shrink-0',
+                needsWork ? 'text-[#9B9A97]' : 'text-[#37352F]'
+              )}>
+                {DOMAIN_LABELS[domainKey]}
+              </span>
+              <div className="flex-1 h-1.5 bg-[#E8E6E1] rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-[#37352F] rounded-full"
+                  style={{ width: `${coveragePercent}%` }}
+                />
+              </div>
+              <span className="w-12 text-right text-[#5C5A56]">
+                {domain.topics_covered}/{domain.topics_total}
+              </span>
+              {needsWork ? (
+                <span className="w-16 text-right text-[11px] text-[#D9730D]">Need 2+</span>
+              ) : (
+                <span className="w-16 text-right text-[11px] text-[#0F7B6C]">✓</span>
+              )}
+            </div>
+          );
+        })}
       </div>
+
+      {/* CTA */}
+      <Link
+        href="/workspace"
+        className="inline-flex items-center gap-2 px-4 py-2 bg-[#2383E2] text-white rounded-md text-[13px] font-medium hover:bg-[#1A6DC0] transition-colors"
+      >
+        Continue Assessment
+        <ArrowRight className="w-4 h-4" />
+      </Link>
     </div>
   );
 }
@@ -209,189 +181,69 @@ function ReadinessStatus({
   coveragePercentage,
   topicsCovered,
   topicsTotal,
+  domains,
 }: {
   readinessLevel: ReadinessLevel;
   verdictSummary?: string;
   coveragePercentage: number;
   topicsCovered: number;
   topicsTotal: number;
+  domains: Record<DomainType, DomainResult>;
 }) {
   const config = READINESS_CONFIG[readinessLevel];
 
   return (
-    <div className={cn('rounded-lg p-5', config.bgColor)}>
-      <div className="flex items-start gap-3 mb-4">
-        <span className={cn('text-[24px]', config.color)}>{config.icon}</span>
-        <div>
-          <h4 className={cn('text-[18px] font-semibold mb-1', config.color)}>
-            {config.label}
-          </h4>
-          {verdictSummary && (
-            <p className="text-[14px] text-[#5C5A56] leading-relaxed">
-              {verdictSummary}
-            </p>
-          )}
-        </div>
-      </div>
-
-      {/* Coverage bar */}
-      <div className="ml-9">
-        <div className="flex items-center justify-between mb-1.5">
-          <span className="text-[12px] text-[#5C5A56]">
-            Coverage: {topicsCovered}/{topicsTotal} topics
-          </span>
-          <span className="text-[12px] font-medium text-[#37352F]">
-            {coveragePercentage}%
-          </span>
-        </div>
-        <div className="h-2 bg-white/50 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-[#37352F] rounded-full transition-all duration-300"
-            style={{ width: `${coveragePercentage}%` }}
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Render confidence dots: ●●●●○ for HIGH, ●●●○○ for MEDIUM, ●○○○○ for LOW
-function ConfidenceDots({ level, total = 5 }: { level: 'high' | 'medium' | 'low'; total?: number }) {
-  const filledCount = level === 'high' ? 4 : level === 'medium' ? 2 : 1;
-  const colors = {
-    high: 'text-[#0F7B6C]',
-    medium: 'text-[#D9730D]',
-    low: 'text-[#E03E3E]',
-  };
-
-  return (
-    <span className={cn('text-[12px] tracking-tight', colors[level])}>
-      {'●'.repeat(filledCount)}
-      <span className="text-[#D4D1CB]">{'○'.repeat(total - filledCount)}</span>
-    </span>
-  );
-}
-
-function DomainRow({
-  label,
-  topicsCovered,
-  topicsTotal,
-  confidenceLevel,
-  gapCount,
-  isIncomplete,
-}: {
-  label: string;
-  topicsCovered: number;
-  topicsTotal: number;
-  confidenceLevel: 'high' | 'medium' | 'low';
-  gapCount: number;
-  isIncomplete: boolean;
-}) {
-  const coveragePercent = (topicsCovered / topicsTotal) * 100;
-  const needsWork = topicsCovered < 2;
-  const confConfig = CONFIDENCE_LABELS[confidenceLevel];
-
-  return (
-    <div className="bg-[#FAF9F7] rounded-lg p-4">
-      {/* Row 1: Domain name */}
-      <div className="flex items-center justify-between mb-2">
-        <span className={cn(
-          'text-[14px] font-medium',
-          needsWork && isIncomplete ? 'text-[#9B9A97]' : 'text-[#37352F]'
-        )}>
-          {label}
-        </span>
-      </div>
-
-      {/* Row 2: Dual metrics - Coverage (left) | Confidence (right) */}
-      <div className="flex items-center gap-4">
-        {/* Coverage section */}
-        <div className="flex-1">
-          <div className="h-1.5 bg-[#E8E6E1] rounded-full overflow-hidden mb-1">
-            <div
-              className="h-full bg-[#37352F] rounded-full transition-all duration-300"
-              style={{ width: `${coveragePercent}%` }}
-            />
+    <div>
+      {/* Verdict */}
+      <div className={cn('rounded-lg p-4 mb-4', config.bgColor)}>
+        <div className="flex items-start gap-3">
+          <span className={cn('text-[20px]', config.color)}>{config.icon}</span>
+          <div className="flex-1">
+            <div className="flex items-center justify-between">
+              <h3 className={cn('text-[16px] font-semibold', config.color)}>
+                {config.label}
+              </h3>
+              <span className="text-[12px] text-[#5C5A56]">
+                {topicsCovered}/{topicsTotal} topics ({coveragePercentage}%)
+              </span>
+            </div>
+            {verdictSummary && (
+              <p className="text-[13px] text-[#5C5A56] mt-1">
+                {verdictSummary}
+              </p>
+            )}
           </div>
-          <span className="text-[11px] text-[#5C5A56]">
-            {topicsCovered}/{topicsTotal} topics
-          </span>
         </div>
+      </div>
 
-        {/* Confidence section */}
-        <div className="flex items-center gap-2 flex-shrink-0">
-          {isIncomplete && needsWork ? (
-            <span className="text-[11px] text-[#D9730D]">Need 2+ topics</span>
-          ) : (
-            <>
-              <ConfidenceDots level={confidenceLevel} />
-              <span className={cn('text-[11px] font-medium', confConfig.color)}>
+      {/* Compact domain breakdown */}
+      <div className="space-y-1.5">
+        {DOMAIN_ORDER.map((domainKey) => {
+          const domain = domains[domainKey];
+          const coveragePercent = (domain.topics_covered / domain.topics_total) * 100;
+          const confConfig = CONFIDENCE_CONFIG[domain.confidence_level];
+
+          return (
+            <div key={domainKey} className="flex items-center gap-3 text-[13px]">
+              <span className="w-24 flex-shrink-0 text-[#37352F]">
+                {DOMAIN_LABELS[domainKey]}
+              </span>
+              <div className="flex-1 h-1.5 bg-[#E8E6E1] rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-[#37352F] rounded-full"
+                  style={{ width: `${coveragePercent}%` }}
+                />
+              </div>
+              <span className="w-10 text-right text-[#5C5A56]">
+                {domain.topics_covered}/{domain.topics_total}
+              </span>
+              <span className={cn('w-10 text-right text-[11px] font-medium', confConfig.color)}>
                 {confConfig.label}
               </span>
-            </>
-          )}
-        </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
-}
-
-// Helper to generate executive summary bullets
-function generateSummaryBullets(
-  domains: Record<DomainType, DomainResult>,
-  criticalActions: CriticalAction[],
-  isIncomplete: boolean
-): { text: string; isBlocker: boolean }[] {
-  if (isIncomplete) return [];
-
-  const bullets: { text: string; isBlocker: boolean }[] = [];
-
-  // Find the primary blocker domain (lowest confidence or most gaps)
-  let blockerDomain: DomainType | null = null;
-  let blockerReason = '';
-
-  for (const domain of DOMAIN_ORDER) {
-    const d = domains[domain];
-    if (d.confidence_level === 'low' && d.topics_covered >= 2) {
-      blockerDomain = domain;
-      blockerReason = 'needs work';
-      break;
-    }
-  }
-
-  // Add domain summaries
-  for (const domain of DOMAIN_ORDER) {
-    const d = domains[domain];
-    const label = DOMAIN_LABELS[domain];
-    const conf = CONFIDENCE_LABELS[d.confidence_level];
-
-    if (d.confidence_level === 'high') {
-      bullets.push({
-        text: `${label}: ${conf.label} confidence`,
-        isBlocker: false,
-      });
-    } else if (d.confidence_level === 'low') {
-      const gapCount = d.topics_total - d.topics_covered;
-      bullets.push({
-        text: `${label}: ${conf.label} confidence — needs attention${gapCount > 0 ? ` (${gapCount} gaps)` : ''}`,
-        isBlocker: true,
-      });
-    } else {
-      bullets.push({
-        text: `${label}: ${conf.label} confidence — validation needed`,
-        isBlocker: false,
-      });
-    }
-  }
-
-  // Add primary blocker from critical actions if available
-  if (criticalActions.length > 0) {
-    const primaryBlocker = criticalActions[0];
-    bullets.unshift({
-      text: `Primary blocker: ${primaryBlocker.title}`,
-      isBlocker: true,
-    });
-  }
-
-  return bullets.slice(0, 6); // Limit to 6 bullets max
 }

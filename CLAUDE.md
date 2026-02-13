@@ -110,6 +110,7 @@ docs/DESIGN-OVERHAUL-BRIEF.md
 docs/DESIGN-SYSTEM-V3.md
 docs/FOUNDER-FEEDBACK-V3-PLAN.md
 docs/MVP-BUILD-DOCUMENTATION.md
+docs/POST-MORTEM-V3-REPORT.md
 docs/PRD-Progress-Visibility-Feature.md
 docs/product
 docs/product/central-console-feedback-v1.md
@@ -136,7 +137,6 @@ packages/types/src/index.ts
 packages/types/tsconfig.json
 pnpm-lock.yaml
 pnpm-workspace.yaml
-scripts
 ```
 <!-- /AUTO:STRUCTURE -->
 
@@ -213,7 +213,9 @@ scripts
 ## Recent Commits
 
 ```
-7331416 Implement V3 Readiness Report per design spec
+4bd19d9 Emergency fix: Compact report layout for incomplete assessments
+a26daa9 Implement V3 Readiness Report per design spec
+28d021d docs: auto-update MVP documentation [skip ci]
 86d8078 Fix report showing no topic details
 22d615a Fix DB schema - remove all V2 columns from insert
 286e495 Fix DB schema mismatch - remove key_stats column
@@ -221,7 +223,5 @@ scripts
 f4cb6a8 docs: auto-update MVP documentation [skip ci]
 2d7d305 Speed up snapshot generation to avoid 60s timeout
 cad0271 Fix API timeout by removing redundant V2 generation call
-98517e9 Refactor report: Verdict → Actions → Evidence structure
-42091e3 Implement V3 Readiness Report with structured topic analysis
 ```
 <!-- /AUTO:RECENT_CHANGES -->
