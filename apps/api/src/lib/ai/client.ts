@@ -13,7 +13,7 @@ export const anthropic = createAnthropic({
 export const models = {
   conversation: 'claude-sonnet-4-5-20250929',
   classification: 'claude-haiku-4-5-20251001',
-  synthesis: 'claude-sonnet-4-5-20250929',
+  synthesis: 'claude-haiku-4-5-20251001', // Use Haiku for faster synthesis (avoid timeout)
 } as const;
 
 export const modelConfig = {
@@ -26,7 +26,7 @@ export const modelConfig = {
     temperature: 0,
   },
   synthesis: {
-    maxTokens: 4096,
+    maxTokens: 2048, // Reduced to speed up generation
     temperature: 0.3,
   },
 } as const;

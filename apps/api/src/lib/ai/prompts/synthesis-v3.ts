@@ -204,60 +204,36 @@ export function buildSynthesisV3UserPrompt(inputs: Input[]): string {
     financials: 'Financials',
   };
 
-  let prompt = `# Assessment Inputs\n\n`;
-
-  // First, show topic structure for reference
-  prompt += `## Topic Structure (25 total topics)\n\n`;
+  // Build compact topic coverage map
+  const coveredTopics = new Set(inputs.map(i => i.question_id));
+  const allTopicIds: string[] = [];
   for (const domain of domains) {
-    prompt += `### ${domainLabels[domain]}\n`;
     for (const topic of TOPIC_DEFINITIONS[domain]) {
-      const hasInput = inputs.some(i => i.question_id === topic.id);
-      prompt += `- ${topic.id}: "${topic.label}" ${hasInput ? '(HAS INPUT)' : '(NO INPUT)'}\n`;
-      prompt += `  Requirements: ${topic.requirements.join(', ')}\n`;
+      allTopicIds.push(topic.id);
     }
-    prompt += `\n`;
   }
 
-  prompt += `\n## Captured Inputs\n\n`;
+  let prompt = `# Assessment Summary\n`;
+  prompt += `Topics covered: ${coveredTopics.size}/25\n`;
+  prompt += `Covered: ${[...coveredTopics].join(', ')}\n`;
+  prompt += `Not covered: ${allTopicIds.filter(id => !coveredTopics.has(id)).join(', ')}\n\n`;
+
+  prompt += `# User Inputs\n\n`;
 
   for (const domain of domains) {
     const domainInputs = inputs.filter((i) => i.domain === domain);
+    if (domainInputs.length === 0) continue;
 
-    prompt += `### ${domainLabels[domain]}\n`;
-
-    if (domainInputs.length === 0) {
-      prompt += `No inputs captured.\n\n`;
-      continue;
-    }
+    prompt += `## ${domainLabels[domain]}\n`;
 
     for (const input of domainInputs) {
-      const response = truncate(input.user_response, 400);
-      const extracted = input.extracted_data as { keyInsight?: string; summary?: string } | null;
-      const insight = extracted?.keyInsight || extracted?.summary || '';
-
-      prompt += `#### ${input.question_id} [${input.confidence_level.toUpperCase()}]\n`;
-      prompt += `User said: "${response}"\n`;
-      if (insight) {
-        prompt += `Extracted insight: ${truncate(insight, 150)}\n`;
-      }
-      if (input.confidence_rationale) {
-        prompt += `Confidence note: ${truncate(input.confidence_rationale, 100)}\n`;
-      }
-      prompt += `\n`;
+      const response = truncate(input.user_response, 300);
+      prompt += `**${input.question_id}** [${input.confidence_level.toUpperCase()}]: ${response}\n`;
     }
     prompt += `\n`;
   }
 
-  prompt += `\n## Instructions
-
-Generate a V3 Readiness Report:
-1. First, calculate assessment status (incomplete vs assessable)
-2. If assessable, determine readiness level using conservative logic
-3. For EVERY topic (all 25), provide status and analysis
-4. Link all critical actions and assumptions to their source topics
-5. Create a 30-day action plan with week assignments
-
-Be conservative - if information is vague or missing, call it out explicitly.`;
+  prompt += `Generate the V3 report. Be conservative - mark unclear info as LOW confidence.`;
 
   return prompt;
 }

@@ -213,7 +213,8 @@ scripts
 ## Recent Commits
 
 ```
-09ee99b Fix API timeout by removing redundant V2 generation call
+b95a758 Speed up snapshot generation to avoid 60s timeout
+cad0271 Fix API timeout by removing redundant V2 generation call
 98517e9 Refactor report: Verdict → Actions → Evidence structure
 42091e3 Implement V3 Readiness Report with structured topic analysis
 3ade314 Add Readiness Report V3 redesign spec
@@ -222,6 +223,5 @@ c2cf905 Implement Readiness Report V2
 537c284 Update snapshot UI to Notion-inspired design system
 f9303f7 Fix PDF download by using correct coverage property names
 d4fb889 docs: auto-update MVP documentation [skip ci]
-f283025 Fix snapshot: increase maxTokens to 4096, make arrays optional with defaults
 ```
 <!-- /AUTO:RECENT_CHANGES -->
