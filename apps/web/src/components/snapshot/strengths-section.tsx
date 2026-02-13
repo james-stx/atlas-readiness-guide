@@ -2,7 +2,6 @@
 
 import { cn } from '@/lib/utils';
 import type { Strength } from '@atlas/types';
-import { CheckCircle } from 'lucide-react';
 
 interface StrengthsSectionProps {
   strengths: Strength[];
@@ -28,36 +27,31 @@ export function StrengthsSection({ strengths, className }: StrengthsSectionProps
   }, {} as Record<string, Strength[]>);
 
   return (
-    <div className={cn('bg-white rounded-xl border border-neutral-200 p-6', className)}>
-      <div className="flex items-center gap-2 mb-4">
-        <div className="w-8 h-8 rounded-lg bg-accent-100 flex items-center justify-center">
-          <CheckCircle className="w-4 h-4 text-accent-600" />
-        </div>
-        <div>
-          <h3 className="text-lg font-semibold text-neutral-900">Strengths</h3>
-          <p className="text-sm text-neutral-500">What you know with confidence</p>
-        </div>
-      </div>
+    <div className={cn('bg-white rounded-lg border border-[#E8E6E1] p-6', className)}>
+      <h3 className="text-[11px] font-medium uppercase tracking-wide text-[#0F7B6C] mb-1">
+        Strengths
+      </h3>
+      <p className="text-[12px] text-[#9B9A97] mb-4">What you know with confidence</p>
 
       {Object.keys(groupedStrengths).length === 0 ? (
-        <p className="text-sm text-neutral-500 italic">No high-confidence strengths identified.</p>
+        <p className="text-[13px] text-[#9B9A97] italic">No high-confidence strengths identified.</p>
       ) : (
         <div className="space-y-4">
           {Object.entries(groupedStrengths).map(([domain, domainStrengths]) => (
             <div key={domain}>
-              <h4 className="text-sm font-medium text-accent-700 mb-2">
+              <h4 className="text-[11px] font-medium uppercase tracking-wide text-[#0F7B6C] mb-2">
                 {DOMAIN_LABELS[domain]}
               </h4>
               <ul className="space-y-2">
                 {domainStrengths.map((strength, index) => (
                   <li
                     key={index}
-                    className="pl-4 border-l-2 border-accent-300"
+                    className="pl-4 border-l-2 border-[#0F7B6C]"
                   >
-                    <p className="text-sm text-neutral-800 font-medium">
+                    <p className="text-[14px] text-[#37352F] font-medium">
                       {strength.item}
                     </p>
-                    <p className="text-xs text-neutral-500 mt-0.5">
+                    <p className="text-[12px] text-[#9B9A97] mt-0.5">
                       {strength.evidence}
                     </p>
                   </li>

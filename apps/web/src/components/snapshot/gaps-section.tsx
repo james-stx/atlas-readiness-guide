@@ -2,7 +2,6 @@
 
 import { cn } from '@/lib/utils';
 import type { Gap, GapImportance } from '@atlas/types';
-import { AlertCircle } from 'lucide-react';
 
 interface GapsSectionProps {
   gaps: Gap[];
@@ -17,21 +16,27 @@ const DOMAIN_LABELS: Record<string, string> = {
   financials: 'Financials',
 };
 
-const IMPORTANCE_STYLES: Record<GapImportance, { bg: string; border: string; badge: string }> = {
+const IMPORTANCE_STYLES: Record<GapImportance, { bg: string; border: string; badge: string; badgeBg: string; dot: string }> = {
   critical: {
-    bg: 'bg-red-50',
-    border: 'border-red-400',
-    badge: 'bg-red-100 text-red-700',
+    bg: 'bg-[#FBE4E4]',
+    border: 'border-[#E03E3E]',
+    badge: 'text-[#E03E3E]',
+    badgeBg: 'bg-white/60',
+    dot: 'bg-[#E03E3E]',
   },
   important: {
-    bg: 'bg-warm-50',
-    border: 'border-warm-400',
-    badge: 'bg-warm-100 text-warm-700',
+    bg: 'bg-[#FAEBDD]',
+    border: 'border-[#D9730D]',
+    badge: 'text-[#D9730D]',
+    badgeBg: 'bg-white/60',
+    dot: 'bg-[#D9730D]',
   },
   'nice-to-have': {
-    bg: 'bg-neutral-50',
-    border: 'border-neutral-300',
-    badge: 'bg-neutral-100 text-neutral-600',
+    bg: 'bg-[#FAF9F7]',
+    border: 'border-[#9B9A97]',
+    badge: 'text-[#9B9A97]',
+    badgeBg: 'bg-white/60',
+    dot: 'bg-[#9B9A97]',
   },
 };
 
@@ -47,19 +52,14 @@ export function GapsSection({ gaps, className }: GapsSectionProps) {
   });
 
   return (
-    <div className={cn('bg-white rounded-xl border border-neutral-200 p-6', className)}>
-      <div className="flex items-center gap-2 mb-4">
-        <div className="w-8 h-8 rounded-lg bg-neutral-100 flex items-center justify-center">
-          <AlertCircle className="w-4 h-4 text-neutral-600" />
-        </div>
-        <div>
-          <h3 className="text-lg font-semibold text-neutral-900">Gaps to Address</h3>
-          <p className="text-sm text-neutral-500">Information you need but don&apos;t have yet</p>
-        </div>
-      </div>
+    <div className={cn('bg-white rounded-lg border border-[#E8E6E1] p-6', className)}>
+      <h3 className="text-[11px] font-medium uppercase tracking-wide text-[#E03E3E] mb-1">
+        Gaps to Address
+      </h3>
+      <p className="text-[12px] text-[#9B9A97] mb-4">Information you need but don&apos;t have yet</p>
 
       {sortedGaps.length === 0 ? (
-        <p className="text-sm text-neutral-500 italic">No significant gaps identified.</p>
+        <p className="text-[13px] text-[#9B9A97] italic">No significant gaps identified.</p>
       ) : (
         <div className="space-y-3">
           {sortedGaps.map((gap, index) => {
@@ -69,7 +69,7 @@ export function GapsSection({ gaps, className }: GapsSectionProps) {
               <div
                 key={index}
                 className={cn(
-                  'p-4 rounded-lg border-l-4',
+                  'p-4 rounded-lg border-l-[3px]',
                   styles.bg,
                   styles.border
                 )}
@@ -78,23 +78,25 @@ export function GapsSection({ gaps, className }: GapsSectionProps) {
                   <div className="flex items-center gap-2">
                     <span
                       className={cn(
-                        'px-2 py-0.5 rounded text-xs font-medium uppercase',
+                        'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-medium uppercase',
+                        styles.badgeBg,
                         styles.badge
                       )}
                     >
+                      <span className={cn('h-1.5 w-1.5 rounded-full', styles.dot)} />
                       {gap.importance}
                     </span>
-                    <span className="text-xs text-neutral-500">
+                    <span className="text-[11px] text-[#9B9A97]">
                       {DOMAIN_LABELS[gap.domain]}
                     </span>
                   </div>
                 </div>
 
-                <p className="text-sm font-medium text-neutral-800 mb-1">
+                <p className="text-[14px] font-medium text-[#37352F] mb-1">
                   {gap.item}
                 </p>
-                <p className="text-sm text-neutral-600">
-                  <span className="text-neutral-500">Recommendation: </span>
+                <p className="text-[13px] text-[#5C5A56]">
+                  <span className="text-[#9B9A97]">Recommendation: </span>
                   {gap.recommendation}
                 </p>
               </div>

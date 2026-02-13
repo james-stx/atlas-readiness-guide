@@ -13,7 +13,7 @@ import { GapsSection } from '@/components/snapshot/gaps-section';
 import { NextStepsSection } from '@/components/snapshot/next-steps-section';
 import { ExportSection } from '@/components/snapshot/export-section';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2, Compass } from 'lucide-react';
 import type { Snapshot } from '@atlas/types';
 
 export default function SnapshotPage() {
@@ -73,15 +73,15 @@ export default function SnapshotPage() {
   // Loading state
   if (!session || isGenerating || isLoading) {
     return (
-      <div className="min-h-screen bg-neutral-50">
-        <div className="max-w-4xl mx-auto px-6 py-12">
+      <div className="min-h-screen bg-[#FAF9F7]">
+        <div className="max-w-[720px] mx-auto px-6 py-12">
           <div className="text-center mb-12">
-            <Loader2 className="w-8 h-8 animate-spin text-neutral-900 mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-neutral-900 mb-2">
+            <Loader2 className="w-8 h-8 animate-spin text-[#37352F] mx-auto mb-4" />
+            <h1 className="text-2xl font-semibold text-[#37352F] mb-2">
               {isGenerating ? 'Generating Your Snapshot...' : 'Loading...'}
             </h1>
             {isGenerating && (
-              <p className="text-neutral-600">
+              <p className="text-[14px] text-[#5C5A56]">
                 Analyzing your responses and synthesizing insights
               </p>
             )}
@@ -89,11 +89,11 @@ export default function SnapshotPage() {
 
           {/* Skeleton loading state */}
           <div className="space-y-6">
-            <Skeleton className="h-40 w-full rounded-xl" />
-            <Skeleton className="h-32 w-full rounded-xl" />
+            <Skeleton className="h-40 w-full rounded-lg" />
+            <Skeleton className="h-32 w-full rounded-lg" />
             <div className="grid md:grid-cols-2 gap-6">
-              <Skeleton className="h-48 rounded-xl" />
-              <Skeleton className="h-48 rounded-xl" />
+              <Skeleton className="h-48 rounded-lg" />
+              <Skeleton className="h-48 rounded-lg" />
             </div>
           </div>
         </div>
@@ -104,10 +104,10 @@ export default function SnapshotPage() {
   // Error state
   if (error) {
     return (
-      <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#FAF9F7] flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-600 mb-4">{error}</p>
-          <Link href="/workspace" className="text-accent-600 hover:underline">
+          <p className="text-[#E03E3E] mb-4">{error}</p>
+          <Link href="/workspace" className="text-[#2383E2] hover:underline">
             Return to workspace
           </Link>
         </div>
@@ -118,10 +118,10 @@ export default function SnapshotPage() {
   // No snapshot yet
   if (!snapshot) {
     return (
-      <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#FAF9F7] flex items-center justify-center">
         <div className="text-center">
-          <p className="text-neutral-600 mb-4">No snapshot available yet.</p>
-          <Link href="/workspace" className="text-accent-600 hover:underline">
+          <p className="text-[#5C5A56] mb-4">No snapshot available yet.</p>
+          <Link href="/workspace" className="text-[#2383E2] hover:underline">
             Complete your assessment in workspace
           </Link>
         </div>
@@ -130,34 +130,32 @@ export default function SnapshotPage() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen bg-[#FAF9F7]">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-neutral-100 sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link
-            href="/workspace"
-            className="flex items-center gap-2 text-neutral-600 hover:text-neutral-900 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span className="text-sm">Back to Workspace</span>
-          </Link>
-          <div className="text-sm text-neutral-500">
-            {session.email}
-          </div>
+      <header className="flex h-12 items-center justify-between border-b border-[#E8E6E1] bg-white px-4 sticky top-0 z-50">
+        <Link
+          href="/workspace"
+          className="flex items-center gap-2 text-[#5C5A56] hover:text-[#37352F] transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span className="text-[13px]">Back to Workspace</span>
+        </Link>
+        <div className="text-[13px] text-[#9B9A97]">
+          {session.email}
         </div>
       </header>
 
       {/* Content */}
-      <main className="max-w-4xl mx-auto px-6 py-8">
+      <main className="max-w-[720px] mx-auto px-6 py-8">
         {/* Title */}
         <div className="text-center mb-8">
-          <div className="w-12 h-12 bg-neutral-900 rounded-xl flex items-center justify-center mx-auto mb-4">
-            <span className="text-white font-bold text-xl">A</span>
+          <div className="w-12 h-12 bg-[#37352F] rounded-lg flex items-center justify-center mx-auto mb-4">
+            <Compass className="w-6 h-6 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-neutral-900 mb-2">
+          <h1 className="text-[24px] font-semibold text-[#37352F] mb-2">
             Your Readiness Snapshot
           </h1>
-          <p className="text-neutral-600">
+          <p className="text-[14px] text-[#5C5A56]">
             A summary of what you know vs. what you&apos;re assuming about U.S. expansion
           </p>
         </div>
@@ -187,8 +185,8 @@ export default function SnapshotPage() {
         </div>
 
         {/* Footer */}
-        <footer className="mt-12 pt-8 border-t border-neutral-200 text-center">
-          <p className="text-xs text-neutral-400">
+        <footer className="mt-12 pt-8 border-t border-[#E8E6E1] text-center">
+          <p className="text-[11px] text-[#9B9A97]">
             Generated by Atlas Readiness Guide | This snapshot reflects your self-reported information.
             <br />
             It is not a score or recommendation to expand.

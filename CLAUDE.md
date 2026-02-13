@@ -212,7 +212,9 @@ supabase
 ## Recent Commits
 
 ```
-2e80d59 Fix PDF download by using correct coverage property names
+df01f96 Update snapshot UI to Notion-inspired design system
+f9303f7 Fix PDF download by using correct coverage property names
+d4fb889 docs: auto-update MVP documentation [skip ci]
 f283025 Fix snapshot: increase maxTokens to 4096, make arrays optional with defaults
 8e38e6a Fix error logging and add specific AI error handling
 c174a65 Add detailed logging to snapshot generation for debugging
@@ -220,7 +222,5 @@ c174a65 Add detailed logging to snapshot generation for debugging
 fbc9417 Fix snapshot timeout: use Haiku + increase maxDuration
 215c44f Reduce token usage for snapshot generation
 ac28106 docs: auto-update MVP documentation [skip ci]
-10febb6 Improve snapshot generation error handling and feedback
-4163268 docs: auto-update MVP documentation [skip ci]
 ```
 <!-- /AUTO:RECENT_CHANGES -->

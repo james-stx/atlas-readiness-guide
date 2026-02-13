@@ -62,11 +62,11 @@ export function ExportSection({ sessionId, email, className }: ExportSectionProp
   }
 
   return (
-    <div className={cn('bg-white rounded-xl border border-neutral-200 p-6', className)}>
-      <h3 className="text-lg font-semibold text-neutral-900 mb-2">
+    <div className={cn('bg-white rounded-lg border border-[#E8E6E1] p-6', className)}>
+      <h3 className="text-[11px] font-medium uppercase tracking-wide text-[#9B9A97] mb-1">
         Export Your Snapshot
       </h3>
-      <p className="text-sm text-neutral-500 mb-4">
+      <p className="text-[13px] text-[#5C5A56] mb-4">
         Download or email your readiness snapshot to share with your team.
       </p>
 
@@ -75,12 +75,12 @@ export function ExportSection({ sessionId, email, className }: ExportSectionProp
           onClick={handleDownload}
           disabled={downloadState === 'loading'}
           variant="outline"
-          className="flex-1"
+          className="flex-1 border-[#E8E6E1] hover:border-[#D4D1CB] hover:bg-[#FAF9F7] text-[#37352F]"
         >
           {downloadState === 'loading' ? (
             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
           ) : downloadState === 'done' ? (
-            <Check className="w-4 h-4 mr-2 text-accent-600" />
+            <Check className="w-4 h-4 mr-2 text-[#0F7B6C]" />
           ) : (
             <Download className="w-4 h-4 mr-2" />
           )}
@@ -90,7 +90,7 @@ export function ExportSection({ sessionId, email, className }: ExportSectionProp
         <Button
           onClick={handleEmailSend}
           disabled={emailState === 'loading' || emailState === 'done'}
-          className="flex-1"
+          className="flex-1 bg-[#2383E2] hover:bg-[#1a6fc0] text-white"
         >
           {emailState === 'loading' ? (
             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -104,13 +104,13 @@ export function ExportSection({ sessionId, email, className }: ExportSectionProp
       </div>
 
       {emailState === 'done' && (
-        <p className="text-sm text-accent-600 mt-3 text-center">
+        <p className="text-[13px] text-[#0F7B6C] mt-3 text-center">
           Snapshot sent to {email}
         </p>
       )}
 
       {emailState === 'error' && emailError && (
-        <p className="text-sm text-red-600 mt-3 text-center">{emailError}</p>
+        <p className="text-[13px] text-[#E03E3E] mt-3 text-center">{emailError}</p>
       )}
     </div>
   );
