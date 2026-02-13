@@ -6,9 +6,8 @@ import Link from 'next/link';
 import { useAssessment } from '@/lib/context/assessment-context';
 import { getSnapshot } from '@/lib/api-client';
 import { AssessmentOverview } from '@/components/snapshot/AssessmentOverview';
+import { ActionPlanUnified } from '@/components/snapshot/ActionPlanUnified';
 import { DomainDetailSection } from '@/components/snapshot/DomainDetailSection';
-import { CriticalActionsSection } from '@/components/snapshot/CriticalActionsSection';
-import { ActionPlanSectionV3 } from '@/components/snapshot/ActionPlanSectionV3';
 import { ExportSection } from '@/components/snapshot/export-section';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, Loader2, Compass } from 'lucide-react';
@@ -159,7 +158,7 @@ export default function SnapshotPage() {
 
           <div className="bg-white rounded-lg border border-[#E8E6E1] p-6 text-center">
             <p className="text-[14px] text-[#5C5A56]">
-              Please regenerate your report to see the enhanced V3 format with detailed topic analysis.
+              Please regenerate your report to see the enhanced format with detailed analysis.
             </p>
             <button
               onClick={() => generateSnapshot()}
@@ -172,6 +171,8 @@ export default function SnapshotPage() {
       </div>
     );
   }
+
+  const isIncomplete = v3.assessment_status === 'incomplete';
 
   return (
     <div className="min-h-screen bg-[#FAF9F7]">
@@ -204,9 +205,9 @@ export default function SnapshotPage() {
           </p>
         </div>
 
-        {/* Report sections */}
+        {/* Report sections - REORDERED: Verdict → Actions → Evidence */}
         <div className="space-y-6">
-          {/* Section 1: Assessment Overview */}
+          {/* Section 1: Assessment Overview (Verdict + Summary) */}
           <AssessmentOverview
             assessmentStatus={v3.assessment_status}
             coveragePercentage={v3.coverage_percentage}
@@ -215,27 +216,37 @@ export default function SnapshotPage() {
             readinessLevel={v3.readiness_level}
             verdictSummary={v3.verdict_summary}
             domains={v3.domains}
-          />
-
-          {/* Section 2: Domain Details (all 5 domains) */}
-          {DOMAIN_ORDER.map((domain) => (
-            <DomainDetailSection
-              key={domain}
-              domain={domain}
-              domainResult={v3.domains[domain]}
-            />
-          ))}
-
-          {/* Section 3: Critical Actions & Assumptions */}
-          <CriticalActionsSection
             criticalActions={v3.critical_actions}
-            assumptions={v3.assumptions}
           />
 
-          {/* Section 4: 30-Day Action Plan */}
-          <ActionPlanSectionV3 actionPlan={v3.action_plan} />
+          {/* Section 2: Unified Action Plan (only if assessable) */}
+          {!isIncomplete && (
+            <ActionPlanUnified
+              criticalActions={v3.critical_actions}
+              assumptions={v3.assumptions}
+              actionPlan={v3.action_plan}
+            />
+          )}
 
-          {/* Section 5: Share & Export */}
+          {/* Section 3: Domain Evidence (Detailed Findings) */}
+          {!isIncomplete && (
+            <div>
+              <h3 className="text-[11px] font-medium uppercase tracking-wide text-[#9B9A97] mb-4 px-1">
+                Detailed Findings by Domain
+              </h3>
+              <div className="space-y-4">
+                {DOMAIN_ORDER.map((domain) => (
+                  <DomainDetailSection
+                    key={domain}
+                    domain={domain}
+                    domainResult={v3.domains[domain]}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Section 4: Share & Export */}
           <ExportSection
             sessionId={session.id}
             email={session.email}

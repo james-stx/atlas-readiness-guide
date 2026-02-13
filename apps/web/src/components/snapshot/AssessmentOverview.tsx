@@ -7,7 +7,8 @@ import type {
   DomainType,
   AssessmentStatus,
   ReadinessLevel,
-  DomainResult
+  DomainResult,
+  CriticalAction,
 } from '@atlas/types';
 
 interface AssessmentOverviewProps {
@@ -18,8 +19,11 @@ interface AssessmentOverviewProps {
   readinessLevel?: ReadinessLevel;
   verdictSummary?: string;
   domains: Record<DomainType, DomainResult>;
+  criticalActions?: CriticalAction[];
   className?: string;
 }
+
+const DOMAIN_ORDER: DomainType[] = ['market', 'product', 'gtm', 'operations', 'financials'];
 
 const DOMAIN_LABELS: Record<DomainType, string> = {
   market: 'Market',
@@ -28,8 +32,6 @@ const DOMAIN_LABELS: Record<DomainType, string> = {
   operations: 'Operations',
   financials: 'Financials',
 };
-
-const DOMAIN_ORDER: DomainType[] = ['market', 'product', 'gtm', 'operations', 'financials'];
 
 const READINESS_CONFIG: Record<ReadinessLevel, {
   label: string;
@@ -57,7 +59,7 @@ const READINESS_CONFIG: Record<ReadinessLevel, {
   },
 };
 
-const CONFIDENCE_CONFIG: Record<'high' | 'medium' | 'low', {
+const CONFIDENCE_LABELS: Record<'high' | 'medium' | 'low', {
   label: string;
   color: string;
 }> = {
@@ -74,16 +76,16 @@ export function AssessmentOverview({
   readinessLevel,
   verdictSummary,
   domains,
+  criticalActions = [],
   className,
 }: AssessmentOverviewProps) {
   const isIncomplete = assessmentStatus === 'incomplete';
 
+  // Generate executive summary bullets
+  const summaryBullets = generateSummaryBullets(domains, criticalActions, isIncomplete);
+
   return (
     <div className={cn('bg-white rounded-lg border border-[#E8E6E1] p-6', className)}>
-      <h3 className="text-[11px] font-medium uppercase tracking-wide text-[#9B9A97] mb-4">
-        Assessment Overview
-      </h3>
-
       {/* Assessment Status Card */}
       {isIncomplete ? (
         <IncompleteStatus
@@ -102,12 +104,34 @@ export function AssessmentOverview({
         />
       )}
 
-      {/* Domain Breakdown */}
-      <div className="mt-6">
-        <h4 className="text-[11px] font-medium uppercase tracking-wide text-[#9B9A97] mb-3">
-          Domain Breakdown
+      {/* Executive Summary */}
+      {!isIncomplete && summaryBullets.length > 0 && (
+        <div className="mt-6 pt-6 border-t border-[#E8E6E1]">
+          <h4 className="text-[11px] font-medium uppercase tracking-wide text-[#9B9A97] mb-3">
+            Summary
+          </h4>
+          <ul className="space-y-2">
+            {summaryBullets.map((bullet, index) => (
+              <li key={index} className="flex items-start gap-2">
+                <span className="text-[#9B9A97] mt-0.5">•</span>
+                <span className={cn(
+                  'text-[13px]',
+                  bullet.isBlocker ? 'text-[#E03E3E] font-medium' : 'text-[#5C5A56]'
+                )}>
+                  {bullet.text}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Domain Breakdown - Simplified stacked layout */}
+      <div className="mt-6 pt-6 border-t border-[#E8E6E1]">
+        <h4 className="text-[11px] font-medium uppercase tracking-wide text-[#9B9A97] mb-4">
+          By Domain
         </h4>
-        <div className="space-y-2">
+        <div className="space-y-4">
           {DOMAIN_ORDER.map((domainKey) => {
             const domain = domains[domainKey];
             return (
@@ -117,7 +141,7 @@ export function AssessmentOverview({
                 topicsCovered={domain.topics_covered}
                 topicsTotal={domain.topics_total}
                 confidenceLevel={domain.confidence_level}
-                confidenceBreakdown={domain.confidence_breakdown}
+                gapCount={domain.topics_total - domain.topics_covered}
                 isIncomplete={isIncomplete}
               />
             );
@@ -159,21 +183,22 @@ function IncompleteStatus({
         </div>
       </div>
 
-      {/* What's needed */}
       {domainsNeedingWork.length > 0 && (
-        <div className="text-[13px] text-[#5C5A56] mb-4">
-          <span className="font-medium">Domains needing more coverage: </span>
+        <p className="text-[13px] text-[#5C5A56] mb-4 ml-8">
+          <span className="font-medium">Needs more coverage: </span>
           {domainsNeedingWork.map((d) => DOMAIN_LABELS[d]).join(', ')}
-        </div>
+        </p>
       )}
 
-      <Link
-        href="/workspace"
-        className="inline-flex items-center gap-2 px-4 py-2 bg-[#2383E2] text-white rounded-md text-[14px] font-medium hover:bg-[#1A6DC0] transition-colors"
-      >
-        Continue Assessment
-        <ArrowRight className="w-4 h-4" />
-      </Link>
+      <div className="ml-8">
+        <Link
+          href="/workspace"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-[#2383E2] text-white rounded-md text-[14px] font-medium hover:bg-[#1A6DC0] transition-colors"
+        >
+          Continue Assessment
+          <ArrowRight className="w-4 h-4" />
+        </Link>
+      </div>
     </div>
   );
 }
@@ -194,30 +219,32 @@ function ReadinessStatus({
   const config = READINESS_CONFIG[readinessLevel];
 
   return (
-    <div className={cn('rounded-lg p-5 border', config.bgColor, 'border-transparent')}>
+    <div className={cn('rounded-lg p-5', config.bgColor)}>
       <div className="flex items-start gap-3 mb-4">
-        <span className={cn('text-[20px]', config.color)}>{config.icon}</span>
+        <span className={cn('text-[24px]', config.color)}>{config.icon}</span>
         <div>
-          <h4 className={cn('text-[16px] font-semibold mb-1', config.color)}>
+          <h4 className={cn('text-[18px] font-semibold mb-1', config.color)}>
             {config.label}
           </h4>
           {verdictSummary && (
-            <p className="text-[14px] text-[#5C5A56]">{verdictSummary}</p>
+            <p className="text-[14px] text-[#5C5A56] leading-relaxed">
+              {verdictSummary}
+            </p>
           )}
         </div>
       </div>
 
       {/* Coverage bar */}
-      <div className="mt-4">
-        <div className="flex items-center justify-between mb-1">
-          <span className="text-[11px] font-medium uppercase tracking-wide text-[#9B9A97]">
-            Coverage
+      <div className="ml-9">
+        <div className="flex items-center justify-between mb-1.5">
+          <span className="text-[12px] text-[#5C5A56]">
+            Coverage: {topicsCovered}/{topicsTotal} topics
           </span>
-          <span className="text-[13px] text-[#5C5A56]">
-            {topicsCovered}/{topicsTotal} topics ({coveragePercentage}%)
+          <span className="text-[12px] font-medium text-[#37352F]">
+            {coveragePercentage}%
           </span>
         </div>
-        <div className="h-2 bg-[#E8E6E1] rounded-full overflow-hidden">
+        <div className="h-2 bg-white/50 rounded-full overflow-hidden">
           <div
             className="h-full bg-[#37352F] rounded-full transition-all duration-300"
             style={{ width: `${coveragePercentage}%` }}
@@ -233,91 +260,118 @@ function DomainRow({
   topicsCovered,
   topicsTotal,
   confidenceLevel,
-  confidenceBreakdown,
+  gapCount,
   isIncomplete,
 }: {
   label: string;
   topicsCovered: number;
   topicsTotal: number;
   confidenceLevel: 'high' | 'medium' | 'low';
-  confidenceBreakdown: { high: number; medium: number; low: number };
+  gapCount: number;
   isIncomplete: boolean;
 }) {
   const coveragePercent = (topicsCovered / topicsTotal) * 100;
   const needsWork = topicsCovered < 2;
-  const confConfig = CONFIDENCE_CONFIG[confidenceLevel];
+  const confConfig = CONFIDENCE_LABELS[confidenceLevel];
 
   return (
-    <div className="flex items-center gap-4 py-2 border-b border-[#F1F0EC] last:border-0">
-      {/* Domain name */}
-      <div className="w-[100px] flex-shrink-0">
+    <div className="bg-[#FAF9F7] rounded-lg p-4">
+      {/* Row 1: Domain name and topic count */}
+      <div className="flex items-center justify-between mb-2">
         <span className={cn(
           'text-[14px] font-medium',
           needsWork && isIncomplete ? 'text-[#9B9A97]' : 'text-[#37352F]'
         )}>
           {label}
         </span>
-      </div>
-
-      {/* Coverage bar */}
-      <div className="flex-1 flex items-center gap-2">
-        <div className="flex-1 h-1.5 bg-[#E8E6E1] rounded-full overflow-hidden">
-          <div
-            className="h-full bg-[#37352F] rounded-full transition-all duration-300"
-            style={{ width: `${coveragePercent}%` }}
-          />
-        </div>
-        <span className="text-[12px] text-[#9B9A97] w-[50px]">
-          {topicsCovered}/{topicsTotal}
+        <span className="text-[13px] text-[#5C5A56]">
+          {topicsCovered}/{topicsTotal} topics
         </span>
       </div>
 
-      {/* Confidence dots OR warning */}
-      <div className="w-[120px] flex-shrink-0 flex items-center justify-end gap-2">
+      {/* Row 2: Progress bar */}
+      <div className="h-1.5 bg-[#E8E6E1] rounded-full overflow-hidden mb-2">
+        <div
+          className="h-full bg-[#37352F] rounded-full transition-all duration-300"
+          style={{ width: `${coveragePercent}%` }}
+        />
+      </div>
+
+      {/* Row 3: Confidence and gap info */}
+      <div className="flex items-center justify-between text-[12px]">
         {isIncomplete && needsWork ? (
-          <span className="text-[11px] text-[#D9730D]">Need 2+</span>
+          <span className="text-[#D9730D]">Need 2+ topics</span>
         ) : (
-          <>
-            <ConfidenceDots breakdown={confidenceBreakdown} />
-            <span className={cn('text-[11px] font-medium', confConfig.color)}>
-              {confConfig.label}
-            </span>
-          </>
+          <span className={confConfig.color}>
+            {confConfig.label} confidence
+          </span>
+        )}
+        {gapCount > 0 && !isIncomplete && (
+          <span className="text-[#9B9A97]">
+            {gapCount} gap{gapCount !== 1 ? 's' : ''}
+          </span>
         )}
       </div>
     </div>
   );
 }
 
-function ConfidenceDots({ breakdown }: { breakdown: { high: number; medium: number; low: number } }) {
-  const total = breakdown.high + breakdown.medium + breakdown.low;
-  const dots = [];
+// Helper to generate executive summary bullets
+function generateSummaryBullets(
+  domains: Record<DomainType, DomainResult>,
+  criticalActions: CriticalAction[],
+  isIncomplete: boolean
+): { text: string; isBlocker: boolean }[] {
+  if (isIncomplete) return [];
 
-  // Create dots representing up to 5 topics
-  for (let i = 0; i < 5; i++) {
-    let type: 'high' | 'medium' | 'low' | 'empty' = 'empty';
+  const bullets: { text: string; isBlocker: boolean }[] = [];
 
-    if (i < breakdown.high) {
-      type = 'high';
-    } else if (i < breakdown.high + breakdown.medium) {
-      type = 'medium';
-    } else if (i < total) {
-      type = 'low';
+  // Find the primary blocker domain (lowest confidence or most gaps)
+  let blockerDomain: DomainType | null = null;
+  let blockerReason = '';
+
+  for (const domain of DOMAIN_ORDER) {
+    const d = domains[domain];
+    if (d.confidence_level === 'low' && d.topics_covered >= 2) {
+      blockerDomain = domain;
+      blockerReason = 'needs work';
+      break;
     }
-
-    dots.push(
-      <span
-        key={i}
-        className={cn(
-          'w-2 h-2 rounded-full',
-          type === 'high' && 'bg-[#0F7B6C]',
-          type === 'medium' && 'bg-[#D9730D]',
-          type === 'low' && 'bg-[#E03E3E]',
-          type === 'empty' && 'bg-[#E8E6E1]'
-        )}
-      />
-    );
   }
 
-  return <div className="flex items-center gap-0.5">{dots}</div>;
+  // Add domain summaries
+  for (const domain of DOMAIN_ORDER) {
+    const d = domains[domain];
+    const label = DOMAIN_LABELS[domain];
+    const conf = CONFIDENCE_LABELS[d.confidence_level];
+
+    if (d.confidence_level === 'high') {
+      bullets.push({
+        text: `${label}: ${conf.label} confidence`,
+        isBlocker: false,
+      });
+    } else if (d.confidence_level === 'low') {
+      const gapCount = d.topics_total - d.topics_covered;
+      bullets.push({
+        text: `${label}: ${conf.label} confidence — needs attention${gapCount > 0 ? ` (${gapCount} gaps)` : ''}`,
+        isBlocker: true,
+      });
+    } else {
+      bullets.push({
+        text: `${label}: ${conf.label} confidence — validation needed`,
+        isBlocker: false,
+      });
+    }
+  }
+
+  // Add primary blocker from critical actions if available
+  if (criticalActions.length > 0) {
+    const primaryBlocker = criticalActions[0];
+    bullets.unshift({
+      text: `Primary blocker: ${primaryBlocker.title}`,
+      isBlocker: true,
+    });
+  }
+
+  return bullets.slice(0, 6); // Limit to 6 bullets max
 }
