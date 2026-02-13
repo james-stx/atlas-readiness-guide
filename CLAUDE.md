@@ -213,7 +213,8 @@ scripts
 ## Recent Commits
 
 ```
-af7fd96 Refactor report: Verdict → Actions → Evidence structure
+09ee99b Fix API timeout by removing redundant V2 generation call
+98517e9 Refactor report: Verdict → Actions → Evidence structure
 42091e3 Implement V3 Readiness Report with structured topic analysis
 3ade314 Add Readiness Report V3 redesign spec
 c2cf905 Implement Readiness Report V2
@@ -222,6 +223,5 @@ c2cf905 Implement Readiness Report V2
 f9303f7 Fix PDF download by using correct coverage property names
 d4fb889 docs: auto-update MVP documentation [skip ci]
 f283025 Fix snapshot: increase maxTokens to 4096, make arrays optional with defaults
-8e38e6a Fix error logging and add specific AI error handling
 ```
 <!-- /AUTO:RECENT_CHANGES -->

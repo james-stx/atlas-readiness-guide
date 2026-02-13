@@ -3,8 +3,6 @@ import { generateObject } from 'ai';
 import { z } from 'zod';
 import { anthropic, models, modelConfig } from '@/lib/ai/client';
 import {
-  SYNTHESIS_SYSTEM_PROMPT,
-  buildSynthesisUserPrompt,
   calculateCoverageSummary,
   calculateKeyStats,
 } from '@/lib/ai/prompts/synthesis';
@@ -23,60 +21,6 @@ import type { DomainType, ConfidenceLevel } from '@atlas/types';
 
 // Increase timeout for this route (Vercel Pro: up to 300s, Hobby: 10s max)
 export const maxDuration = 60;
-
-// Snapshot schema for structured generation - V2
-const snapshotSchema = z.object({
-  // V2 fields
-  readinessLevel: z.enum(['ready', 'ready_with_caveats', 'not_ready']),
-  verdictSummary: z.string(),
-
-  keyFindings: z.array(
-    z.object({
-      domain: z.enum(['market', 'product', 'gtm', 'operations', 'financials']),
-      finding: z.string(),
-      confidence: z.enum(['high', 'medium', 'low']),
-    })
-  ).min(1).max(5),
-
-  strengths: z.array(
-    z.object({
-      domain: z.enum(['market', 'product', 'gtm', 'operations', 'financials']),
-      item: z.string(),
-      evidence: z.string(),
-      userQuote: z.string().optional(),
-    })
-  ).default([]),
-
-  assumptions: z.array(
-    z.object({
-      domain: z.enum(['market', 'product', 'gtm', 'operations', 'financials']),
-      item: z.string(),
-      risk: z.string(),
-      validationSuggestion: z.string(),
-    })
-  ).default([]),
-
-  gaps: z.array(
-    z.object({
-      domain: z.enum(['market', 'product', 'gtm', 'operations', 'financials']),
-      item: z.string(),
-      importance: z.enum(['critical', 'important', 'nice-to-have']),
-      recommendation: z.string(),
-      researchAction: z.string().optional(),
-      executionAction: z.string().optional(),
-    })
-  ).default([]),
-
-  nextSteps: z.array(
-    z.object({
-      priority: z.number().min(1).max(8),
-      action: z.string(),
-      domain: z.enum(['market', 'product', 'gtm', 'operations', 'financials']),
-      rationale: z.string(),
-      week: z.number().min(1).max(4).optional(),
-    })
-  ).default([]),
-});
 
 // V3 Snapshot schema for structured generation
 const snapshotV3Schema = z.object({
@@ -182,38 +126,14 @@ export async function POST(request: NextRequest) {
     const keyStats = calculateKeyStats(inputs);
     console.log('[Snapshot] Key stats calculated');
 
-    // Build the prompt
-    const userPrompt = buildSynthesisUserPrompt(inputs);
-    console.log('[Snapshot] Prompt built, length:', userPrompt.length);
-
     // Calculate V3 assessment status
     const assessmentStatus = calculateAssessmentStatus(inputs);
     const domainResults = calculateDomainResults(inputs);
     console.log('[Snapshot] V3 Assessment status:', assessmentStatus.status);
 
-    // Generate structured snapshot using Claude (V2 for backwards compat)
-    console.log('[Snapshot] Calling Claude API with model:', models.synthesis);
-    let generatedSnapshot;
-    try {
-      const result = await generateObject({
-        model: anthropic(models.synthesis),
-        schema: snapshotSchema,
-        system: SYNTHESIS_SYSTEM_PROMPT,
-        prompt: userPrompt,
-        maxTokens: modelConfig.synthesis.maxTokens,
-        temperature: modelConfig.synthesis.temperature,
-      });
-      generatedSnapshot = result.object;
-      console.log('[Snapshot] Claude API response received (V2)');
-    } catch (aiError) {
-      const msg = aiError instanceof Error ? aiError.message : String(aiError);
-      console.error('[Snapshot] Claude API error:', msg);
-      throw new Error(`AI generation failed: ${msg}`);
-    }
-
-    // Generate V3 structured snapshot
+    // Generate V3 structured snapshot (single API call to avoid timeout)
     const v3UserPrompt = buildSynthesisV3UserPrompt(inputs);
-    console.log('[Snapshot] Generating V3 snapshot...');
+    console.log('[Snapshot] Calling Claude API with model:', models.synthesis);
     let generatedV3Snapshot;
     try {
       const v3Result = await generateObject({
@@ -228,13 +148,12 @@ export async function POST(request: NextRequest) {
       console.log('[Snapshot] V3 snapshot generated');
     } catch (aiError) {
       const msg = aiError instanceof Error ? aiError.message : String(aiError);
-      console.error('[Snapshot] V3 generation error (non-fatal):', msg);
-      // V3 is optional - continue with V2 data
-      generatedV3Snapshot = null;
+      console.error('[Snapshot] Claude API error:', msg);
+      throw new Error(`AI generation failed: ${msg}`);
     }
 
-    // Count critical gaps for key stats
-    const criticalGapsCount = generatedSnapshot.gaps.filter(g => g.importance === 'critical').length;
+    // Count critical actions for key stats (derived from V3)
+    const criticalGapsCount = generatedV3Snapshot.criticalActions.length;
 
     // Transform coverage summary to match DB schema
     const dbCoverageSummary = {
@@ -270,42 +189,53 @@ export async function POST(request: NextRequest) {
       },
     };
 
-    // Transform generated data to match DB schema
-    const dbKeyFindings = generatedSnapshot.keyFindings.map((f) => ({
-      domain: f.domain,
-      finding: f.finding,
-      confidence: f.confidence,
+    // Transform V3 data to V2-compatible DB schema for backwards compatibility
+    // Key findings: derive from V3 topic results that have key insights
+    const dbKeyFindings = generatedV3Snapshot.topicResults
+      .filter((t: { keyInsight?: string }) => t.keyInsight)
+      .slice(0, 5)
+      .map((t: { domain: DomainType; keyInsight?: string; confidence?: ConfidenceLevel }) => ({
+        domain: t.domain,
+        finding: t.keyInsight || '',
+        confidence: t.confidence || 'medium',
+      }));
+
+    // Strengths: derive from high-confidence covered topics
+    const dbStrengths = generatedV3Snapshot.topicResults
+      .filter((t: { status: string; confidence?: ConfidenceLevel }) => t.status === 'covered' && t.confidence === 'high')
+      .slice(0, 5)
+      .map((t: { domain: DomainType; topicLabel: string; keyInsight?: string }) => ({
+        domain: t.domain,
+        item: t.topicLabel,
+        evidence: t.keyInsight || '',
+        user_quote: null,
+      }));
+
+    // Assumptions: derive from V3 assumptions
+    const dbAssumptions = generatedV3Snapshot.assumptions.map((a: { sourceDomain: DomainType; title: string; description: string; validation: string }) => ({
+      domain: a.sourceDomain,
+      item: a.title,
+      risk: a.description,
+      validation_suggestion: a.validation,
     }));
 
-    const dbStrengths = generatedSnapshot.strengths.map((s) => ({
-      domain: s.domain,
-      item: s.item,
-      evidence: s.evidence,
-      user_quote: s.userQuote,
+    // Gaps: derive from V3 critical actions
+    const dbGaps = generatedV3Snapshot.criticalActions.map((ca: { sourceDomain: DomainType; title: string; description: string; action: string }) => ({
+      domain: ca.sourceDomain,
+      item: ca.title,
+      importance: 'critical' as const,
+      recommendation: ca.description,
+      research_action: null,
+      execution_action: ca.action,
     }));
 
-    const dbAssumptions = generatedSnapshot.assumptions.map((a) => ({
-      domain: a.domain,
-      item: a.item,
-      risk: a.risk,
-      validation_suggestion: a.validationSuggestion,
-    }));
-
-    const dbGaps = generatedSnapshot.gaps.map((g) => ({
-      domain: g.domain,
-      item: g.item,
-      importance: g.importance,
-      recommendation: g.recommendation,
-      research_action: g.researchAction,
-      execution_action: g.executionAction,
-    }));
-
-    const dbNextSteps = generatedSnapshot.nextSteps.map((n) => ({
-      priority: n.priority,
-      action: n.action,
-      domain: n.domain,
-      rationale: n.rationale,
-      week: n.week,
+    // Next steps: derive from V3 action plan
+    const dbNextSteps = generatedV3Snapshot.actionPlan.map((ap: { week: number; action: string; sourceDomain: DomainType; unblocks: string }, index: number) => ({
+      priority: index + 1,
+      action: ap.action,
+      domain: ap.sourceDomain,
+      rationale: ap.unblocks,
+      week: ap.week,
     }));
 
     // Key stats with actual critical gaps count
@@ -317,7 +247,7 @@ export async function POST(request: NextRequest) {
     };
 
     // Build V3 data structure
-    const v3Data = generatedV3Snapshot ? {
+    const v3Data = {
       assessment_status: assessmentStatus.status,
       coverage_percentage: assessmentStatus.coverage_percentage,
       topics_covered: assessmentStatus.topics_covered,
@@ -382,7 +312,7 @@ export async function POST(request: NextRequest) {
         source_topic: ap.sourceTopic,
         unblocks: ap.unblocks,
       })),
-    } : null;
+    };
 
     // Save snapshot to database
     console.log('[Snapshot] Saving to database...');
@@ -396,12 +326,11 @@ export async function POST(request: NextRequest) {
         assumptions: dbAssumptions,
         gaps: dbGaps,
         next_steps: dbNextSteps,
-        raw_output: JSON.stringify({ v2: generatedSnapshot, v3: generatedV3Snapshot }),
-        // V2 fields
-        readiness_level: generatedSnapshot.readinessLevel,
-        verdict_summary: generatedSnapshot.verdictSummary,
+        raw_output: JSON.stringify({ v3: generatedV3Snapshot }),
+        // V2 fields (derived from V3)
+        readiness_level: generatedV3Snapshot.readinessLevel || 'not_ready',
+        verdict_summary: generatedV3Snapshot.verdictSummary || 'Assessment incomplete',
         key_stats: dbKeyStats,
-        // V3 data (stored in raw_output for now until DB schema updated)
       })
       .select()
       .single();
