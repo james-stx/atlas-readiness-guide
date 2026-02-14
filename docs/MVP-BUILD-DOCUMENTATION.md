@@ -1251,6 +1251,28 @@ GET /api/snapshot/[sessionId]
 ```
 Retrieves existing snapshot for a session.
 
+**Response Format:**
+```json
+{
+  "snapshot": {
+    "id": "uuid",
+    "session_id": "uuid",
+    "created_at": "timestamp",
+    "raw_output": "json_string",
+    "v3": {
+      // V3 analysis data extracted from raw_output
+    },
+    "key_stats": {
+      // Key statistics extracted from raw_output
+    },
+    "readiness_level": "string",
+    "verdict_summary": "string"
+  }
+}
+```
+
+**Note:** The API extracts V3 data, key_stats, readiness_level, and verdict_summary from the raw_output field to provide an enriched response format that matches the generate route.
+
 ---
 
 #### Download PDF
@@ -1643,16 +1665,4 @@ If something breaks:
 - Check that `transitionDomain` tool is being called when domain topics are covered
 - Verify single-step execution allows sufficient tool execution in conversation flow
 
-**Progress Tracking Issues**:
-- **Symptom**: Progress checklist not updating despite user providing answers
-- **Cause**: AI using incorrect question IDs that don't match the predefined domain questions
-- **Solution**: Check that the conversation agent is using exact question IDs from the system prompt
-- **Verification**: Monitor the `recordInput` tool calls to ensure questionId parameters match the domain configuration
-
-**Domain Transition Problems**:
-- **Symptom**: Conversations getting stuck in one domain without progressing
-- **Solution**: The AI now has explicit instructions to call `transitionDomain` after 3-4 topics are covered
-- **Verification**: Check that domain transitions occur naturally in conversation flow
-
-**Troubleshooting Topic Selection:**
-- If auto-message doesn't send, check that `
+**Progress Tracking Issues
