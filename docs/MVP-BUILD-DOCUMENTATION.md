@@ -31,6 +31,14 @@
 
 Atlas Readiness Guide is a web application that helps Australian companies assess their readiness to expand into the United States market. It uses an AI-powered conversational interface to guide users through a structured assessment across five key business domains.
 
+## V4 Philosophy: Synthesis-First Reporting
+
+Atlas V4 introduces a fundamental shift in how readiness reports are generated:
+
+- **Synthesis over Summarization**: Reports now identify cross-domain patterns and insights rather than simply summarizing individual topics
+- **Incomplete Assessment Value**: Users receive actionable insights and personalized guidance even before reaching the 60% completion threshold
+- **Progressive Disclosure**: The system provides different experiences for incomplete vs. complete assessments, maximizing value at each stage
+
 ### What Problem Does It Solve?
 
 Australian companies considering U.S. expansion often don't know what they don't know. They may have assumptions about their readiness that haven't been validated. This tool helps them:
@@ -177,19 +185,21 @@ A reference for technical terms used throughout this documentation.
 
 4. **Source Traceability**: All action items include domain → topic source attribution
 
-#### 3. Snapshot Generation (`/snapshot`)
-- When all domains are covered, user triggers snapshot generation
-- AI synthesizes all inputs into:
-  - Key findings
-  - Coverage summary by domain
-  - Strengths (high confidence items)
-  - Assumptions (medium confidence items)
-  - Gaps (low confidence items)
-  - Recommended next steps
+### Incomplete Assessment Report Flow (V4)
 
-#### 4. Export Options
-- **Download PDF** - Professional formatted document
-- **Send Email** - Snapshot delivered to inbox with PDF link
+1. User accesses snapshot page with <60% topic coverage
+2. **Assessment Progress**: Visual progress bar showing path to 60% threshold with domain-by-domain coverage
+3. **Early Signals**: Cross-domain patterns identified from existing inputs (strengths, risks, unknowns)
+4. **Recommended Topics**: Personalized next-topic suggestions with impact reasoning and unlock previews
+5. **Unlock Preview**: Preview of full report deliverables with call-to-action to continue
+6. **Export Options**: Current insights available for export
+
+### Complete Assessment Report Flow (Existing)
+
+1. User reaches 60%+ coverage threshold
+2. Full readiness verdict with confidence levels
+3. Critical actions and assumptions with source traceability
+4. Complete action plan and export options
 
 ### Auto-Navigation Behavior
 
@@ -354,6 +364,35 @@ The readiness report implements a comprehensive visual design system:
 - **Status Icons**: ✓ addressed, △ partial, ○ not addressed
 - **Progress Bars**: Coverage visualization with dual metrics
 - **Card Styles**: Solid borders for covered topics, dashed borders for uncovered
+
+## V4 Incomplete Assessment Components
+
+### AssessmentProgress
+- Progress bar toward 60% completion threshold
+- Domain-by-domain coverage visualization
+- Guidance on which domains need attention
+- Visual indicators for domains meeting minimum coverage
+
+### EarlySignals
+- Cross-domain pattern display with type classification:
+  - **Strength** (●): Positive indicators spanning domains
+  - **Pattern** (◉): Consistent themes across inputs
+  - **Risk** (◐): Potential issues identified
+  - **Unknown** (○): Gaps that need investigation
+- Source traceability showing which inputs contributed to each signal
+- Implications and blocked insights
+
+### RecommendedTopics
+- Prioritized list of next topics to tackle
+- Impact level indicators (High/Medium)
+- Reasoning for why each topic is valuable
+- Preview of what insights each topic will unlock
+- Direct navigation to workspace
+
+### UnlockPreview
+- Preview of full report deliverables
+- Visual representation of locked insights
+- Clear call-to-action to continue assessment
 
 ### Page-Specific Design Updates
 
@@ -729,15 +768,21 @@ atlas-readiness-guide/
 └── docs/                       # Documentation
 ```
 
-### Snapshot Components
-
+### V4 New Components
 ```
 apps/web/src/components/snapshot/
-├── ActionPlanUnified.tsx       # Unified action plan with 3-tier structure
-├── AssessmentOverview.tsx      # Executive summary with confidence indicators
-├── DomainDetailSection.tsx     # Structured domain analysis with topic cards
-└── ...
+├── AssessmentProgress.tsx    # Progress toward 60% threshold
+├── EarlySignals.tsx         # Cross-domain pattern display
+├── RecommendedTopics.tsx    # Personalized next-topic guidance
+├── UnlockPreview.tsx        # Preview of complete report
+├── AssessmentOverview.tsx   # Existing: Complete assessment display
+├── ActionPlanUnified.tsx    # Existing: Full action plan
+└── export-section.tsx       # Existing: Export functionality
 ```
+
+### Updated API Routes
+- `apps/api/src/app/api/snapshot/generate/route.ts`: Enhanced with V4 synthesis logic
+- `apps/api/src/lib/ai/prompts/synthesis-v3.ts`: Updated prompts for cross-domain synthesis
 
 **ActionPlanUnified**: Implements three-section action plan:
 - Critical Actions (red theme, numbered priority)
@@ -883,6 +928,38 @@ interface ActionPlanItem {
 - Source traceability: All items track originating domain and topic
 - Structured validation: Assumptions include specific validation steps
 - Timeline organization: Action items organized by week with unblock information
+
+## V4 New Types
+
+### CrossDomainSignal
+```typescript
+interface CrossDomainSignal {
+  type: 'strength' | 'pattern' | 'risk' | 'unknown';
+  title: string;
+  description: string;
+  derived_from: string[]; // Source topics
+  blocked_by?: DomainType[]; // Missing domain coverage
+  implication: string;
+}
+```
+
+### TopicRecommendation
+```typescript
+interface TopicRecommendation {
+  domain: DomainType;
+  topic_id: string;
+  topic_label: string;
+  impact: 'high' | 'medium';
+  why: string; // Reasoning for recommendation
+  unlocks: string[]; // What insights this will provide
+}
+```
+
+### Updated Snapshot Schema
+The V3 snapshot schema now includes:
+- `early_signals`: Array of CrossDomainSignal for incomplete assessments
+- `recommended_topics`: Array of TopicRecommendation for incomplete assessments
+- Backward compatibility with existing complete assessment fields
 
 ### Data Lifecycle
 
@@ -1121,6 +1198,27 @@ Generates readiness snapshot from all inputs.
 ```
 
 **Response**: Generated snapshot data.
+
+## AI Prompt Updates for V4
+
+### Incomplete Assessment Prompts
+When coverage is below 60%, the AI system now generates:
+
+1. **Early Signals** (2-4 cross-domain patterns)
+   - Synthesizes patterns across available inputs
+   - Identifies strengths, risks, and unknowns
+   - Provides implications for expansion readiness
+
+2. **Recommended Topics** (3 highest-value topics)
+   - Prioritizes topics based on current coverage gaps
+   - Explains why each topic is valuable
+   - Previews what insights each topic will unlock
+
+### Synthesis Instructions
+- Explicit instruction to synthesize patterns, not summarize topics
+- Focus on cross-domain implications and insights
+- Provide unique value beyond what the console interface shows
+- Generate actionable guidance for next steps
 
 ---
 
@@ -1559,94 +1657,4 @@ If something breaks:
 
 #### "Failed to fetch" error on start page
 **Cause**: API not running or CORS issue
-**Fix**:
-1. Check API is running (`pnpm dev`)
-2. Check NEXT_PUBLIC_API_URL is correct
-3. Check API CORS allows web app origin
-
-#### Chat not responding
-**Cause**: Anthropic API issue
-**Fix**:
-1. Check ANTHROPIC_API_KEY is set
-2. Check API key is valid and has credits
-3. Check browser console for errors
-
-#### "Invalid supabaseUrl" error
-**Cause**: Environment variable not set
-**Fix**: Ensure SUPABASE_URL is set in Vercel/env file
-
-#### PDF won't download
-**Cause**: React-PDF rendering issue
-**Fix**: Check browser console, ensure snapshot data is valid
-
-#### Email not received
-**Cause**: Resend configuration
-**Fix**:
-1. Check RESEND_API_KEY is valid
-2. Check sender domain is verified in Resend
-3. Check spam folder
-
-#### Chatbot Streaming Issues
-- If chatbot appears to hang during tool execution: Check browser network tab for stalled SSE connections
-- Tool execution errors are now caught and logged to prevent silent stream failures
-- Expected behavior: Text should continue streaming even during input recording and domain transitions
-
-#### Report Shows No Topic Details
-- **Symptoms**: Topics appear without insights or confidence levels
-- **Cause**: AI model returned empty topicResults array
-- **Resolution**: System now automatically falls back to input data
-- **Verification**: Topics should display with user's original confidence level and "User provided input on this topic" message
-- **Additional Notes**: This fallback ensures reports remain useful even during AI processing issues
-
-### SSE Streaming Issues
-- SSE streams now buffer incomplete chunks across TCP packet boundaries
-- API streaming errors are surfaced to users instead of being silently dropped
-- If you experience streaming issues, check the browser console for error events that are now properly handled
-- Session state corruption from undefined tool results has been prevented with null guards
-
-### SSE Stream Issues
-
-#### Symptoms
-- Assessment responses freeze mid-generation
-- Incomplete AI responses in chat
-- Stream appears to stop without completion
-
-#### Debugging
-- Check browser console for SSE stream debug logs
-- Look for 'SSE Event:', 'Stream completed:', and 'Stream ended without complete event' messages
-- Verify if 'complete' event was received from the stream
-
-#### Resolution
-- Partial content will be automatically saved if stream ends without completion
-- If no content is received, an error message will be displayed
-- Check network connectivity and server-side SSE implementation
-- Monitor for network timeouts or connection drops
-
-### Tool Execution Issues
-
-**Tool Execution Issues**: If the AI chat stops responding after calling tools, verify that maxSteps is properly configured. Without maxSteps, the AI SDK may call tools but never receive results, causing non-Error objects to be thrown during stream iteration. Check the chat route error handling for proper extraction of error messages from non-Error thrown objects.
-
-### Rate Limiting & Service Interruptions
-
-The system now handles API rate limits and temporary service unavailability automatically:
-
-1. **Expected Behavior**: When rate limits are hit, users will see "Service busy. Retrying in Xs..." messages
-2. **Retry Logic**: System attempts up to 3 retries with exponential backoff (1.5s, 2.25s, 3.375s delays)
-3. **Testing**: To test retry behavior, you can simulate rate limits by temporarily modifying API responses
-
-**Troubleshooting Steps:**
-- If chat remains unresponsive after retries, check network connectivity
-- Monitor browser console for non-retryable error messages
-- Verify API service status if persistent failures occur
-
-**Rate Limit Errors**: If you encounter rate limit errors during testing, the system now provides user-friendly error messages. The conversation agent is configured to use only the 6 most recent messages to stay within token limits. For testing scenarios requiring longer conversation history, you may need to wait for rate limits to reset or consider using a higher-tier API plan.
-
-### Chat Stream Issues
-
-#### Chat Freezing During Streaming
-**Problem**: Chat appears to freeze or hang during AI response streaming
-
-**Root Cause**: SSE (Server-Sent Events) stream connections can hang without properly closing, causing the reader to wait indefinitely
-
-**Solution**: The system now includes:
-- 60-second timeout on stream read operations
+**Fix**
