@@ -2,7 +2,7 @@
 
 import { cn } from '@/lib/utils';
 import { ArrowRight } from 'lucide-react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import type {
   DomainType,
   AssessmentStatus,
@@ -113,6 +113,8 @@ function IncompleteStatus({
   topicsTotal: number;
   domains: Record<DomainType, DomainResult>;
 }) {
+  const router = useRouter();
+
   // Get all covered topics across domains
   const coveredTopics = DOMAIN_ORDER.flatMap(domainKey =>
     domains[domainKey].topics
@@ -195,13 +197,13 @@ function IncompleteStatus({
       </p>
 
       {/* CTA */}
-      <Link
-        href="/workspace"
-        className="inline-flex items-center gap-2 px-4 py-2 bg-[#2383E2] text-white rounded-md text-[13px] font-medium hover:bg-[#1A6DC0] transition-colors"
+      <button
+        onClick={() => router.push('/workspace')}
+        className="inline-flex items-center gap-2 px-4 py-2 bg-[#2383E2] text-white rounded-md text-[13px] font-medium hover:bg-[#1A6DC0] transition-colors cursor-pointer"
       >
         Continue Assessment
         <ArrowRight className="w-4 h-4" />
-      </Link>
+      </button>
     </div>
   );
 }

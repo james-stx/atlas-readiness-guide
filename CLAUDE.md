@@ -213,7 +213,8 @@ pnpm-workspace.yaml
 ## Recent Commits
 
 ```
-a145120 Compact report layout: dots instead of bars, add preliminary insights
+33a5937 Fix: Convert Continue Assessment link to button with router.push
+2180a49 Compact report layout: dots instead of bars, add preliminary insights
 b6306e3 Emergency fix: Compact report layout for incomplete assessments
 39ec257 docs: auto-update MVP documentation [skip ci]
 a26daa9 Implement V3 Readiness Report per design spec
@@ -222,6 +223,5 @@ a26daa9 Implement V3 Readiness Report per design spec
 22d615a Fix DB schema - remove all V2 columns from insert
 286e495 Fix DB schema mismatch - remove key_stats column
 70c6aee Fix Haiku schema validation - simplify and add defaults
-f4cb6a8 docs: auto-update MVP documentation [skip ci]
 ```
 <!-- /AUTO:RECENT_CHANGES -->
