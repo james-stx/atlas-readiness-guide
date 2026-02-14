@@ -329,7 +329,15 @@ export default function SnapshotPage() {
               )}
 
               {/* Section 4: What You'll Unlock + CTA */}
-              <UnlockPreview />
+              <UnlockPreview
+                coveragePercentage={v3.coverage_percentage}
+                domainsNeedingWork={
+                  v3.domains
+                    ? (['market', 'product', 'gtm', 'operations', 'financials'] as const)
+                        .filter(d => v3.domains[d]?.topics_covered < 2)
+                    : undefined
+                }
+              />
 
               {/* Section 5: Export (simplified for incomplete) */}
               <ExportSection

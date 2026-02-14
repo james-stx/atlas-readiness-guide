@@ -3,10 +3,21 @@
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import { ArrowRight, Target, AlertTriangle, HelpCircle, ListChecks } from 'lucide-react';
+import type { DomainType } from '@atlas/types';
 
 interface UnlockPreviewProps {
   className?: string;
+  coveragePercentage?: number;
+  domainsNeedingWork?: DomainType[];
 }
+
+const DOMAIN_LABELS: Record<DomainType, string> = {
+  market: 'Market',
+  product: 'Product',
+  gtm: 'Go-to-Market',
+  operations: 'Operations',
+  financials: 'Financials',
+};
 
 const UNLOCK_ITEMS = [
   {
@@ -39,18 +50,39 @@ const UNLOCK_ITEMS = [
   },
 ];
 
-export function UnlockPreview({ className }: UnlockPreviewProps) {
+export function UnlockPreview({ className, coveragePercentage, domainsNeedingWork }: UnlockPreviewProps) {
   const router = useRouter();
+
+  // Determine what's blocking the full report
+  const meetsTopicThreshold = (coveragePercentage || 0) >= 60;
+  const meetsDomainRequirement = !domainsNeedingWork || domainsNeedingWork.length === 0;
+
+  // Build helpful message
+  const getBlockingMessage = () => {
+    if (meetsTopicThreshold && !meetsDomainRequirement) {
+      const domainNames = domainsNeedingWork!.map(d => DOMAIN_LABELS[d]).join(' and ');
+      return `Almost there! Add 2+ topics to ${domainNames} to unlock your full report.`;
+    }
+    if (!meetsTopicThreshold && !meetsDomainRequirement) {
+      return 'Complete at least 60% of topics with coverage in all 5 domains.';
+    }
+    return 'Your full readiness report will include:';
+  };
 
   return (
     <div className={cn('bg-white rounded-lg border border-[#E8E6E1] p-5', className)}>
       {/* Header */}
       <div className="mb-4">
         <h3 className="text-[15px] font-semibold text-[#37352F] mb-1">
-          Complete Your Assessment to Unlock
+          {meetsTopicThreshold && !meetsDomainRequirement
+            ? 'Almost Ready to Unlock'
+            : 'Complete Your Assessment to Unlock'}
         </h3>
-        <p className="text-[13px] text-[#5C5A56]">
-          Your full readiness report will include:
+        <p className={cn(
+          'text-[13px]',
+          meetsTopicThreshold && !meetsDomainRequirement ? 'text-[#D9730D]' : 'text-[#5C5A56]'
+        )}>
+          {getBlockingMessage()}
         </p>
       </div>
 

@@ -55,6 +55,22 @@ export function AssessmentProgress({
   const progressToThreshold = Math.min((coveragePercentage / COMPLETION_THRESHOLD) * 100, 100);
   const topicsNeeded = Math.max(MIN_TOPICS - topicsCovered, 0);
 
+  // Full report requires BOTH 60% coverage AND 2+ topics per domain
+  const meetsTopicThreshold = topicsNeeded === 0;
+  const meetsDomainRequirement = domainsNeedingWork.length === 0;
+  const fullyReady = meetsTopicThreshold && meetsDomainRequirement;
+
+  // Progress message that accounts for both requirements
+  const getProgressMessage = () => {
+    if (fullyReady) {
+      return 'Ready for full report!';
+    }
+    if (meetsTopicThreshold && !meetsDomainRequirement) {
+      return `Need 2+ topics in ${domainsNeedingWork.length} domain${domainsNeedingWork.length > 1 ? 's' : ''}`;
+    }
+    return `${topicsNeeded} more topics needed`;
+  };
+
   return (
     <div className={cn('bg-white rounded-lg border border-[#E8E6E1] p-5', className)}>
       {/* Header */}
@@ -74,22 +90,25 @@ export function AssessmentProgress({
       <div className="mb-5 ml-6">
         <div className="flex items-center justify-between text-[12px] mb-1.5">
           <span className="text-[#5C5A56]">Progress to full report</span>
-          <span className="text-[#9B9A97]">
-            {topicsNeeded > 0 ? `${topicsNeeded} more topics needed` : 'Threshold met!'}
+          <span className={cn(
+            meetsTopicThreshold && !meetsDomainRequirement ? 'text-[#D9730D]' : 'text-[#9B9A97]'
+          )}>
+            {getProgressMessage()}
           </span>
         </div>
         <div className="h-2 bg-[#E8E6E1] rounded-full overflow-hidden">
           <div
             className={cn(
               'h-full rounded-full transition-all duration-500',
-              progressToThreshold >= 100 ? 'bg-[#0F7B6C]' : 'bg-[#37352F]'
+              fullyReady ? 'bg-[#0F7B6C]' :
+              meetsTopicThreshold ? 'bg-[#D9730D]' : 'bg-[#37352F]'
             )}
             style={{ width: `${progressToThreshold}%` }}
           />
         </div>
         <div className="flex justify-between text-[11px] text-[#9B9A97] mt-1">
           <span>0%</span>
-          <span className="font-medium">60% threshold</span>
+          <span className="font-medium">60% + all domains</span>
           <span>100%</span>
         </div>
       </div>
