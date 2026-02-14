@@ -213,7 +213,8 @@ pnpm-lock.yaml
 ## Recent Commits
 
 ```
-006fd45 Improve messaging for incomplete assessments with partial domain coverage
+917ce42 Improve message when report needs refresh
+ad7295b Improve messaging for incomplete assessments with partial domain coverage
 e5e57a0 Fix: Store transformed v3Data with domains in raw_output
 84ef3d3 Add guards for undefined arrays in all snapshot components
 f6a327a Add defensive guards for undefined domains in snapshot components
@@ -222,6 +223,5 @@ f6a327a Add defensive guards for undefined domains in snapshot components
 322679c Fix snapshot GET API to extract V3 data from raw_output
 a42948e Fix domain transition error handling
 17b5605 docs: auto-update MVP documentation [skip ci]
-95896ae Allow chatting on completed sessions
 ```
 <!-- /AUTO:RECENT_CHANGES -->

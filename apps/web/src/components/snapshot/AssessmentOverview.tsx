@@ -78,16 +78,22 @@ export function AssessmentOverview({
 }: AssessmentOverviewProps) {
   const isIncomplete = assessmentStatus === 'incomplete';
 
-  // Guard against undefined domains
+  // Guard against undefined domains - show helpful message
   if (!domains) {
     return (
       <div className={cn('bg-white rounded-lg border border-[#E8E6E1] p-5', className)}>
-        <div className="flex items-center gap-2">
-          <span className="text-[16px] text-[#9B9A97]">○</span>
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-[16px] text-[#D9730D]">⚠</span>
           <h3 className="text-[15px] font-semibold text-[#37352F]">
-            Loading assessment data...
+            Report needs refresh
           </h3>
         </div>
+        <p className="text-[13px] text-[#5C5A56] mb-3">
+          This report was generated with an older format. Click the <strong>Refresh</strong> button in the header above to regenerate with your latest inputs.
+        </p>
+        <p className="text-[12px] text-[#9B9A97]">
+          If you don&apos;t see the header, scroll to the top of the page.
+        </p>
       </div>
     );
   }
