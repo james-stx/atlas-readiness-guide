@@ -213,7 +213,9 @@ pnpm-lock.yaml
 ## Recent Commits
 
 ```
-917ce42 Improve message when report needs refresh
+ee1828f Fix readiness level calculation with server-side logic
+c84e159 Improve message when report needs refresh
+37577ca docs: auto-update MVP documentation [skip ci]
 ad7295b Improve messaging for incomplete assessments with partial domain coverage
 e5e57a0 Fix: Store transformed v3Data with domains in raw_output
 84ef3d3 Add guards for undefined arrays in all snapshot components
@@ -221,7 +223,5 @@ f6a327a Add defensive guards for undefined domains in snapshot components
 57ba0e9 Add fallbacks for undefined config lookups in snapshot components
 71d1644 docs: auto-update MVP documentation [skip ci]
 322679c Fix snapshot GET API to extract V3 data from raw_output
-a42948e Fix domain transition error handling
-17b5605 docs: auto-update MVP documentation [skip ci]
 ```
 <!-- /AUTO:RECENT_CHANGES -->

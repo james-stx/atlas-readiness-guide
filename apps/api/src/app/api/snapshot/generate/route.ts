@@ -268,13 +268,61 @@ export async function POST(request: NextRequest) {
       critical_gaps_count: criticalGapsCount,
     };
 
+    // Calculate readiness level based on actual data (override AI if needed)
+    const calculateReadinessLevel = (): 'ready' | 'ready_with_caveats' | 'not_ready' => {
+      const domains: DomainType[] = ['market', 'product', 'gtm', 'operations', 'financials'];
+
+      // Count domains by confidence level
+      let highConfidenceDomains = 0;
+      let lowConfidenceDomains = 0;
+      let domainsWithNoHighTopics = 0;
+
+      for (const domain of domains) {
+        const dr = domainResults[domain];
+        if (dr.confidence_level === 'high') highConfidenceDomains++;
+        if (dr.confidence_level === 'low') lowConfidenceDomains++;
+        if (dr.confidence_breakdown.high === 0 && dr.topics_covered > 0) domainsWithNoHighTopics++;
+      }
+
+      const assumptionsCount = (generatedV3Snapshot.assumptions || []).length;
+
+      console.log('[Snapshot] Readiness calc:', {
+        highConfidenceDomains,
+        lowConfidenceDomains,
+        domainsWithNoHighTopics,
+        criticalGapsCount,
+        assumptionsCount,
+        aiReadinessLevel: generatedV3Snapshot.readinessLevel,
+      });
+
+      // Apply rules:
+      // not_ready: >= 2 domains LOW, OR >= 3 critical gaps, OR any domain with 0 HIGH topics
+      if (lowConfidenceDomains >= 2 || criticalGapsCount >= 3 || domainsWithNoHighTopics > 0) {
+        return 'not_ready';
+      }
+
+      // ready: >= 4 domains HIGH, 0 critical gaps, <= 2 assumptions
+      if (highConfidenceDomains >= 4 && criticalGapsCount === 0 && assumptionsCount <= 2) {
+        return 'ready';
+      }
+
+      // ready_with_caveats: everything else that's assessable
+      return 'ready_with_caveats';
+    };
+
+    const calculatedReadinessLevel = assessmentStatus.status === 'assessable'
+      ? calculateReadinessLevel()
+      : undefined;
+
+    console.log('[Snapshot] Final readiness level:', calculatedReadinessLevel);
+
     // Build V3 data structure
     const v3Data = {
       assessment_status: assessmentStatus.status,
       coverage_percentage: assessmentStatus.coverage_percentage,
       topics_covered: assessmentStatus.topics_covered,
       topics_total: assessmentStatus.topics_total,
-      readiness_level: assessmentStatus.status === 'assessable' ? generatedV3Snapshot.readinessLevel : undefined,
+      readiness_level: calculatedReadinessLevel,
       verdict_summary: assessmentStatus.status === 'assessable' ? generatedV3Snapshot.verdictSummary : undefined,
       domains: Object.fromEntries(
         (['market', 'product', 'gtm', 'operations', 'financials'] as DomainType[]).map((domain) => {
@@ -377,7 +425,7 @@ export async function POST(request: NextRequest) {
         raw_output: JSON.stringify({
           v3: v3Data,  // Store the transformed v3Data with domains, not raw AI output
           key_stats: dbKeyStats,
-          readiness_level: generatedV3Snapshot.readinessLevel || 'not_ready',
+          readiness_level: calculatedReadinessLevel || 'not_ready',
           verdict_summary: generatedV3Snapshot.verdictSummary || 'Assessment incomplete',
         }),
       })
@@ -397,7 +445,7 @@ export async function POST(request: NextRequest) {
     const responseSnapshot = {
       ...savedSnapshot,
       key_stats: dbKeyStats,
-      readiness_level: generatedV3Snapshot.readinessLevel || 'not_ready',
+      readiness_level: calculatedReadinessLevel || 'not_ready',
       verdict_summary: generatedV3Snapshot.verdictSummary || 'Assessment incomplete',
       v3: v3Data,
     };
