@@ -170,6 +170,9 @@ A reference for technical terms used throughout this documentation.
 2. Logo click returns to home page
 3. Current domain/progress visible in simplified header format
 
+#### 3. Completion and Continued Interaction
+After completing an assessment and viewing their report, users can continue chatting to refine or expand their assessment. The session remains active and accessible for further conversation. Only abandoned sessions prevent continued interaction.
+
 ### Readiness Report Review Flow
 
 1. **Assessment Overview**: Users see overall readiness status with:
@@ -854,13 +857,19 @@ Stores user assessment sessions.
 |--------|------|-------------|
 | `id` | UUID | Unique session identifier |
 | `email` | VARCHAR | User's email address |
-| `status` | ENUM | `active`, `synthesizing`, `completed` |
+| `status` | ENUM | `active`, `synthesizing`, `completed`, `abandoned` |
 | `current_domain` | ENUM | Current domain being assessed |
 | `recovery_token_hash` | VARCHAR | Hashed token for session recovery |
 | `created_at` | TIMESTAMP | When session started |
 | `updated_at` | TIMESTAMP | Last activity |
 | `expires_at` | TIMESTAMP | When session expires |
 | `metadata` | JSONB | Additional session data |
+
+**Session Status Types:**
+- **active**: Session in progress, user can chat
+- **synthesizing**: Snapshot being generated
+- **completed**: Assessment finished and report generated, but user can still continue chatting
+- **abandoned**: Session terminated, no further interaction allowed
 
 #### `messages`
 Stores chat conversation history.
@@ -1182,6 +1191,8 @@ The `recordInput` tool now includes server-side validation:
 - **questionId validation**: The tool validates that the provided `questionId` exists in the current domain's valid question IDs
 - **Error handling**: If an invalid `questionId` is provided, the tool returns an error response containing the list of valid IDs for the current domain
 - **Self-correction**: This enables the AI agent to automatically retry with a correct `questionId` when validation fails
+
+**Session Status Validation**: The chat endpoint now allows messages for sessions with status 'active' or 'completed'. Only sessions with status 'abandoned' will return a validation error 'This session is no longer active'.
 
 **Request Timeout Behavior**
 - All chat requests automatically timeout after 90 seconds
@@ -1644,17 +1655,4 @@ If something breaks:
 - **Verification**: Check that domain transitions occur naturally in conversation flow
 
 **Troubleshooting Topic Selection:**
-- If auto-message doesn't send, check that `isLoading` state is false and `selectedCategory` is properly set
-- Verify `sendMessage` function is available and not throwing errors
-
-### Snapshot Generation Debugging
-
-**Console Logging**: The InlineSnapshotCTA component now includes detailed console logging for snapshot generation:
-- `[Atlas] Starting snapshot generation...` - When generation begins
-- `[Atlas] Snapshot generated, navigating to /snapshot` - On successful completion
-- `[Atlas] Snapshot generation failed: [error]` - On failure with error details
-
-**Error States**: 
-- Errors are displayed inline with an AlertCircle icon in a red-bordered container
-- Button shows "Generating..." state during processing and is disabled
-- Local error state
+- If auto-message doesn't send, check that `
