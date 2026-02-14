@@ -213,7 +213,9 @@ pnpm-lock.yaml
 ## Recent Commits
 
 ```
-fa3790f Fix navigation between snapshot and workspace pages
+4354848 Always show Report link in sidebar for easy access
+309aa5a Fix navigation between snapshot and workspace pages
+0915e66 docs: auto-update MVP documentation [skip ci]
 77f5144 V4 Readiness Report: Synthesis-first redesign for incomplete assessments
 4401590 Fix: Convert Continue Assessment link to button with router.push
 2180a49 Compact report layout: dots instead of bars, add preliminary insights
@@ -221,7 +223,5 @@ b6306e3 Emergency fix: Compact report layout for incomplete assessments
 39ec257 docs: auto-update MVP documentation [skip ci]
 a26daa9 Implement V3 Readiness Report per design spec
 28d021d docs: auto-update MVP documentation [skip ci]
-86d8078 Fix report showing no topic details
-22d615a Fix DB schema - remove all V2 columns from insert
 ```
 <!-- /AUTO:RECENT_CHANGES -->
