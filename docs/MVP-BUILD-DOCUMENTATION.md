@@ -151,6 +151,12 @@ A reference for technical terms used throughout this documentation.
 - Progress bar shows current domain
 - Users can type freely or use quick-response buttons
 
+**Navigation Between Pages:**
+- Direct navigation via anchor tags (<a>) resets React context
+- Both workspace and snapshot pages implement session recovery from localStorage
+- If session recovery fails, users are automatically redirected to /start
+- Session recovery prevents loss of assessment progress during navigation
+
 **Chat Interaction Flow Updates:**
 
 *Message Input:*
@@ -553,6 +559,12 @@ This separation allows users to browse content freely without accidentally trigg
   - Server-Sent Events (SSE) for streaming
   - PDF generation with React-PDF
   - Email sending with React templates
+
+**Session Management:**
+- Assessment context can be lost during navigation via anchor tags
+- Session recovery mechanism implemented in both workspace and snapshot pages
+- Uses localStorage as fallback when React context is unavailable
+- Automatic fallback to /start route when session cannot be recovered
 
 **Chat Interface Technical Details:**
 
@@ -1645,16 +1657,4 @@ If something breaks:
 **Error States**: 
 - Errors are displayed inline with an AlertCircle icon in a red-bordered container
 - Button shows "Generating..." state during processing and is disabled
-- Local error state takes precedence over global error state for immediate feedback
-
-**Troubleshooting Snapshot Issues**:
-1. Check browser console for `[Atlas]` prefixed messages
-2. Look for error messages displayed above the snapshot generation button
-3. Verify the button state - it should be disabled during generation
-4. If generation fails, the error message will persist until the next attempt
-
-### Common Issues & Fixes
-
-#### "Failed to fetch" error on start page
-**Cause**: API not running or CORS issue
-**Fix**
+- Local error state
