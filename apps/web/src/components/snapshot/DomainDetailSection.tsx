@@ -60,6 +60,15 @@ export function DomainDetailSection({
   domainResult,
   className,
 }: DomainDetailSectionProps) {
+  // Guard against undefined domainResult
+  if (!domainResult) {
+    return (
+      <div className={cn('bg-white rounded-lg border border-[#E8E6E1] p-6', className)}>
+        <p className="text-[13px] text-[#9B9A97]">Loading domain data...</p>
+      </div>
+    );
+  }
+
   const confConfig = CONFIDENCE_CONFIG[domainResult.confidence_level] || CONFIDENCE_CONFIG.low;
   const { topics_covered, topics_total, topics } = domainResult;
 

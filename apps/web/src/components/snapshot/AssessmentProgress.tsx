@@ -32,6 +32,20 @@ export function AssessmentProgress({
   domains,
   className,
 }: AssessmentProgressProps) {
+  // Guard against undefined domains
+  if (!domains) {
+    return (
+      <div className={cn('bg-white rounded-lg border border-[#E8E6E1] p-5', className)}>
+        <div className="flex items-center gap-2">
+          <span className="text-[16px] text-[#9B9A97]">○</span>
+          <h3 className="text-[15px] font-semibold text-[#37352F]">
+            Loading progress data...
+          </h3>
+        </div>
+      </div>
+    );
+  }
+
   // Find domains that need work (priority order for guidance)
   const domainsNeedingWork = DOMAIN_ORDER.filter(
     (d) => domains[d].topics_covered < 2

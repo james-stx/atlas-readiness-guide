@@ -29,6 +29,11 @@ const CONFIDENCE_CONFIG: Record<'high' | 'medium' | 'low', {
 };
 
 export function PreliminaryInsights({ domains, className }: PreliminaryInsightsProps) {
+  // Guard against undefined domains
+  if (!domains) {
+    return null;
+  }
+
   // Collect all covered topics with insights
   const topicsWithInsights: { topic: TopicResult; domain: DomainType }[] = [];
 

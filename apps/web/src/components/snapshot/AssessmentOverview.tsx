@@ -78,6 +78,20 @@ export function AssessmentOverview({
 }: AssessmentOverviewProps) {
   const isIncomplete = assessmentStatus === 'incomplete';
 
+  // Guard against undefined domains
+  if (!domains) {
+    return (
+      <div className={cn('bg-white rounded-lg border border-[#E8E6E1] p-5', className)}>
+        <div className="flex items-center gap-2">
+          <span className="text-[16px] text-[#9B9A97]">○</span>
+          <h3 className="text-[15px] font-semibold text-[#37352F]">
+            Loading assessment data...
+          </h3>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={cn('bg-white rounded-lg border border-[#E8E6E1] p-5', className)}>
       {/* Assessment Status */}

@@ -213,7 +213,9 @@ pnpm-lock.yaml
 ## Recent Commits
 
 ```
-291008e Add fallbacks for undefined config lookups in snapshot components
+bed6baf Add defensive guards for undefined domains in snapshot components
+57ba0e9 Add fallbacks for undefined config lookups in snapshot components
+71d1644 docs: auto-update MVP documentation [skip ci]
 322679c Fix snapshot GET API to extract V3 data from raw_output
 a42948e Fix domain transition error handling
 17b5605 docs: auto-update MVP documentation [skip ci]
@@ -221,7 +223,5 @@ a42948e Fix domain transition error handling
 04343e3 docs: auto-update MVP documentation [skip ci]
 1c7353d Fix snapshot page to recover session from localStorage
 1b37fb3 Always show Report link in sidebar for easy access
-309aa5a Fix navigation between snapshot and workspace pages
-0915e66 docs: auto-update MVP documentation [skip ci]
 ```
 <!-- /AUTO:RECENT_CHANGES -->
