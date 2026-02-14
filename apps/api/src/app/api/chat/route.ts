@@ -30,7 +30,8 @@ export async function POST(request: NextRequest) {
     const session = await getValidSession(sessionId);
 
     // Check if session is in a valid state for chat
-    if (session.status === 'completed' || session.status === 'abandoned') {
+    // Note: 'completed' sessions CAN continue chatting - users can update their assessment after viewing a report
+    if (session.status === 'abandoned') {
       throw new ValidationError('This session is no longer active');
     }
 
