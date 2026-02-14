@@ -18,6 +18,8 @@ export default function WorkspacePage() {
     hasStoredSession,
   } = useAssessment();
 
+  console.log('[Atlas] WorkspacePage render - session:', !!session, 'hasStoredSession:', hasStoredSession, 'status:', session?.status);
+
   // Redirect if no session
   useEffect(() => {
     if (!session && !hasStoredSession) {
@@ -39,12 +41,9 @@ export default function WorkspacePage() {
     }
   }, [session, messages.length, initChat]);
 
-  // Redirect to snapshot when completed
-  useEffect(() => {
-    if (session?.status === 'completed') {
-      router.push('/snapshot');
-    }
-  }, [session?.status, router]);
+  // Note: We no longer auto-redirect to snapshot when completed
+  // Users should be able to navigate freely between workspace and report
+  // The sidebar shows a "View Report" link when a report exists
 
   // Loading state while recovering session
   if (!session) {

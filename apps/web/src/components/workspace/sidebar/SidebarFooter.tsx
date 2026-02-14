@@ -3,17 +3,21 @@
 import { useWorkspace } from '@/lib/context/workspace-context';
 import { useRouter } from 'next/navigation';
 import { useAssessment } from '@/lib/context/assessment-context';
+import { FileText, RefreshCw } from 'lucide-react';
 
 export function SidebarFooter() {
   const router = useRouter();
   const { progressState } = useWorkspace();
-  const { generateSnapshot, isLoading, error } = useAssessment();
+  const { generateSnapshot, snapshot, isLoading, error } = useAssessment();
 
   const progress = progressState.overallProgress;
-  const isDisabled = progress < 20;
+  const hasExistingReport = !!snapshot;
 
-  const handleSnapshot = async () => {
-    if (isDisabled) return;
+  const handleViewReport = () => {
+    router.push('/snapshot');
+  };
+
+  const handleGenerateReport = async () => {
     try {
       console.log('[Atlas] Starting snapshot generation...');
       await generateSnapshot();
@@ -56,16 +60,50 @@ export function SidebarFooter() {
         </div>
       )}
 
-      {/* Snapshot button - only show when there's enough progress */}
-      {progress >= 20 && (
-        <button
-          onClick={handleSnapshot}
-          disabled={isLoading}
-          className="w-full h-[28px] rounded-[3px] bg-[#2383E2] text-[13px] font-medium text-white transition-colors hover:bg-[#1A6DC0] disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isLoading ? 'Generating...' : 'Generate Snapshot'}
-        </button>
-      )}
+      {/* Report section */}
+      <div className="space-y-2">
+        {/* View existing report button - always visible if report exists */}
+        {hasExistingReport && (
+          <button
+            onClick={handleViewReport}
+            className="w-full h-[32px] rounded-[3px] bg-[#37352F] text-[13px] font-medium text-white transition-colors hover:bg-[#2F2E2B] flex items-center justify-center gap-2"
+          >
+            <FileText className="w-3.5 h-3.5" />
+            View Report
+          </button>
+        )}
+
+        {/* Generate/Regenerate button */}
+        {progress >= 20 && (
+          <button
+            onClick={handleGenerateReport}
+            disabled={isLoading}
+            className={`w-full h-[28px] rounded-[3px] text-[12px] font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 ${
+              hasExistingReport
+                ? 'border border-[#E8E6E1] bg-white text-[#5C5A56] hover:bg-[#F7F6F3] hover:border-[#D4D1CB]'
+                : 'bg-[#2383E2] text-white hover:bg-[#1A6DC0]'
+            }`}
+          >
+            {isLoading ? (
+              'Generating...'
+            ) : hasExistingReport ? (
+              <>
+                <RefreshCw className="w-3 h-3" />
+                Regenerate Report
+              </>
+            ) : (
+              'Generate Report'
+            )}
+          </button>
+        )}
+
+        {/* Helpful text when no progress */}
+        {progress < 20 && !hasExistingReport && (
+          <p className="text-[11px] text-[#9B9A97] text-center">
+            Complete at least 20% to generate a report
+          </p>
+        )}
+      </div>
     </div>
   );
 }

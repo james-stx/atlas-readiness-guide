@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { useAssessment } from '@/lib/context/assessment-context';
 import { getSnapshot } from '@/lib/api-client';
 // V4 Components for incomplete assessments
@@ -15,15 +14,23 @@ import { AssessmentOverview } from '@/components/snapshot/AssessmentOverview';
 import { ActionPlanUnified } from '@/components/snapshot/ActionPlanUnified';
 import { ExportSection } from '@/components/snapshot/export-section';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, Loader2, Compass } from 'lucide-react';
+import { ArrowLeft, Loader2, Compass, RefreshCw } from 'lucide-react';
 import type { Snapshot, SnapshotV3 } from '@atlas/types';
 
 export default function SnapshotPage() {
   const router = useRouter();
   const { session, snapshot: contextSnapshot, generateSnapshot, isLoading } = useAssessment();
+
+  // ALL useState hooks must be at the top, before any conditional returns
   const [snapshot, setSnapshot] = useState<Snapshot | null>(contextSnapshot);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isRegenerating, setIsRegenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Navigation handler
+  const handleBackToWorkspace = () => {
+    window.location.href = '/workspace';
+  };
 
   // Redirect if no session
   useEffect(() => {
@@ -32,7 +39,7 @@ export default function SnapshotPage() {
     }
   }, [session, router]);
 
-  // Load or generate snapshot
+  // Load existing snapshot (don't auto-generate)
   useEffect(() => {
     async function loadSnapshot() {
       if (!session) return;
@@ -43,27 +50,22 @@ export default function SnapshotPage() {
         return;
       }
 
-      // Try to fetch existing snapshot
+      // Try to fetch existing snapshot (but don't auto-generate)
       try {
         const { snapshot: existingSnapshot } = await getSnapshot(session.id);
 
         if (existingSnapshot) {
           setSnapshot(existingSnapshot);
-          return;
         }
-
-        // No snapshot exists, generate one
-        setIsGenerating(true);
-        await generateSnapshot();
+        // If no snapshot exists, we'll show the "no snapshot" state
+        // User must explicitly click "Generate Report" to create one
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load snapshot');
-      } finally {
-        setIsGenerating(false);
       }
     }
 
     loadSnapshot();
-  }, [session, contextSnapshot, generateSnapshot]);
+  }, [session, contextSnapshot]);
 
   // Update local snapshot when context changes
   useEffect(() => {
@@ -71,6 +73,32 @@ export default function SnapshotPage() {
       setSnapshot(contextSnapshot);
     }
   }, [contextSnapshot]);
+
+  // Generate handler
+  const handleGenerate = async () => {
+    setIsGenerating(true);
+    setError(null);
+    try {
+      await generateSnapshot();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to generate report');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // Regenerate handler
+  const handleRegenerate = async () => {
+    setIsRegenerating(true);
+    setError(null);
+    try {
+      await generateSnapshot();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to regenerate report');
+    } finally {
+      setIsRegenerating(false);
+    }
+  };
 
   // Loading state
   if (!session || isGenerating || isLoading) {
@@ -105,24 +133,64 @@ export default function SnapshotPage() {
       <div className="min-h-screen bg-[#FAF9F7] flex items-center justify-center">
         <div className="text-center">
           <p className="text-[#E03E3E] mb-4">{error}</p>
-          <Link href="/workspace" className="text-[#2383E2] hover:underline">
+          <a
+            href="/workspace"
+            className="text-[#2383E2] hover:underline"
+          >
             Return to workspace
-          </Link>
+          </a>
         </div>
       </div>
     );
   }
 
-  // No snapshot yet
+  // No snapshot yet - show generate option
   if (!snapshot) {
     return (
-      <div className="min-h-screen bg-[#FAF9F7] flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-[#5C5A56] mb-4">No report available yet.</p>
-          <Link href="/workspace" className="text-[#2383E2] hover:underline">
-            Complete your assessment in workspace
-          </Link>
-        </div>
+      <div className="min-h-screen bg-[#FAF9F7]">
+        <header className="flex h-12 items-center justify-between border-b border-[#E8E6E1] bg-white px-4 sticky top-0 z-50">
+          <a
+            href="/workspace"
+            className="flex items-center gap-2 text-[#5C5A56] hover:text-[#37352F] transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span className="text-[13px]">Back to Workspace</span>
+          </a>
+          <div className="text-[13px] text-[#9B9A97]">{session.email}</div>
+        </header>
+
+        <main className="max-w-[720px] mx-auto px-6 py-12">
+          <div className="text-center">
+            <div className="w-12 h-12 bg-[#37352F] rounded-lg flex items-center justify-center mx-auto mb-4">
+              <Compass className="w-6 h-6 text-white" />
+            </div>
+            <h1 className="text-[24px] font-semibold text-[#37352F] mb-2">
+              Your Readiness Report
+            </h1>
+            <p className="text-[14px] text-[#5C5A56] mb-6">
+              Generate a comprehensive analysis of your U.S. expansion readiness based on your assessment progress.
+            </p>
+
+            <button
+              onClick={handleGenerate}
+              disabled={isGenerating}
+              className="px-6 py-3 bg-[#2383E2] text-white rounded-lg text-[14px] font-medium hover:bg-[#1A6DC0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Generate Report
+            </button>
+
+            <p className="text-[12px] text-[#9B9A97] mt-4">
+              Or{' '}
+              <a
+                href="/workspace"
+                className="text-[#2383E2] hover:underline"
+              >
+                continue your assessment
+              </a>
+              {' '}to improve your report.
+            </p>
+          </div>
+        </main>
       </div>
     );
   }
@@ -135,13 +203,13 @@ export default function SnapshotPage() {
     return (
       <div className="min-h-screen bg-[#FAF9F7]">
         <header className="flex h-12 items-center justify-between border-b border-[#E8E6E1] bg-white px-4 sticky top-0 z-50">
-          <Link
+          <a
             href="/workspace"
             className="flex items-center gap-2 text-[#5C5A56] hover:text-[#37352F] transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             <span className="text-[13px]">Back to Workspace</span>
-          </Link>
+          </a>
           <div className="text-[13px] text-[#9B9A97]">{session.email}</div>
         </header>
 
@@ -163,7 +231,7 @@ export default function SnapshotPage() {
               Please regenerate your report to see the enhanced format with detailed analysis.
             </p>
             <button
-              onClick={() => generateSnapshot()}
+              onClick={handleRegenerate}
               className="mt-4 px-4 py-2 bg-[#2383E2] text-white rounded-md text-[14px] font-medium hover:bg-[#1A6DC0] transition-colors"
             >
               Regenerate Report
@@ -176,19 +244,42 @@ export default function SnapshotPage() {
 
   const isIncomplete = v3.assessment_status === 'incomplete';
 
+  // Format the report date
+  const reportDate = snapshot.created_at
+    ? new Date(snapshot.created_at).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+      })
+    : null;
+
   return (
     <div className="min-h-screen bg-[#FAF9F7]">
       {/* Header */}
       <header className="flex h-12 items-center justify-between border-b border-[#E8E6E1] bg-white px-4 sticky top-0 z-50 print:hidden">
-        <Link
+        <a
           href="/workspace"
           className="flex items-center gap-2 text-[#5C5A56] hover:text-[#37352F] transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span className="text-[13px]">Back to Workspace</span>
-        </Link>
-        <div className="text-[13px] text-[#9B9A97]">
-          {session.email}
+        </a>
+        <div className="flex items-center gap-3">
+          {reportDate && (
+            <span className="text-[11px] text-[#9B9A97]">
+              Generated {reportDate}
+            </span>
+          )}
+          <button
+            onClick={handleRegenerate}
+            disabled={isRegenerating}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-[3px] text-[12px] text-[#5C5A56] hover:bg-[#F7F6F3] hover:text-[#37352F] transition-colors disabled:opacity-50"
+            title="Regenerate report with latest assessment data"
+          >
+            <RefreshCw className={`w-3 h-3 ${isRegenerating ? 'animate-spin' : ''}`} />
+            {isRegenerating ? 'Regenerating...' : 'Refresh'}
+          </button>
         </div>
       </header>
 
