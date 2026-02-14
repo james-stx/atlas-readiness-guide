@@ -33,8 +33,49 @@ export function ActionPlanUnified({
   const hasAssumptions = safeAssumptions.length > 0;
   const hasRoadmap = safeActionPlan.length > 0;
 
+  // Show a positive "all clear" message when there's nothing to address
   if (!hasBlockers && !hasAssumptions && !hasRoadmap) {
-    return null;
+    return (
+      <div className={cn('bg-white rounded-lg border border-[#E8E6E1] p-6', className)}>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-full bg-[#DDEDEA] flex items-center justify-center">
+            <span className="text-[#0F7B6C] text-xl">✓</span>
+          </div>
+          <div>
+            <h3 className="text-[16px] font-semibold text-[#0F7B6C]">
+              You&apos;re Ready to Execute
+            </h3>
+            <p className="text-[13px] text-[#5C5A56]">
+              No critical blockers or major assumptions to address
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-[#DDEDEA]/30 rounded-lg p-4 border border-[#0F7B6C]/20">
+          <h4 className="text-[13px] font-medium text-[#37352F] mb-2">
+            Recommended Next Steps
+          </h4>
+          <ul className="space-y-2 text-[13px] text-[#5C5A56]">
+            <li className="flex items-start gap-2">
+              <span className="text-[#0F7B6C] mt-0.5">→</span>
+              <span>Begin executing your U.S. expansion plan with confidence</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-[#0F7B6C] mt-0.5">→</span>
+              <span>Set up your U.S. legal entity if not already established</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-[#0F7B6C] mt-0.5">→</span>
+              <span>Activate your go-to-market strategy and start customer acquisition</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-[#0F7B6C] mt-0.5">→</span>
+              <span>Monitor early metrics and adjust based on market feedback</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    );
   }
 
   // Group action plan by week

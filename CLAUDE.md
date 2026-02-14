@@ -213,7 +213,8 @@ pnpm-lock.yaml
 ## Recent Commits
 
 ```
-ee1828f Fix readiness level calculation with server-side logic
+e852e53 Show positive "Ready to Execute" message when no blockers/assumptions
+01fbc2f Fix readiness level calculation with server-side logic
 c84e159 Improve message when report needs refresh
 37577ca docs: auto-update MVP documentation [skip ci]
 ad7295b Improve messaging for incomplete assessments with partial domain coverage
@@ -222,6 +223,5 @@ e5e57a0 Fix: Store transformed v3Data with domains in raw_output
 f6a327a Add defensive guards for undefined domains in snapshot components
 57ba0e9 Add fallbacks for undefined config lookups in snapshot components
 71d1644 docs: auto-update MVP documentation [skip ci]
-322679c Fix snapshot GET API to extract V3 data from raw_output
 ```
 <!-- /AUTO:RECENT_CHANGES -->
