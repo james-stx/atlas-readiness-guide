@@ -213,7 +213,8 @@ pnpm-lock.yaml
 ## Recent Commits
 
 ```
-4354848 Always show Report link in sidebar for easy access
+8ff042a Fix snapshot page to recover session from localStorage
+1b37fb3 Always show Report link in sidebar for easy access
 309aa5a Fix navigation between snapshot and workspace pages
 0915e66 docs: auto-update MVP documentation [skip ci]
 77f5144 V4 Readiness Report: Synthesis-first redesign for incomplete assessments
@@ -222,6 +223,5 @@ pnpm-lock.yaml
 b6306e3 Emergency fix: Compact report layout for incomplete assessments
 39ec257 docs: auto-update MVP documentation [skip ci]
 a26daa9 Implement V3 Readiness Report per design spec
-28d021d docs: auto-update MVP documentation [skip ci]
 ```
 <!-- /AUTO:RECENT_CHANGES -->

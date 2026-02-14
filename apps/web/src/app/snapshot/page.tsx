@@ -19,25 +19,34 @@ import type { Snapshot, SnapshotV3 } from '@atlas/types';
 
 export default function SnapshotPage() {
   const router = useRouter();
-  const { session, snapshot: contextSnapshot, generateSnapshot, isLoading } = useAssessment();
+  const { session, snapshot: contextSnapshot, generateSnapshot, isLoading, recoverSession, hasStoredSession } = useAssessment();
 
   // ALL useState hooks must be at the top, before any conditional returns
   const [snapshot, setSnapshot] = useState<Snapshot | null>(contextSnapshot);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isRecovering, setIsRecovering] = useState(false);
 
   // Navigation handler
   const handleBackToWorkspace = () => {
     window.location.href = '/workspace';
   };
 
-  // Redirect if no session
+  // Try to recover session if we don't have one but there's one in storage
   useEffect(() => {
-    if (!session) {
+    if (!session && hasStoredSession && !isRecovering) {
+      setIsRecovering(true);
+      recoverSession().then((recovered) => {
+        if (!recovered) {
+          router.push('/start');
+        }
+        setIsRecovering(false);
+      });
+    } else if (!session && !hasStoredSession) {
       router.push('/start');
     }
-  }, [session, router]);
+  }, [session, hasStoredSession, recoverSession, router, isRecovering]);
 
   // Load existing snapshot (don't auto-generate)
   useEffect(() => {
@@ -100,8 +109,8 @@ export default function SnapshotPage() {
     }
   };
 
-  // Loading state
-  if (!session || isGenerating || isLoading) {
+  // Loading state (including session recovery)
+  if (!session || isGenerating || isLoading || isRecovering) {
     return (
       <div className="min-h-screen bg-[#FAF9F7]">
         <div className="max-w-[720px] mx-auto px-6 py-12">
