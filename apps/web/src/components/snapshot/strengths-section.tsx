@@ -17,8 +17,11 @@ const DOMAIN_LABELS: Record<string, string> = {
 };
 
 export function StrengthsSection({ strengths, className }: StrengthsSectionProps) {
+  // Guard against undefined array
+  const safeStrengths = strengths || [];
+
   // Group by domain
-  const groupedStrengths = strengths.reduce((acc, strength) => {
+  const groupedStrengths = safeStrengths.reduce((acc, strength) => {
     if (!acc[strength.domain]) {
       acc[strength.domain] = [];
     }

@@ -17,6 +17,9 @@ const DOMAIN_LABELS: Record<string, string> = {
 };
 
 export function AssumptionsSection({ assumptions, className }: AssumptionsSectionProps) {
+  // Guard against undefined array
+  const safeAssumptions = assumptions || [];
+
   return (
     <div className={cn('bg-white rounded-lg border border-[#E8E6E1] p-6', className)}>
       <h3 className="text-[11px] font-medium uppercase tracking-wide text-[#D9730D] mb-1">
@@ -24,11 +27,11 @@ export function AssumptionsSection({ assumptions, className }: AssumptionsSectio
       </h3>
       <p className="text-[12px] text-[#9B9A97] mb-4">Areas that need verification before major investment</p>
 
-      {assumptions.length === 0 ? (
+      {safeAssumptions.length === 0 ? (
         <p className="text-[13px] text-[#9B9A97] italic">No assumptions requiring validation.</p>
       ) : (
         <div className="space-y-4">
-          {assumptions.map((assumption, index) => (
+          {safeAssumptions.map((assumption, index) => (
             <div
               key={index}
               className="p-4 rounded-lg bg-[#FAEBDD] border-l-[3px] border-[#D9730D]"

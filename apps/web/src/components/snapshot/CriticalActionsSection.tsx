@@ -22,8 +22,12 @@ export function CriticalActionsSection({
   assumptions,
   className,
 }: CriticalActionsSectionProps) {
-  const hasCriticalActions = criticalActions.length > 0;
-  const hasAssumptions = assumptions.length > 0;
+  // Guard against undefined arrays
+  const safeActions = criticalActions || [];
+  const safeAssumptions = assumptions || [];
+
+  const hasCriticalActions = safeActions.length > 0;
+  const hasAssumptions = safeAssumptions.length > 0;
 
   if (!hasCriticalActions && !hasAssumptions) {
     return null;
@@ -39,7 +43,7 @@ export function CriticalActionsSection({
               Critical Actions
             </h3>
             <span className="text-[12px] text-[#9B9A97]">
-              {criticalActions.length} item{criticalActions.length !== 1 ? 's' : ''}
+              {safeActions.length} item{safeActions.length !== 1 ? 's' : ''}
             </span>
           </div>
           <p className="text-[12px] text-[#9B9A97] mb-4">
@@ -47,7 +51,7 @@ export function CriticalActionsSection({
           </p>
 
           <div className="space-y-3">
-            {criticalActions.map((action, index) => (
+            {safeActions.map((action, index) => (
               <CriticalActionCard
                 key={index}
                 action={action}
@@ -66,7 +70,7 @@ export function CriticalActionsSection({
               Assumptions to Validate
             </h3>
             <span className="text-[12px] text-[#9B9A97]">
-              {assumptions.length} item{assumptions.length !== 1 ? 's' : ''}
+              {safeAssumptions.length} item{safeAssumptions.length !== 1 ? 's' : ''}
             </span>
           </div>
           <p className="text-[12px] text-[#9B9A97] mb-4">
@@ -74,7 +78,7 @@ export function CriticalActionsSection({
           </p>
 
           <div className="space-y-3">
-            {assumptions.map((assumption, index) => (
+            {safeAssumptions.map((assumption, index) => (
               <AssumptionCard key={index} assumption={assumption} />
             ))}
           </div>

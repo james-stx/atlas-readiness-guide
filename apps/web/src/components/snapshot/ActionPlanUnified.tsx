@@ -24,16 +24,21 @@ export function ActionPlanUnified({
   actionPlan,
   className,
 }: ActionPlanUnifiedProps) {
-  const hasBlockers = criticalActions.length > 0;
-  const hasAssumptions = assumptions.length > 0;
-  const hasRoadmap = actionPlan.length > 0;
+  // Guard against undefined arrays
+  const safeActions = criticalActions || [];
+  const safeAssumptions = assumptions || [];
+  const safeActionPlan = actionPlan || [];
+
+  const hasBlockers = safeActions.length > 0;
+  const hasAssumptions = safeAssumptions.length > 0;
+  const hasRoadmap = safeActionPlan.length > 0;
 
   if (!hasBlockers && !hasAssumptions && !hasRoadmap) {
     return null;
   }
 
   // Group action plan by week
-  const planByWeek = actionPlan.reduce((acc, item) => {
+  const planByWeek = safeActionPlan.reduce((acc, item) => {
     const weekKey = item.week >= 3 ? 3 : item.week;
     if (!acc[weekKey]) {
       acc[weekKey] = [];
@@ -59,12 +64,12 @@ export function ActionPlanUnified({
               </p>
             </div>
             <span className="text-[12px] text-[#9B9A97]">
-              {criticalActions.length} item{criticalActions.length !== 1 ? 's' : ''}
+              {safeActions.length} item{safeActions.length !== 1 ? 's' : ''}
             </span>
           </div>
 
           <div className="space-y-4">
-            {criticalActions.map((action, index) => (
+            {safeActions.map((action, index) => (
               <div
                 key={index}
                 className="bg-[#FBE4E4] rounded-lg p-4 border-l-4 border-[#E03E3E]"
@@ -109,12 +114,12 @@ export function ActionPlanUnified({
               </p>
             </div>
             <span className="text-[12px] text-[#9B9A97]">
-              {assumptions.length} item{assumptions.length !== 1 ? 's' : ''}
+              {safeAssumptions.length} item{safeAssumptions.length !== 1 ? 's' : ''}
             </span>
           </div>
 
           <div className="space-y-4">
-            {assumptions.map((assumption, index) => (
+            {safeAssumptions.map((assumption, index) => (
               <div
                 key={index}
                 className="bg-[#FAEBDD] rounded-lg p-4 border-l-4 border-[#D9730D]"

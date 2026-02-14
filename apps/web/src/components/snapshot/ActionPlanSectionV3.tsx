@@ -24,12 +24,15 @@ const WEEK_LABELS: Record<number, { title: string; subtitle: string }> = {
 };
 
 export function ActionPlanSectionV3({ actionPlan, className }: ActionPlanSectionV3Props) {
-  if (actionPlan.length === 0) {
+  // Guard against undefined array
+  const safePlan = actionPlan || [];
+
+  if (safePlan.length === 0) {
     return null;
   }
 
   // Group by week, combining weeks 3 and 4
-  const planByWeek = actionPlan.reduce((acc, item) => {
+  const planByWeek = safePlan.reduce((acc, item) => {
     const weekKey = item.week >= 3 ? 3 : item.week;
     if (!acc[weekKey]) {
       acc[weekKey] = [];

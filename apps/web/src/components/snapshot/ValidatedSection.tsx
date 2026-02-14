@@ -17,8 +17,11 @@ const DOMAIN_LABELS: Record<DomainType, string> = {
 };
 
 export function ValidatedSection({ strengths, className }: ValidatedSectionProps) {
+  // Guard against undefined array
+  const safeStrengths = strengths || [];
+
   // Group by domain
-  const groupedStrengths = strengths.reduce((acc, strength) => {
+  const groupedStrengths = safeStrengths.reduce((acc, strength) => {
     if (!acc[strength.domain]) {
       acc[strength.domain] = [];
     }

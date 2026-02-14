@@ -48,13 +48,17 @@ const IMPORTANCE_CONFIG: Record<GapImportance, {
 };
 
 export function AttentionSection({ gaps, assumptions, className }: AttentionSectionProps) {
-  // Group gaps by importance
-  const criticalGaps = gaps.filter(g => g.importance === 'critical');
-  const importantGaps = gaps.filter(g => g.importance === 'important');
-  const niceToHaveGaps = gaps.filter(g => g.importance === 'nice-to-have');
+  // Guard against undefined arrays
+  const safeGaps = gaps || [];
+  const safeAssumptions = assumptions || [];
 
-  const hasGaps = gaps.length > 0;
-  const hasAssumptions = assumptions.length > 0;
+  // Group gaps by importance
+  const criticalGaps = safeGaps.filter(g => g.importance === 'critical');
+  const importantGaps = safeGaps.filter(g => g.importance === 'important');
+  const niceToHaveGaps = safeGaps.filter(g => g.importance === 'nice-to-have');
+
+  const hasGaps = safeGaps.length > 0;
+  const hasAssumptions = safeAssumptions.length > 0;
 
   if (!hasGaps && !hasAssumptions) {
     return (
@@ -104,7 +108,7 @@ export function AttentionSection({ gaps, assumptions, className }: AttentionSect
               Things you believe but haven&apos;t proven
             </p>
             <div className="space-y-3">
-              {assumptions.map((assumption, index) => (
+              {safeAssumptions.map((assumption, index) => (
                 <div
                   key={index}
                   className="bg-white border border-[#E8E6E1] rounded-lg p-4"

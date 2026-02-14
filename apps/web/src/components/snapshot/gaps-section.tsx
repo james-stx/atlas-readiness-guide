@@ -41,8 +41,11 @@ const IMPORTANCE_STYLES: Record<GapImportance, { bg: string; border: string; bad
 };
 
 export function GapsSection({ gaps, className }: GapsSectionProps) {
+  // Guard against undefined array
+  const safeGaps = gaps || [];
+
   // Sort by importance
-  const sortedGaps = [...gaps].sort((a, b) => {
+  const sortedGaps = [...safeGaps].sort((a, b) => {
     const order: Record<GapImportance, number> = {
       critical: 0,
       important: 1,
