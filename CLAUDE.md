@@ -213,7 +213,9 @@ pnpm-lock.yaml
 ## Recent Commits
 
 ```
-1b3b003 Allow chatting on completed sessions
+a58a135 Fix domain transition error handling
+95896ae Allow chatting on completed sessions
+04343e3 docs: auto-update MVP documentation [skip ci]
 1c7353d Fix snapshot page to recover session from localStorage
 1b37fb3 Always show Report link in sidebar for easy access
 309aa5a Fix navigation between snapshot and workspace pages
@@ -221,7 +223,5 @@ pnpm-lock.yaml
 77f5144 V4 Readiness Report: Synthesis-first redesign for incomplete assessments
 4401590 Fix: Convert Continue Assessment link to button with router.push
 2180a49 Compact report layout: dots instead of bars, add preliminary insights
-b6306e3 Emergency fix: Compact report layout for incomplete assessments
-39ec257 docs: auto-update MVP documentation [skip ci]
 ```
 <!-- /AUTO:RECENT_CHANGES -->

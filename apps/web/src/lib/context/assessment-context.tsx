@@ -375,6 +375,8 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
                   type: 'UPDATE_DOMAIN',
                   payload: parsed.domain,
                 });
+                // Mark that we had a successful domain change (counts as valid response)
+                assistantContent = assistantContent || '[Domain transition]';
               } else if (parsed.type === 'complete') {
                 receivedComplete = true;
                 // Add final assistant message

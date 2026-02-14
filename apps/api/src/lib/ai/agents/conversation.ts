@@ -372,5 +372,11 @@ You just recorded the user's input. Now acknowledge what they shared and continu
       type: 'error',
       content: message,
     };
+
+    // Always send complete event so client knows stream is done
+    yield {
+      type: 'complete',
+      data: { message: null, error: true },
+    };
   }
 }
