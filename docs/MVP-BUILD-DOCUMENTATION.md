@@ -210,6 +210,21 @@ After completing an assessment and viewing their report, users can continue chat
 3. Critical actions and assumptions with source traceability
 4. Complete action plan and export options
 
+**Assessment Completion Flow - Enhanced Guidance**
+
+4. **Progress Tracking with Domain Awareness**:
+   - User sees overall progress percentage
+   - When 60% topic threshold is reached but domain coverage incomplete:
+     - Progress bar turns amber
+     - Clear messaging shows which domains need more topics
+     - UnlockPreview shows "Almost Ready to Unlock" with specific guidance
+   - Example: User with 64% coverage missing Operations/Financials sees exactly what's needed
+
+5. **Domain-Specific Guidance**:
+   - System identifies domains with <2 topics covered
+   - Provides domain names in user-friendly format (e.g., "Go-to-Market" not "gtm")
+   - Prioritizes domains in logical order: Market, Product, Go-to-Market, Operations, Financials
+
 ### Auto-Navigation Behavior
 
 **Auto-Navigation Behavior:**
@@ -381,6 +396,26 @@ The readiness report implements a comprehensive visual design system:
 - Domain-by-domain coverage visualization
 - Guidance on which domains need attention
 - Visual indicators for domains meeting minimum coverage
+
+**Assessment Progress States**
+
+The assessment progress component shows different states based on completion:
+
+- **In Progress**: Shows topic count and percentage, with progress bar toward 60% threshold
+- **Topics Met, Domains Incomplete**: Progress bar turns amber with message "Need 2+ topics in X domains" instead of "Threshold met!"
+- **Fully Complete**: Ready for full report generation
+
+**Progress Bar Logic**:
+- Tracks progress toward 60% topic coverage
+- Changes color to amber when topics are sufficient but domain coverage is incomplete
+- Shows specific domain requirements: "Need 2+ topics in [domain count] domain(s)"
+- Threshold label displays as "60% + all domains" for clarity
+
+**UnlockPreview Messaging**:
+- **Standard state**: "Complete Your Assessment to Unlock"
+- **Almost ready state**: "Almost Ready to Unlock" when 60% topics met but domains incomplete
+- Shows specific domains needing work: "Almost there! Add 2+ topics to [Domain Name] to unlock your full report"
+- Color-coded messaging (amber for almost ready vs standard gray)
 
 ### EarlySignals
 - Cross-domain pattern display with type classification:
@@ -1628,41 +1663,3 @@ If something breaks:
 3. Send messages that capture business inputs
 4. Confirm toast notifications appear for each captured input
 5. Check domain pills update status as topics are covered
-6. Verify current domain highlighting follows conversation flow
-
-**Readiness Panel**:
-1. Click "View Details" to open progress panel
-2. Test domain accordion expand/collapse functionality
-3. Verify topic lists show correct coverage status
-4. Check confidence indicators match captured inputs
-5. Test "Generate Snapshot" button appears when ready
-6. Verify panel closes with X button, Escape key, or back button
-
-**Responsive Behavior**:
-1. Test progress header layout on mobile vs desktop
-2. Verify toast notifications position correctly on small screens
-3. Check readiness panel becomes full-screen on mobile
-4. Test touch interactions on domain pills and accordions
-
-**Testing Topic Selection:**
-1. Navigate to any domain with topic cards
-2. Click 'Talk to Atlas' on a topic
-3. Verify chat opens and automatically sends "Let's talk about: [Topic Name]"
-4. Verify Atlas responds immediately with topic-relevant content
-5. Test with different topics to ensure consistent behavior
-
-**Testing AI Response Consistency**: When testing conversations, verify that users always receive text responses even when the AI primarily uses tools. If you notice silent responses where only tool execution occurs, this should trigger the automatic fallback mechanism to generate a follow-up conversational response.
-
-### Progress Tracking Issues
-
-**Problem**: Progress not updating when user provides inputs
-- Check browser network tab for `input` SSE events during conversation
-- Verify tool execution is working by looking for `recordInput` calls in API logs
-- Ensure question IDs in `apps/web/src/lib/progress.ts` match those in `apps/api/src/lib/ai/prompts/domains.ts`
-
-**Problem**: Domain transition not working
-- Look for `domain_change` SSE events in network tab
-- Check that `transitionDomain` tool is being called when domain topics are covered
-- Verify single-step execution allows sufficient tool execution in conversation flow
-
-**Progress Tracking Issues
