@@ -375,7 +375,7 @@ export async function POST(request: NextRequest) {
         gaps: dbGaps,
         next_steps: dbNextSteps,
         raw_output: JSON.stringify({
-          v3: generatedV3Snapshot,
+          v3: v3Data,  // Store the transformed v3Data with domains, not raw AI output
           key_stats: dbKeyStats,
           readiness_level: generatedV3Snapshot.readinessLevel || 'not_ready',
           verdict_summary: generatedV3Snapshot.verdictSummary || 'Assessment incomplete',
