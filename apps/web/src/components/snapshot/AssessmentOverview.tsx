@@ -223,7 +223,7 @@ function ReadinessStatus({
   topicsTotal: number;
   domains: Record<DomainType, DomainResult>;
 }) {
-  const config = READINESS_CONFIG[readinessLevel];
+  const config = READINESS_CONFIG[readinessLevel] || READINESS_CONFIG.not_ready;
 
   return (
     <div>
@@ -249,7 +249,7 @@ function ReadinessStatus({
       <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-[13px]">
         {DOMAIN_ORDER.map((domainKey) => {
           const domain = domains[domainKey];
-          const confConfig = CONFIDENCE_CONFIG[domain.confidence_level];
+          const confConfig = CONFIDENCE_CONFIG[domain.confidence_level] || CONFIDENCE_CONFIG.low;
 
           return (
             <div key={domainKey} className="flex items-center gap-2">

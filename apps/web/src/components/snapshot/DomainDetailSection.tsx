@@ -60,7 +60,7 @@ export function DomainDetailSection({
   domainResult,
   className,
 }: DomainDetailSectionProps) {
-  const confConfig = CONFIDENCE_CONFIG[domainResult.confidence_level];
+  const confConfig = CONFIDENCE_CONFIG[domainResult.confidence_level] || CONFIDENCE_CONFIG.low;
   const { topics_covered, topics_total, topics } = domainResult;
 
   // Separate covered and uncovered topics

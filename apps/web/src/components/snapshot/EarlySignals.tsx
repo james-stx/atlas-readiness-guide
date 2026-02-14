@@ -68,7 +68,7 @@ export function EarlySignals({ signals, className }: EarlySignalsProps) {
       {/* Signals */}
       <div className="space-y-4">
         {signals.map((signal, index) => {
-          const config = SIGNAL_CONFIG[signal.type];
+          const config = SIGNAL_CONFIG[signal.type] || SIGNAL_CONFIG.unknown;
 
           return (
             <div

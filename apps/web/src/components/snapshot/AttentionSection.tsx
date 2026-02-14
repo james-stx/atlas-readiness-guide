@@ -147,7 +147,7 @@ export function AttentionSection({ gaps, assumptions, className }: AttentionSect
 }
 
 function GapGroup({ gaps, importance }: { gaps: Gap[]; importance: GapImportance }) {
-  const config = IMPORTANCE_CONFIG[importance];
+  const config = IMPORTANCE_CONFIG[importance] || IMPORTANCE_CONFIG['nice-to-have'];
 
   return (
     <div>

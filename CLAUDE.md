@@ -213,7 +213,8 @@ pnpm-lock.yaml
 ## Recent Commits
 
 ```
-23eb205 Fix snapshot GET API to extract V3 data from raw_output
+291008e Add fallbacks for undefined config lookups in snapshot components
+322679c Fix snapshot GET API to extract V3 data from raw_output
 a42948e Fix domain transition error handling
 17b5605 docs: auto-update MVP documentation [skip ci]
 95896ae Allow chatting on completed sessions
@@ -222,6 +223,5 @@ a42948e Fix domain transition error handling
 1b37fb3 Always show Report link in sidebar for easy access
 309aa5a Fix navigation between snapshot and workspace pages
 0915e66 docs: auto-update MVP documentation [skip ci]
-77f5144 V4 Readiness Report: Synthesis-first redesign for incomplete assessments
 ```
 <!-- /AUTO:RECENT_CHANGES -->

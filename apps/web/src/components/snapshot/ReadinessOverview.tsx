@@ -78,7 +78,7 @@ export function ReadinessOverview({
 }: ReadinessOverviewProps) {
   // Default to ready_with_caveats if not provided (for backward compatibility)
   const level = readinessLevel || 'ready_with_caveats';
-  const config = READINESS_CONFIG[level];
+  const config = READINESS_CONFIG[level] || READINESS_CONFIG.not_ready;
 
   return (
     <div className={cn('bg-white rounded-lg border border-[#E8E6E1] p-6', className)}>
