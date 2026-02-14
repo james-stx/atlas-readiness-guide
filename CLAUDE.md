@@ -213,7 +213,9 @@ pnpm-lock.yaml
 ## Recent Commits
 
 ```
-a58a135 Fix domain transition error handling
+23eb205 Fix snapshot GET API to extract V3 data from raw_output
+a42948e Fix domain transition error handling
+17b5605 docs: auto-update MVP documentation [skip ci]
 95896ae Allow chatting on completed sessions
 04343e3 docs: auto-update MVP documentation [skip ci]
 1c7353d Fix snapshot page to recover session from localStorage
@@ -221,7 +223,5 @@ a58a135 Fix domain transition error handling
 309aa5a Fix navigation between snapshot and workspace pages
 0915e66 docs: auto-update MVP documentation [skip ci]
 77f5144 V4 Readiness Report: Synthesis-first redesign for incomplete assessments
-4401590 Fix: Convert Continue Assessment link to button with router.push
-2180a49 Compact report layout: dots instead of bars, add preliminary insights
 ```
 <!-- /AUTO:RECENT_CHANGES -->
