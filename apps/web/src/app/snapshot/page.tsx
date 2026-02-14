@@ -5,9 +5,14 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAssessment } from '@/lib/context/assessment-context';
 import { getSnapshot } from '@/lib/api-client';
+// V4 Components for incomplete assessments
+import { AssessmentProgress } from '@/components/snapshot/AssessmentProgress';
+import { EarlySignals } from '@/components/snapshot/EarlySignals';
+import { RecommendedTopics } from '@/components/snapshot/RecommendedTopics';
+import { UnlockPreview } from '@/components/snapshot/UnlockPreview';
+// Components for complete assessments
 import { AssessmentOverview } from '@/components/snapshot/AssessmentOverview';
 import { ActionPlanUnified } from '@/components/snapshot/ActionPlanUnified';
-import { PreliminaryInsights } from '@/components/snapshot/PreliminaryInsights';
 import { ExportSection } from '@/components/snapshot/export-section';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, Loader2, Compass } from 'lucide-react';
@@ -201,38 +206,70 @@ export default function SnapshotPage() {
 
         {/* Report Content */}
         <div className="space-y-6">
-          {/* Assessment Overview - Always shown */}
-          <AssessmentOverview
-            assessmentStatus={v3.assessment_status}
-            coveragePercentage={v3.coverage_percentage}
-            topicsCovered={v3.topics_covered}
-            topicsTotal={v3.topics_total}
-            readinessLevel={v3.readiness_level}
-            verdictSummary={v3.verdict_summary}
-            domains={v3.domains}
-          />
+          {isIncomplete ? (
+            <>
+              {/* V4 Incomplete Assessment Layout */}
 
-          {/* For incomplete: show preliminary insights */}
-          {isIncomplete && (
-            <PreliminaryInsights domains={v3.domains} />
+              {/* Section 1: Assessment Progress */}
+              <AssessmentProgress
+                coveragePercentage={v3.coverage_percentage}
+                topicsCovered={v3.topics_covered}
+                topicsTotal={v3.topics_total}
+                domains={v3.domains}
+              />
+
+              {/* Section 2: Early Signals (cross-domain synthesis) */}
+              {v3.early_signals && v3.early_signals.length > 0 && (
+                <EarlySignals signals={v3.early_signals} />
+              )}
+
+              {/* Section 3: Recommended Next Topics */}
+              {v3.recommended_topics && v3.recommended_topics.length > 0 && (
+                <RecommendedTopics recommendations={v3.recommended_topics} />
+              )}
+
+              {/* Section 4: What You'll Unlock + CTA */}
+              <UnlockPreview />
+
+              {/* Section 5: Export (simplified for incomplete) */}
+              <ExportSection
+                sessionId={session.id}
+                email={session.email}
+                keyStats={snapshot.key_stats}
+                readinessLevel={v3.readiness_level}
+              />
+            </>
+          ) : (
+            <>
+              {/* Complete Assessment Layout */}
+
+              {/* Section 1: Readiness Verdict */}
+              <AssessmentOverview
+                assessmentStatus={v3.assessment_status}
+                coveragePercentage={v3.coverage_percentage}
+                topicsCovered={v3.topics_covered}
+                topicsTotal={v3.topics_total}
+                readinessLevel={v3.readiness_level}
+                verdictSummary={v3.verdict_summary}
+                domains={v3.domains}
+              />
+
+              {/* Section 2: Action Plan (blockers, assumptions, 30-day plan) */}
+              <ActionPlanUnified
+                criticalActions={v3.critical_actions}
+                assumptions={v3.assumptions}
+                actionPlan={v3.action_plan}
+              />
+
+              {/* Section 3: Export */}
+              <ExportSection
+                sessionId={session.id}
+                email={session.email}
+                keyStats={snapshot.key_stats}
+                readinessLevel={v3.readiness_level}
+              />
+            </>
           )}
-
-          {/* For complete: show full action plan */}
-          {!isIncomplete && (
-            <ActionPlanUnified
-              criticalActions={v3.critical_actions}
-              assumptions={v3.assumptions}
-              actionPlan={v3.action_plan}
-            />
-          )}
-
-          {/* Export Section */}
-          <ExportSection
-            sessionId={session.id}
-            email={session.email}
-            keyStats={snapshot.key_stats}
-            readinessLevel={v3.readiness_level}
-          />
         </div>
 
         {/* Footer */}

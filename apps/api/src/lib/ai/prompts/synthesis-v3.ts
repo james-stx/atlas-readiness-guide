@@ -172,7 +172,32 @@ For each of the 25 topics, determine:
    - "partial": Some evidence but incomplete
    - "not_addressed": No evidence or mentioned as unknown
 
-## Critical Actions & Assumptions
+## For INCOMPLETE Assessments: Cross-Domain Synthesis
+
+When assessment is incomplete, generate synthesis outputs that transform partial data into insights:
+
+### early_signals (2-4 items)
+DO NOT repeat individual topic insights. Instead, find PATTERNS across covered topics:
+
+- **strength**: Positive pattern emerging from multiple topics (e.g., "Strong product-market foundation" from Market + Product alignment)
+- **pattern**: Interesting correlation or trend (e.g., "Existing traction validates demand but GTM is undefined")
+- **risk**: Potential issue visible from partial data (e.g., "Financial assumptions appear optimistic without GTM clarity")
+- **unknown**: Important things that can't be assessed due to missing domains
+
+Each signal MUST include:
+- derived_from: Which topic IDs contributed to this insight
+- blocked_by: Which domains need coverage for deeper analysis
+- implication: The "so what?" - why this pattern matters for their expansion
+
+### recommended_topics (3 items)
+Based on current coverage, recommend the 3 MOST VALUABLE topics to cover next:
+
+- Prioritize topics that will unlock cross-domain insights
+- Consider dependencies (e.g., GTM strategy enables revenue projections)
+- Explain WHY each topic matters given what they've already covered
+- List what completing each topic will UNLOCK
+
+## Critical Actions & Assumptions (for ASSESSABLE only)
 
 Generate actions WITH source traceability:
 - Link each critical action to a specific topic (domain + topic label + status)
@@ -185,7 +210,8 @@ Generate actions WITH source traceability:
 - If a topic wasn't discussed, mark it as "not_covered"
 - If information is vague, mark confidence as LOW
 - Critical gaps come from: not covered topics AND low confidence topics
-- Assumptions come from: medium confidence topics where user made claims without evidence`;
+- Assumptions come from: medium confidence topics where user made claims without evidence
+- For incomplete assessments: SYNTHESIZE patterns, don't summarize topics`;
 
 // Truncate text to max length
 function truncate(text: string, maxLen: number): string {
@@ -227,14 +253,25 @@ export function buildSynthesisV3UserPrompt(inputs: Input[]): string {
   prompt += `# Summary\n`;
   prompt += `Coverage: ${coveredCount}/25 topics (${coveragePercent}%)\n\n`;
 
+  const isIncomplete = coveragePercent < 60;
+
   prompt += `# Instructions\n`;
   prompt += `Generate a readiness report with:\n`;
   prompt += `1. topicResults: Array with one entry per COVERED topic (topicId, topicLabel, domain, status="covered", confidence, keyInsight)\n`;
-  prompt += `2. criticalActions: Array of blockers (priority 1-5, title, sourceDomain, sourceTopic, sourceStatus, description, action)\n`;
-  prompt += `3. assumptions: Array of things to validate (title, sourceDomain, sourceTopic, description, validation)\n`;
-  prompt += `4. actionPlan: 30-day plan items (week 1-4, action, sourceDomain, sourceTopic, unblocks)\n`;
-  prompt += `5. readinessLevel: "ready", "ready_with_caveats", or "not_ready" (if ${coveragePercent}% >= 60)\n`;
-  prompt += `6. verdictSummary: One sentence summary\n`;
+
+  if (isIncomplete) {
+    prompt += `\n## INCOMPLETE ASSESSMENT - Generate synthesis outputs:\n`;
+    prompt += `2. earlySignals: 2-4 cross-domain patterns (type: strength|pattern|risk|unknown, title, description, derivedFrom: topic IDs, blockedBy: domain names, implication)\n`;
+    prompt += `3. recommendedTopics: 3 highest-value topics to cover next (domain, topicId, topicLabel, impact: high|medium, why, unlocks: array of strings)\n`;
+    prompt += `\nIMPORTANT: earlySignals should be CROSS-DOMAIN PATTERNS, not per-topic summaries. Find connections between what's covered.\n`;
+    prompt += `\nSkip criticalActions, assumptions, actionPlan for incomplete assessments.\n`;
+  } else {
+    prompt += `2. criticalActions: Array of blockers (priority 1-5, title, sourceDomain, sourceTopic, sourceStatus, description, action)\n`;
+    prompt += `3. assumptions: Array of things to validate (title, sourceDomain, sourceTopic, description, validation)\n`;
+    prompt += `4. actionPlan: 30-day plan items (week 1-4, action, sourceDomain, sourceTopic, unblocks)\n`;
+    prompt += `5. readinessLevel: "ready", "ready_with_caveats", or "not_ready"\n`;
+    prompt += `6. verdictSummary: One sentence summary\n`;
+  }
 
   return prompt;
 }

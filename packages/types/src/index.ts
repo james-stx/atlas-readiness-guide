@@ -221,6 +221,34 @@ export interface SnapshotV3 {
   critical_actions: CriticalAction[];
   assumptions: AssumptionV3[];
   action_plan: ActionPlanItem[];
+
+  // V4 additions for incomplete assessments (synthesis-first)
+  early_signals?: CrossDomainSignal[];
+  recommended_topics?: TopicRecommendation[];
+}
+
+// ============================================
+// V4 Synthesis Types (for incomplete assessments)
+// ============================================
+
+export type SignalType = 'strength' | 'pattern' | 'risk' | 'unknown';
+
+export interface CrossDomainSignal {
+  type: SignalType;
+  title: string;
+  description: string;
+  derived_from: string[];      // topic IDs that contributed to this signal
+  blocked_by?: DomainType[];   // domains that need coverage for deeper analysis
+  implication: string;         // the "so what?" - why this matters
+}
+
+export interface TopicRecommendation {
+  domain: DomainType;
+  topic_id: string;
+  topic_label: string;
+  impact: 'high' | 'medium';
+  why: string;                 // why this topic matters given current coverage
+  unlocks: string[];           // what completing this topic will enable
 }
 
 // ============================================

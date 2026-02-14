@@ -40,6 +40,30 @@ const snapshotV3Schema = z.object({
     })
   ).default([]),
 
+  // V4: Cross-domain signals for incomplete assessments
+  earlySignals: z.array(
+    z.object({
+      type: z.enum(['strength', 'pattern', 'risk', 'unknown']),
+      title: z.string(),
+      description: z.string(),
+      derivedFrom: z.array(z.string()),
+      blockedBy: z.array(z.enum(['market', 'product', 'gtm', 'operations', 'financials'])).optional(),
+      implication: z.string(),
+    })
+  ).default([]),
+
+  // V4: Recommended next topics for incomplete assessments
+  recommendedTopics: z.array(
+    z.object({
+      domain: z.enum(['market', 'product', 'gtm', 'operations', 'financials']),
+      topicId: z.string(),
+      topicLabel: z.string(),
+      impact: z.enum(['high', 'medium']),
+      why: z.string(),
+      unlocks: z.array(z.string()),
+    })
+  ).default([]),
+
   // Critical actions with source traceability
   criticalActions: z.array(
     z.object({
@@ -316,6 +340,23 @@ export async function POST(request: NextRequest) {
         source_domain: ap.sourceDomain,
         source_topic: ap.sourceTopic,
         unblocks: ap.unblocks,
+      })),
+      // V4 fields for incomplete assessments
+      early_signals: (generatedV3Snapshot.earlySignals || []).map((es: { type: string; title: string; description: string; derivedFrom: string[]; blockedBy?: DomainType[]; implication: string }) => ({
+        type: es.type,
+        title: es.title,
+        description: es.description,
+        derived_from: es.derivedFrom,
+        blocked_by: es.blockedBy,
+        implication: es.implication,
+      })),
+      recommended_topics: (generatedV3Snapshot.recommendedTopics || []).map((rt: { domain: DomainType; topicId: string; topicLabel: string; impact: string; why: string; unlocks: string[] }) => ({
+        domain: rt.domain,
+        topic_id: rt.topicId,
+        topic_label: rt.topicLabel,
+        impact: rt.impact,
+        why: rt.why,
+        unlocks: rt.unlocks,
       })),
     };
 

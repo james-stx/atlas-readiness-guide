@@ -117,6 +117,7 @@ docs/product/central-console-feedback-v1.md
 docs/READINESS-REPORT-V2-SPEC.md
 docs/READINESS-REPORT-V2-WIREFRAMES.md
 docs/READINESS-REPORT-V3-REDESIGN.md
+docs/READINESS-REPORT-V4-COMPREHENSIVE-REDESIGN.md
 docs/ux
 docs/UX-UI-Design-Specifications.md
 docs/ux/comprehensive-ux-audit-v1.md
@@ -136,7 +137,6 @@ packages/types/src
 packages/types/src/index.ts
 packages/types/tsconfig.json
 pnpm-lock.yaml
-pnpm-workspace.yaml
 ```
 <!-- /AUTO:STRUCTURE -->
 
@@ -165,7 +165,7 @@ pnpm-workspace.yaml
 - **components/workspace/chat/** (4): ChatHeader,ChatPanel,InputCapturedIndicator,TopicTransitionBanner
 - **components/workspace/mobile/** (1): MobileTabBar
 - **components/ui/** (13): button,confidence-badge,confirm-dialog,error-card,input,network-banner,overflow-menu,progress-bar-mini,progress,skeleton-loader,skeleton,status-indicator,tooltip
-- **components/snapshot/** (17): ActionPlanSection,ActionPlanSectionV3,ActionPlanUnified,AssessmentOverview,assumptions-section,AttentionSection,coverage-overview,CriticalActionsSection,DomainDetailSection,export-section,gaps-section,key-findings,next-steps-section,PreliminaryInsights,ReadinessOverview,strengths-section,ValidatedSection
+- **components/snapshot/** (21): ActionPlanSection,ActionPlanSectionV3,ActionPlanUnified,AssessmentOverview,AssessmentProgress,assumptions-section,AttentionSection,coverage-overview,CriticalActionsSection,DomainDetailSection,EarlySignals,export-section,gaps-section,key-findings,next-steps-section,PreliminaryInsights,ReadinessOverview,RecommendedTopics,strengths-section,UnlockPreview,ValidatedSection
 
 <!-- /AUTO:COMPONENTS -->
 
@@ -213,7 +213,8 @@ pnpm-workspace.yaml
 ## Recent Commits
 
 ```
-33a5937 Fix: Convert Continue Assessment link to button with router.push
+091370f V4 Readiness Report: Synthesis-first redesign for incomplete assessments
+4401590 Fix: Convert Continue Assessment link to button with router.push
 2180a49 Compact report layout: dots instead of bars, add preliminary insights
 b6306e3 Emergency fix: Compact report layout for incomplete assessments
 39ec257 docs: auto-update MVP documentation [skip ci]
@@ -222,6 +223,5 @@ a26daa9 Implement V3 Readiness Report per design spec
 86d8078 Fix report showing no topic details
 22d615a Fix DB schema - remove all V2 columns from insert
 286e495 Fix DB schema mismatch - remove key_stats column
-70c6aee Fix Haiku schema validation - simplify and add defaults
 ```
 <!-- /AUTO:RECENT_CHANGES -->
