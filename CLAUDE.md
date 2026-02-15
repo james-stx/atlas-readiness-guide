@@ -118,6 +118,8 @@ docs/READINESS-REPORT-V2-SPEC.md
 docs/READINESS-REPORT-V2-WIREFRAMES.md
 docs/READINESS-REPORT-V3-REDESIGN.md
 docs/READINESS-REPORT-V4-COMPREHENSIVE-REDESIGN.md
+docs/READINESS-REPORT-V5-DESIGN-REVIEW.md
+docs/READINESS-REPORT-V5-PRD.md
 docs/ux
 docs/UX-UI-Design-Specifications.md
 docs/ux/comprehensive-ux-audit-v1.md
@@ -135,8 +137,6 @@ packages/types/node_modules
 packages/types/package.json
 packages/types/src
 packages/types/src/index.ts
-packages/types/tsconfig.json
-pnpm-lock.yaml
 ```
 <!-- /AUTO:STRUCTURE -->
 
@@ -213,7 +213,8 @@ pnpm-lock.yaml
 ## Recent Commits
 
 ```
-e852e53 Show positive "Ready to Execute" message when no blockers/assumptions
+156161d docs: Add V5 Readiness Report PRD and Design Review
+c4130c2 Show positive "Ready to Execute" message when no blockers/assumptions
 01fbc2f Fix readiness level calculation with server-side logic
 c84e159 Improve message when report needs refresh
 37577ca docs: auto-update MVP documentation [skip ci]
@@ -222,6 +223,5 @@ e5e57a0 Fix: Store transformed v3Data with domains in raw_output
 84ef3d3 Add guards for undefined arrays in all snapshot components
 f6a327a Add defensive guards for undefined domains in snapshot components
 57ba0e9 Add fallbacks for undefined config lookups in snapshot components
-71d1644 docs: auto-update MVP documentation [skip ci]
 ```
 <!-- /AUTO:RECENT_CHANGES -->
