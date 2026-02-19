@@ -65,15 +65,6 @@ export function Sidebar() {
 
   const reportStatus = getReportStatus();
 
-  // Handle assessment section click
-  const handleAssessmentClick = () => {
-    switchToAssessment();
-    // If no domain selected, select first one
-    if (!selectedDomain) {
-      selectDomain('market');
-    }
-  };
-
   return (
     <nav
       className="flex h-full w-[260px] flex-col bg-[#F7F6F3]"
@@ -82,70 +73,67 @@ export function Sidebar() {
     >
       {/* ─── ASSESSMENT SECTION ─── */}
       <div className="flex-1 overflow-hidden flex flex-col">
-        {/* Section header - clickable */}
-        <button
-          onClick={handleAssessmentClick}
-          className={`w-full text-left px-3 pt-4 pb-2 flex items-center justify-between transition-colors ${
-            activeView === 'assessment' ? 'bg-[#EBEBEA]' : 'hover:bg-[#EBEBEA]/50'
-          }`}
-        >
-          <span className={`text-[11px] font-medium tracking-[0.02em] uppercase ${
-            activeView === 'assessment' ? 'text-[#37352F]' : 'text-[#91918E]'
-          }`}>
+        {/* Section header */}
+        <div className="px-3 pt-4 pb-2 flex items-center justify-between">
+          <span className="text-[11px] font-medium tracking-[0.02em] uppercase text-[#91918E]">
             Assessment
           </span>
           <span className="text-[11px] text-[#91918E]">
             {coveredTopics}/{totalTopics}
           </span>
-        </button>
+        </div>
 
-        {/* Domain list - only show when assessment view is active */}
-        {activeView === 'assessment' && (
-          <div
-            className="flex-1 overflow-y-auto"
-            role="tree"
-            aria-label="Assessment domains"
-          >
-            {DOMAINS.map((domain) => {
-              const dp = progressState.domainProgress[domain.key];
-              const topics = getTopicsForDomain(domain.key);
-              const count = getDomainInputCount(domain.key);
-              const isSelected = selectedDomain === domain.key;
-              const isExpanded = expandedDomains.includes(domain.key);
+        {/* Domain list - always visible */}
+        <div
+          className="flex-1 overflow-y-auto"
+          role="tree"
+          aria-label="Assessment domains"
+        >
+          {DOMAINS.map((domain) => {
+            const dp = progressState.domainProgress[domain.key];
+            const topics = getTopicsForDomain(domain.key);
+            const count = getDomainInputCount(domain.key);
+            const isSelected = selectedDomain === domain.key && activeView === 'assessment';
+            const isExpanded = expandedDomains.includes(domain.key);
 
-              return (
-                <div key={domain.key}>
-                  <SidebarDomainItem
-                    domain={domain.key}
-                    label={domain.label}
-                    status={dp.status}
-                    isSelected={isSelected}
-                    isExpanded={isExpanded}
-                    count={count}
-                    onSelect={() => selectDomain(domain.key)}
-                    onToggleExpand={() => toggleDomainExpand(domain.key)}
-                  />
+            return (
+              <div key={domain.key}>
+                <SidebarDomainItem
+                  domain={domain.key}
+                  label={domain.label}
+                  status={dp.status}
+                  isSelected={isSelected}
+                  isExpanded={isExpanded}
+                  count={count}
+                  onSelect={() => {
+                    selectDomain(domain.key);
+                    switchToAssessment();
+                  }}
+                  onToggleExpand={() => toggleDomainExpand(domain.key)}
+                />
 
-                  {/* Expanded topics */}
-                  {isExpanded && (
-                    <div>
-                      {topics.map((topic) => (
-                        <SidebarTopicItem
-                          key={topic.id}
-                          label={topic.label}
-                          covered={topic.covered}
-                          confidence={topic.confidence}
-                          isSelected={selectedCategory === topic.id}
-                          onClick={() => selectCategory(domain.key, topic.id)}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
+                {/* Expanded topics */}
+                {isExpanded && (
+                  <div>
+                    {topics.map((topic) => (
+                      <SidebarTopicItem
+                        key={topic.id}
+                        label={topic.label}
+                        covered={topic.covered}
+                        confidence={topic.confidence}
+                        isSelected={selectedCategory === topic.id && activeView === 'assessment'}
+                        onClick={() => {
+                          selectCategory(domain.key, topic.id);
+                          switchToAssessment();
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* ─── READINESS REPORT SECTION ─── */}

@@ -213,7 +213,8 @@ packages/types/src
 ## Recent Commits
 
 ```
-35a2eaa feat: Integrate readiness report into workspace with single entry point
+3b16149 fix: Remove duplicate report button and keep Assessment section visible
+376174b feat: Integrate readiness report into workspace with single entry point
 9637e7e docs: Add V5 Readiness Report PRD and Design Review
 f458c5f docs: auto-update MVP documentation [skip ci]
 c4130c2 Show positive "Ready to Execute" message when no blockers/assumptions
@@ -222,6 +223,5 @@ c84e159 Improve message when report needs refresh
 37577ca docs: auto-update MVP documentation [skip ci]
 ad7295b Improve messaging for incomplete assessments with partial domain coverage
 e5e57a0 Fix: Store transformed v3Data with domains in raw_output
-84ef3d3 Add guards for undefined arrays in all snapshot components
 ```
 <!-- /AUTO:RECENT_CHANGES -->
