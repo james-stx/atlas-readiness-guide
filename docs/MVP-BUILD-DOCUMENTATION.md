@@ -173,6 +173,21 @@ A reference for technical terms used throughout this documentation.
 #### 3. Completion and Continued Interaction
 After completing an assessment and viewing their report, users can continue chatting to refine or expand their assessment. The session remains active and accessible for further conversation. Only abandoned sessions prevent continued interaction.
 
+### Report Access Flow
+
+**Updated Flow (Single Entry Point):**
+1. User completes assessment topics in workspace
+2. When ready (60% coverage + 2 topics per domain), 'Readiness Report' appears in sidebar
+3. Click 'Readiness Report' to switch views within workspace
+4. Report opens in main content area (no separate page)
+5. User can switch between 'Assessment' and 'Readiness Report' views via sidebar
+
+**Key Changes:**
+- Report integrated into workspace (no separate /snapshot page)
+- Single sidebar navigation replaces multiple entry points
+- Report status shows in sidebar: progress → ready → generated → needs refresh
+- /snapshot URL redirects to /workspace?view=report
+
 ### Readiness Report Review Flow
 
 1. **Assessment Overview**: Users see overall readiness status with:
@@ -327,6 +342,24 @@ If a user leaves and returns:
 3. **Clear Progress** - Always know where you are in the assessment
 4. **Mobile-First** - Works well on phones (where many founders are)
 5. **Minimal Friction** - Email-only signup, no passwords
+
+### Workspace Layout
+
+**Two-View System:**
+- **Assessment View**: Domain navigation + topic cards + chat panel
+- **Report View**: Full readiness report in main content area
+- **Sidebar Navigation**: Two main sections with view switching
+  - Assessment (expandable domain tree)
+  - Readiness Report (with status indicator)
+
+**Report Integration:**
+- ReportPanel component with 4 states:
+  - Not ready (< 60% coverage)
+  - Ready to generate
+  - Viewing generated report
+  - Needs refresh (assessment changed)
+- Status indicators in sidebar show progress/generation date
+- Stale report detection when assessment changes after generation
 
 ### Auto-Navigation Features
 
@@ -647,6 +680,20 @@ This separation allows users to browse content freely without accidentally trigg
 - Timeout errors are handled gracefully with user-friendly messaging
 - Streaming message cleanup ensures UI state consistency
 
+### View Management
+
+**WorkspaceContext Extensions:**
+- `activeView`: 'assessment' | 'report' state management
+- `reportState`: tracking generation status and staleness
+- `switchToAssessment()` / `switchToReport()` navigation methods
+- URL parameter handling for direct report access
+
+**Component Architecture:**
+- ContentPanel routes based on activeView
+- ReportPanel handles all report states and generation
+- Sidebar shows two-section navigation with view switching
+- URL /snapshot redirects to /workspace?view=report
+
 #### Real-time Communication
 **Real-time Communication**: The SSE (Server-Sent Events) implementation includes robust error handling and buffering of incomplete chunks across TCP packet boundaries to ensure reliable streaming of AI responses and tool execution results.
 
@@ -869,6 +916,26 @@ apps/web/src/components/snapshot/
 **AssessmentOverview**: Dual-metric display with coverage bars and confidence dots, executive summary generation
 
 **DomainDetailSection**: Structured topic cards with requirement status indicators, confidence visualization, and uncovered topic handling
+
+### Key Component Changes
+
+**New Components:**
+- `ReportPanel.tsx` - Integrated report with 4-state management
+
+**Modified Components:**
+- `workspace-context.tsx` - Added activeView state and report tracking
+- `Sidebar.tsx` - Two-section structure with view switching
+- `ContentPanel.tsx` - Routes based on activeView
+- `snapshot/page.tsx` - Now redirects to workspace
+- `TopBar.tsx` - Removed duplicate snapshot CTA
+- `InlineSnapshotCTA.tsx` - Simplified to view link only
+
+**Navigation Flow:**
+```
+/workspace → Assessment view (default)
+/workspace?view=report → Report view
+/snapshot → Redirects to /workspace?view=report
+```
 
 ### UI Component Updates
 
@@ -1359,6 +1426,16 @@ Sends snapshot email to user.
 }
 ```
 
+### URL Parameters
+
+**Workspace View Switching:**
+- `GET /workspace?view=report` - Opens workspace in report view
+- `GET /snapshot` - Redirects to `/workspace?view=report`
+
+**Parameter Handling:**
+- URL parameters cleared after view switch to maintain clean URLs
+- Direct links to report view supported via ?view=report parameter
+
 ---
 
 ## 10. Configuration & Secrets
@@ -1545,96 +1622,4 @@ CREATE TABLE inputs (
 CREATE TABLE snapshots (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   session_id UUID REFERENCES sessions(id) ON DELETE CASCADE,
-  key_findings JSONB NOT NULL,
-  coverage_summary JSONB NOT NULL,
-  strengths JSONB NOT NULL,
-  assumptions JSONB NOT NULL,
-  gaps JSONB NOT NULL,
-  next_steps JSONB NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Indexes for performance
-CREATE INDEX idx_sessions_email ON sessions(email);
-CREATE INDEX idx_messages_session ON messages(session_id);
-CREATE INDEX idx_inputs_session ON inputs(session_id);
-CREATE INDEX idx_snapshots_session ON snapshots(session_id);
-```
-
-#### 4. Create Environment Files
-
-Create `apps/api/.env.local`:
-```
-SUPABASE_URL=your-supabase-url
-SUPABASE_ANON_KEY=your-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-ANTHROPIC_API_KEY=your-anthropic-key
-RESEND_API_KEY=re_test_123
-```
-
-Create `apps/web/.env.local`:
-```
-NEXT_PUBLIC_API_URL=http://localhost:3001
-```
-
-#### 5. Start Development Servers
-
-```bash
-pnpm dev
-```
-
-This starts both apps:
-- Web: http://localhost:3000
-- API: http://localhost:3001
-
-#### 6. Test It Out
-
-1. Open http://localhost:3000
-2. Enter an email address
-3. Start chatting!
-
----
-
-## 12. Deployment & Environments
-
-### Environments
-
-| Environment | Purpose | URLs |
-|-------------|---------|------|
-| Local | Development and testing | localhost:3000, localhost:3001 |
-| Production | Live user-facing | atlas-readiness-guide-web.vercel.app |
-
-### How Deployment Works
-
-1. **Code pushed to GitHub** → triggers Vercel
-2. **Vercel detects changes** → starts build
-3. **Build process**:
-   - Installs dependencies
-   - Compiles TypeScript
-   - Builds Next.js application
-4. **Deploy** → new version goes live
-5. **Zero downtime** → old version serves traffic until new is ready
-
-### Deploying Updates
-
-Simply push to the main branch:
-```bash
-git add .
-git commit -m "Description of changes"
-git push
-```
-
-Vercel automatically deploys within a few minutes.
-
-### Automated Documentation Updates
-
-The repository includes a GitHub Action that automatically updates documentation:
-
-1. **Trigger**: Runs on every push to the main branch
-2. **Process**: 
-   - Detects changed files in the commit
-   - Analyzes changes using Claude API
-   - Generates appropriate documentation updates
-   - Commits updated documentation back to the repository
-3. **Requirements**: Requires `ANTHROPIC_API_KEY` secret to be configured in GitHub repository settings
-4. **Manual execution**: Can also be run locally with `
+  key_findings JSON
