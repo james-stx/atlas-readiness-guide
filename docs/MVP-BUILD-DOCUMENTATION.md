@@ -188,6 +188,22 @@ After completing an assessment and viewing their report, users can continue chat
 - Report status shows in sidebar: progress → ready → generated → needs refresh
 - /snapshot URL redirects to /workspace?view=report
 
+### Report Generation & Navigation Flow
+
+1. User completes assessment topics across domains
+2. Once minimum requirements are met (60% overall + 2 topics per domain), report can be generated
+3. User clicks "Generate Report" button in main content area
+4. System switches to report view automatically
+5. Assessment domain list remains visible in sidebar during report viewing
+6. User can click any domain/topic in sidebar to switch back to assessment view
+7. Report header shows generation status and refresh indicators
+
+**Sidebar Navigation:**
+- Assessment section is always visible with domain/topic tree
+- Clicking domains/topics switches to assessment view automatically
+- Footer shows overall progress bar only
+- No report action buttons in sidebar (moved to main content area)
+
 ### Readiness Report Review Flow
 
 1. **Assessment Overview**: Users see overall readiness status with:
@@ -500,6 +516,20 @@ The assessment progress component shows different states based on completion:
   - Focus: Teal ring (`focus-visible:ring-accent-500`) with matching border
   - Padding: `px-4 py-2.5` for comfortable text entry
 
+### Sidebar Footer
+
+- Contains only overall progress indicator
+- Shows progress percentage and visual progress bar
+- No action buttons (report buttons moved to main content area)
+- Fixed height, minimal design
+
+### Assessment Navigation
+
+- Domain list always visible regardless of current view
+- Assessment section header is static (non-clickable)
+- Clicking any domain or topic automatically switches to assessment view
+- Maintains selection state when switching between views
+
 ### Key Screens
 
 #### Start Page
@@ -693,6 +723,12 @@ This separation allows users to browse content freely without accidentally trigg
 - ReportPanel handles all report states and generation
 - Sidebar shows two-section navigation with view switching
 - URL /snapshot redirects to /workspace?view=report
+
+**Component Interactions:**
+- Simplified sidebar to always show assessment domains
+- Removed duplicate report action buttons from SidebarFooter
+- View switching logic moved to domain/topic selection handlers
+- Report actions centralized in main content area
 
 #### Real-time Communication
 **Real-time Communication**: The SSE (Server-Sent Events) implementation includes robust error handling and buffering of incomplete chunks across TCP packet boundaries to ensure reliable streaming of AI responses and tool execution results.
@@ -1587,39 +1623,4 @@ CREATE TABLE sessions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   email VARCHAR(255) NOT NULL,
   status session_status DEFAULT 'active',
-  current_domain domain_type DEFAULT 'market',
-  recovery_token_hash VARCHAR(255),
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
-  expires_at TIMESTAMPTZ DEFAULT (NOW() + INTERVAL '7 days'),
-  metadata JSONB DEFAULT '{}'
-);
-
--- Messages table
-CREATE TABLE messages (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  session_id UUID REFERENCES sessions(id) ON DELETE CASCADE,
-  role message_role NOT NULL,
-  content TEXT NOT NULL,
-  metadata JSONB DEFAULT '{}',
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Inputs table
-CREATE TABLE inputs (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  session_id UUID REFERENCES sessions(id) ON DELETE CASCADE,
-  domain domain_type NOT NULL,
-  question_id VARCHAR(100) NOT NULL,
-  response TEXT NOT NULL,
-  confidence confidence_level NOT NULL,
-  evidence TEXT,
-  metadata JSONB DEFAULT '{}',
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Snapshots table
-CREATE TABLE snapshots (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  session_id UUID REFERENCES sessions(id) ON DELETE CASCADE,
-  key_findings JSON
+  current_domain domain_type
