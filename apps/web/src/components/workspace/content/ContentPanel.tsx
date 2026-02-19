@@ -6,7 +6,7 @@ import { DOMAIN_TOPICS } from '@/lib/progress';
 import { EmptyState } from './EmptyState';
 import { ContentDomainHeader } from './ContentDomainHeader';
 import { TopicCard } from './TopicCard';
-import { InlineSnapshotCTA } from './InlineSnapshotCTA';
+import { ReportPanel } from '../report/ReportPanel';
 import { useEffect, useRef, useCallback, useMemo } from 'react';
 import { useSkippedTopics } from '@/lib/hooks/use-skipped-topics';
 import type { Input } from '@atlas/types';
@@ -19,6 +19,7 @@ export function ContentPanel() {
     selectCategory,
     discussTopic,
     progressState,
+    activeView,
   } = useWorkspace();
   const { inputs, addInput, session } = useAssessment();
   const { isSkipped, skipTopic, unskipTopic } = useSkippedTopics();
@@ -83,6 +84,11 @@ export function ContentPanel() {
 
     addInput(newInput);
   }, [session, selectedDomain, addInput]);
+
+  // If viewing report, render ReportPanel instead
+  if (activeView === 'report') {
+    return <ReportPanel />;
+  }
 
   return (
     <div

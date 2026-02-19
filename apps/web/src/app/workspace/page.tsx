@@ -1,14 +1,17 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useEffect, useRef } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAssessment } from '@/lib/context/assessment-context';
+import { useWorkspace } from '@/lib/context/workspace-context';
 import { WorkspaceLayout } from '@/components/workspace/WorkspaceLayout';
 import { Loader2 } from 'lucide-react';
 
-export default function WorkspacePage() {
+function WorkspaceContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const initRef = useRef(false);
+  const viewParamHandled = useRef(false);
   const {
     session,
     messages,
@@ -17,6 +20,7 @@ export default function WorkspacePage() {
     recoverSession,
     hasStoredSession,
   } = useAssessment();
+  const { switchToReport } = useWorkspace();
 
   console.log('[Atlas] WorkspacePage render - session:', !!session, 'hasStoredSession:', hasStoredSession, 'status:', session?.status);
 
@@ -41,9 +45,18 @@ export default function WorkspacePage() {
     }
   }, [session, messages.length, initChat]);
 
-  // Note: We no longer auto-redirect to snapshot when completed
-  // Users should be able to navigate freely between workspace and report
-  // The sidebar shows a "View Report" link when a report exists
+  // Handle URL parameter for view switching (e.g., /workspace?view=report)
+  useEffect(() => {
+    if (session && !viewParamHandled.current) {
+      const view = searchParams.get('view');
+      if (view === 'report') {
+        switchToReport();
+        // Clear the URL parameter
+        router.replace('/workspace', { scroll: false });
+      }
+      viewParamHandled.current = true;
+    }
+  }, [session, searchParams, switchToReport, router]);
 
   // Loading state while recovering session
   if (!session) {
@@ -60,4 +73,23 @@ export default function WorkspacePage() {
   }
 
   return <WorkspaceLayout />;
+}
+
+export default function WorkspacePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-dvh items-center justify-center bg-white">
+          <div className="text-center">
+            <Loader2 className="mx-auto mb-4 h-8 w-8 animate-spin text-accent-600" />
+            <p className="text-body text-[var(--text-secondary)]">
+              Loading...
+            </p>
+          </div>
+        </div>
+      }
+    >
+      <WorkspaceContent />
+    </Suspense>
+  );
 }

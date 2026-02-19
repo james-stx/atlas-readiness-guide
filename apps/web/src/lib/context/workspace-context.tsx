@@ -19,12 +19,25 @@ import type { ProgressState } from '../progress';
 // ============================================
 
 type MobileTab = 'domains' | 'content' | 'chat';
+type ActiveView = 'assessment' | 'report';
+
+interface ReportState {
+  hasGenerated: boolean;
+  lastGeneratedAt: string | null;
+  lastInputCountAtGeneration: number;  // Track inputs to detect staleness
+}
 
 interface WorkspaceState {
   // Navigation
   selectedDomain: DomainType | null;
   expandedDomains: DomainType[];
   selectedCategory: string | null;
+
+  // Active view - assessment domains or readiness report
+  activeView: ActiveView;
+
+  // Report state tracking
+  reportState: ReportState;
 
   // Chat panel — hidden by default, slides in on category select
   isChatOpen: boolean;
@@ -51,7 +64,10 @@ type WorkspaceAction =
   | { type: 'TOGGLE_SIDEBAR' }
   | { type: 'RESTORE_STATE'; payload: Partial<WorkspaceState> }
   | { type: 'DISCUSS_TOPIC'; payload: { domain: DomainType; topicId: string } }
-  | { type: 'CLEAR_TOPIC_TO_DISCUSS' };
+  | { type: 'CLEAR_TOPIC_TO_DISCUSS' }
+  | { type: 'SET_VIEW'; payload: ActiveView }
+  | { type: 'SET_REPORT_GENERATED'; payload: { timestamp: string; inputCount: number } }
+  | { type: 'UPDATE_REPORT_STALENESS'; payload: number };  // current input count
 
 // ============================================
 // Initial State
@@ -63,6 +79,11 @@ function getInitialState(): WorkspaceState {
   // Restore persisted nav state if available
   let restoredDomain: DomainType | null = 'market';
   let restoredExpanded: DomainType[] = ['market'];
+  let restoredReportState: ReportState = {
+    hasGenerated: false,
+    lastGeneratedAt: null,
+    lastInputCountAtGeneration: 0,
+  };
 
   if (typeof window !== 'undefined') {
     try {
@@ -71,6 +92,7 @@ function getInitialState(): WorkspaceState {
         const parsed = JSON.parse(stored);
         if (parsed.selectedDomain) restoredDomain = parsed.selectedDomain;
         if (parsed.expandedDomains) restoredExpanded = parsed.expandedDomains;
+        if (parsed.reportState) restoredReportState = parsed.reportState;
       }
     } catch {
       // Ignore parse errors
@@ -81,6 +103,8 @@ function getInitialState(): WorkspaceState {
     selectedDomain: restoredDomain,
     expandedDomains: restoredExpanded,
     selectedCategory: null,
+    activeView: 'assessment',  // Default to assessment view
+    reportState: restoredReportState,
     isChatOpen: false, // Chat hidden by default — opens on category select
     chatDomain: null,
     topicToDiscuss: null, // Set when user clicks "Talk to Atlas" button
@@ -167,6 +191,23 @@ function workspaceReducer(
     case 'CLEAR_TOPIC_TO_DISCUSS':
       return { ...state, topicToDiscuss: null };
 
+    case 'SET_VIEW':
+      return { ...state, activeView: action.payload };
+
+    case 'SET_REPORT_GENERATED':
+      return {
+        ...state,
+        reportState: {
+          hasGenerated: true,
+          lastGeneratedAt: action.payload.timestamp,
+          lastInputCountAtGeneration: action.payload.inputCount,
+        },
+      };
+
+    case 'UPDATE_REPORT_STALENESS':
+      // Report is stale if input count changed since generation
+      return state;
+
     default:
       return state;
   }
@@ -181,6 +222,15 @@ interface WorkspaceContextValue extends WorkspaceState {
   selectDomain: (domain: DomainType) => void;
   selectCategory: (domain: DomainType, categoryId: string) => void;
   toggleDomainExpand: (domain: DomainType) => void;
+
+  // View switching
+  setView: (view: ActiveView) => void;
+  switchToAssessment: () => void;
+  switchToReport: () => void;
+
+  // Report state
+  markReportGenerated: (inputCount: number) => void;
+  isReportStale: boolean;  // Computed: inputs changed since last generation
 
   // Chat
   openChat: (domain?: DomainType) => void;
@@ -225,9 +275,10 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
         selectedDomain: state.selectedDomain,
         expandedDomains: state.expandedDomains,
+        reportState: state.reportState,
       }));
     }
-  }, [state.selectedDomain, state.expandedDomains]);
+  }, [state.selectedDomain, state.expandedDomains, state.reportState]);
 
   // Track inputs to auto-navigate when new ones are captured
   const prevInputsLengthRef = useRef(inputs.length);
@@ -307,6 +358,31 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'TOGGLE_SIDEBAR' });
   }, []);
 
+  // View switching
+  const setView = useCallback((view: ActiveView) => {
+    dispatch({ type: 'SET_VIEW', payload: view });
+  }, []);
+
+  const switchToAssessment = useCallback(() => {
+    dispatch({ type: 'SET_VIEW', payload: 'assessment' });
+  }, []);
+
+  const switchToReport = useCallback(() => {
+    dispatch({ type: 'SET_VIEW', payload: 'report' });
+  }, []);
+
+  // Report state management
+  const markReportGenerated = useCallback((inputCount: number) => {
+    dispatch({
+      type: 'SET_REPORT_GENERATED',
+      payload: { timestamp: new Date().toISOString(), inputCount },
+    });
+  }, []);
+
+  // Compute if report is stale (inputs changed since generation)
+  const isReportStale = state.reportState.hasGenerated &&
+    inputs.length !== state.reportState.lastInputCountAtGeneration;
+
   // Helpers
   const getTopicsForDomain = useCallback(
     (domain: DomainType) => {
@@ -340,6 +416,11 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     selectDomain,
     selectCategory,
     toggleDomainExpand,
+    setView,
+    switchToAssessment,
+    switchToReport,
+    markReportGenerated,
+    isReportStale,
     openChat,
     closeChat,
     toggleChat,

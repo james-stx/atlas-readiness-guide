@@ -3,15 +3,12 @@
 import { Compass, PanelRightOpen, PanelRightClose, MessageSquare, Clock } from 'lucide-react';
 import { useWorkspace } from '@/lib/context/workspace-context';
 import { useAssessment } from '@/lib/context/assessment-context';
-import { useRouter } from 'next/navigation';
-import { useState, useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { cn } from '@/lib/utils';
 
 export function TopBar() {
-  const router = useRouter();
   const { progressState, toggleChat, isChatOpen } = useWorkspace();
   const { session } = useAssessment();
-  const [showSnapshotCTA, setShowSnapshotCTA] = useState(false);
 
   const progress = progressState.overallProgress;
 
@@ -26,13 +23,6 @@ export function TopBar() {
     const mins = minutes % 60;
     return mins > 0 ? `~${hours}h ${mins}m` : `~${hours}h`;
   }, [progress]);
-
-  // Show snapshot CTA when progress >= 40%
-  useEffect(() => {
-    if (progress >= 40 && !showSnapshotCTA) {
-      setShowSnapshotCTA(true);
-    }
-  }, [progress, showSnapshotCTA]);
 
   return (
     <header className="flex h-12 items-center justify-between border-b border-[#E8E6E1] bg-white px-4 z-50">
@@ -76,16 +66,6 @@ export function TopBar() {
 
       {/* Right: Actions */}
       <div className="flex items-center gap-2">
-        {/* Snapshot CTA */}
-        {showSnapshotCTA && (
-          <button
-            onClick={() => router.push('/snapshot')}
-            className="rounded-lg border border-[#E8E6E1] bg-white px-3 py-1.5 text-[13px] font-medium text-[#37352F] transition-colors hover:bg-[#F7F6F3]"
-          >
-            Snapshot
-          </button>
-        )}
-
         {/* Chat toggle */}
         <button
           onClick={toggleChat}
