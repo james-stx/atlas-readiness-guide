@@ -6,6 +6,7 @@ import { DOMAIN_TOPICS } from '@/lib/progress';
 import { EmptyState } from './EmptyState';
 import { ContentDomainHeader } from './ContentDomainHeader';
 import { TopicCard } from './TopicCard';
+import { InlineSnapshotCTA } from './InlineSnapshotCTA';
 import { ReportPanel } from '../report/ReportPanel';
 import { useEffect, useRef, useCallback, useMemo } from 'react';
 import { useSkippedTopics } from '@/lib/hooks/use-skipped-topics';
