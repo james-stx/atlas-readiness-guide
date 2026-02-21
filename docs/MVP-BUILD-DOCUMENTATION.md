@@ -347,6 +347,18 @@ If a user leaves and returns:
   - Service limitations and disclaimers
   - Liability limitations and jurisdiction (Victorian law)
 
+### Report Update Flow
+
+1. User notices stale report indicators in sidebar (amber status, pulsing badge)
+2. Navigates to report panel where stale banner displays prominently
+3. Clicks full-width "Update Report" CTA button within banner
+4. System regenerates report with latest assessment data
+5. Status updates to "Generated [date]" with standard refresh option
+
+**Visual Feedback States:**
+- Stale: Amber styling, pulsing indicators, prominent CTA
+- Current: Green styling, standard refresh button, generation date
+
 ---
 
 ## 4. UX/UI Design
@@ -422,6 +434,13 @@ If a user leaves and returns:
 - **Focus States**: Teal focus rings (`focus-visible:ring-accent-500`)
 - **Hover States**: Subtle border color transitions on form elements
 - **Icons**: Integrated Lucide React icons for consistent iconography
+
+**Report Status Indicators:**
+- Sidebar shows "Ready to be updated" status with amber styling when report is stale
+- Stale reports display pulsing dot badge and amber icon background for visual prominence
+- Report panel replaces subtle refresh button with prominent full-width "Update Report" CTA when stale
+- Current reports show standard refresh button and "Generated [date]" status
+- Action-oriented banner copy encourages immediate report updates
 
 ### TopBar Simplification
 
@@ -1589,35 +1608,4 @@ Before starting, you need:
    - Verify: `git --version`
 
 4. **Accounts** (for API keys)
-   - Supabase account: https://supabase.com
-   - Anthropic account: https://console.anthropic.com
-   - Resend account: https://resend.com (optional for local)
-
-### Step-by-Step Setup
-
-#### 1. Clone the Repository
-
-Open Terminal and run:
-```bash
-git clone https://github.com/james-stx/atlas-readiness-guide.git
-cd atlas-readiness-guide
-```
-
-#### 2. Install Dependencies
-
-```bash
-pnpm install
-```
-
-This installs all packages for all apps in the monorepo.
-
-#### 3. Set Up Supabase Database
-
-1. Create a new project at supabase.com
-2. Go to SQL Editor
-3. Run this migration to create tables:
-
-```sql
--- Create enum types
-CREATE TYPE session_status AS ENUM ('active', 'synthesizing', 'completed');
-CREATE TYPE domain_type AS ENUM ('market', 'product', 'gtm',
+   - Supabase account: https://su
