@@ -213,7 +213,8 @@ packages/types/node_modules
 ## Recent Commits
 
 ```
-04c8d2f feat: Graceful legacy report handling for pre-V5 snapshots
+ab77250 perf: Skip topicResults generation for assessable reports, bump maxDuration to 120s
+6578b6d feat: Graceful legacy report handling for pre-V5 snapshots
 68c890b feat: Comprehensive Readiness Report V5 redesign
 8859866 docs: auto-update MVP documentation [skip ci]
 9369771 feat: Improve stale report UX with clearer update CTA
@@ -222,6 +223,5 @@ d3ae2f0 feat: Style 'Why This Matters' section with two-shade grey block UI
 3b0e0b4 docs: auto-update MVP documentation [skip ci]
 54ef9ac fix: Remove 'My Assessment' label and inline snapshot CTA, upgrade to Sonnet 4.6
 d0c610f Fix missing InlineSnapshotCTA import in ContentPanel
-851757a docs: auto-update MVP documentation [skip ci]
 ```
 <!-- /AUTO:RECENT_CHANGES -->

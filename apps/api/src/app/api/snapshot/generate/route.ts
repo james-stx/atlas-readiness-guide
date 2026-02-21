@@ -20,7 +20,7 @@ import { handleApiError, ValidationError } from '@/lib/errors';
 import type { DomainType, ConfidenceLevel, ExpansionPositioning } from '@atlas/types';
 
 // Increase timeout for this route (Vercel Pro: up to 300s, Hobby: 10s max)
-export const maxDuration = 60;
+export const maxDuration = 120;
 
 // V3 Snapshot schema for structured generation
 const snapshotV3Schema = z.object({
