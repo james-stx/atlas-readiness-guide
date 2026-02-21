@@ -213,7 +213,8 @@ packages/types/node_modules
 ## Recent Commits
 
 ```
-e5cdae5 debug: Expose error detail in 500 response temporarily
+01913f4 revert: Remove debug error detail from 500 response
+0ae8ee9 debug: Expose error detail in 500 response temporarily
 7505a29 fix: Split snapshot schema by assessment status to resolve 500 error
 a8a1d02 perf: Skip topicResults generation for assessable reports, bump maxDuration to 120s
 9c1193b docs: auto-update MVP documentation [skip ci]
@@ -222,6 +223,5 @@ a8a1d02 perf: Skip topicResults generation for assessable reports, bump maxDurat
 8859866 docs: auto-update MVP documentation [skip ci]
 9369771 feat: Improve stale report UX with clearer update CTA
 81d9390 fix: Remove duplicate confidence pill from bottom of expanded topic card
-d3ae2f0 feat: Style 'Why This Matters' section with two-shade grey block UI
 ```
 <!-- /AUTO:RECENT_CHANGES -->
