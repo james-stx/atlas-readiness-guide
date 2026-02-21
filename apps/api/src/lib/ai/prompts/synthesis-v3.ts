@@ -279,16 +279,16 @@ export function buildSynthesisV3UserPrompt(inputs: Input[]): string {
 
   prompt += `# Instructions\n`;
 
+  prompt += `Generate a readiness report with:\n`;
+
   if (isIncomplete) {
-    prompt += `Generate a readiness report with:\n`;
     prompt += `1. topicResults: Array with one entry per COVERED topic (topicId, topicLabel, domain, status="covered", confidence, keyInsight)\n`;
-    prompt += `\n## INCOMPLETE ASSESSMENT - Generate synthesis outputs:\n`;
+    prompt += `\n## INCOMPLETE ASSESSMENT:\n`;
     prompt += `2. earlySignals: 2-4 cross-domain patterns (type: strength|pattern|risk|unknown, title, description, derivedFrom: topic IDs, blockedBy: domain names, implication)\n`;
     prompt += `3. recommendedTopics: 3 highest-value topics to cover next (domain, topicId, topicLabel, impact: high|medium, why, unlocks: array of strings)\n`;
     prompt += `\nIMPORTANT: earlySignals should be CROSS-DOMAIN PATTERNS, not per-topic summaries.\n`;
-    prompt += `\nSkip all other sections for incomplete assessments.\n`;
   } else {
-    prompt += `## FULL REPORT - Generate all sections (do NOT generate topicResults — skip that field entirely):\n`;
+    prompt += `## FULL REPORT:\n`;
     prompt += `1. executiveSummary: 2-3 compelling sentences on current position and where to strengthen\n`;
     prompt += `2. strengths: HIGH-confidence validated advantages (title, description, sourceDomain, sourceTopic, confidence: "high")\n`;
     prompt += `3. risks: MEDIUM-confidence concerning signals (title, description, sourceDomain, sourceTopic)\n`;

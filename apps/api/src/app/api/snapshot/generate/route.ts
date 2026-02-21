@@ -22,40 +22,33 @@ import type { DomainType, ConfidenceLevel, ExpansionPositioning } from '@atlas/t
 // Increase timeout for this route (Vercel Pro: up to 300s, Hobby: 10s max)
 export const maxDuration = 120;
 
-// V3 Snapshot schema for structured generation
-const snapshotV3Schema = z.object({
-  // Overall readiness (only if assessable)
-  readinessLevel: z.enum(['ready', 'ready_with_caveats', 'not_ready']).optional(),
-  verdictSummary: z.string().optional(),
+const domainEnum = z.enum(['market', 'product', 'gtm', 'operations', 'financials']);
 
-  // Topic-level results (for covered topics only - simpler for Haiku)
+// Schema for INCOMPLETE assessments (< 60% coverage)
+const incompleteSnapshotSchema = z.object({
   topicResults: z.array(
     z.object({
       topicId: z.string(),
       topicLabel: z.string(),
-      domain: z.enum(['market', 'product', 'gtm', 'operations', 'financials']),
+      domain: domainEnum,
       status: z.enum(['covered', 'not_covered']),
       confidence: z.enum(['high', 'medium', 'low']).optional(),
       keyInsight: z.string().optional(),
     })
   ).default([]),
-
-  // V4: Cross-domain signals for incomplete assessments
   earlySignals: z.array(
     z.object({
       type: z.enum(['strength', 'pattern', 'risk', 'unknown']),
       title: z.string(),
       description: z.string(),
       derivedFrom: z.array(z.string()),
-      blockedBy: z.array(z.enum(['market', 'product', 'gtm', 'operations', 'financials'])).optional(),
+      blockedBy: z.array(domainEnum).optional(),
       implication: z.string(),
     })
   ).default([]),
-
-  // V4: Recommended next topics for incomplete assessments
   recommendedTopics: z.array(
     z.object({
-      domain: z.enum(['market', 'product', 'gtm', 'operations', 'financials']),
+      domain: domainEnum,
       topicId: z.string(),
       topicLabel: z.string(),
       impact: z.enum(['high', 'medium']),
@@ -63,93 +56,73 @@ const snapshotV3Schema = z.object({
       unlocks: z.array(z.string()),
     })
   ).default([]),
+});
 
-  // V5: Executive summary narrative
+// Schema for ASSESSABLE reports (>= 60% coverage, full V5 report)
+const assessableSnapshotSchema = z.object({
+  readinessLevel: z.enum(['ready', 'ready_with_caveats', 'not_ready']).optional(),
+  verdictSummary: z.string().optional(),
   executiveSummary: z.string().optional(),
-
-  // V5: Strengths (high-confidence advantages)
   strengths: z.array(
     z.object({
       title: z.string(),
       description: z.string(),
-      sourceDomain: z.enum(['market', 'product', 'gtm', 'operations', 'financials']),
+      sourceDomain: domainEnum,
       sourceTopic: z.string(),
       confidence: z.enum(['high', 'medium', 'low']).default('high'),
     })
   ).default([]),
-
-  // V5: Risks (medium-confidence concerns)
   risks: z.array(
     z.object({
       title: z.string(),
       description: z.string(),
-      sourceDomain: z.enum(['market', 'product', 'gtm', 'operations', 'financials']),
+      sourceDomain: domainEnum,
       sourceTopic: z.string(),
     })
   ).default([]),
-
-  // Critical actions with source traceability
   criticalActions: z.array(
     z.object({
       priority: z.number().min(1).max(5),
       title: z.string(),
-      sourceDomain: z.enum(['market', 'product', 'gtm', 'operations', 'financials']),
+      sourceDomain: domainEnum,
       sourceTopic: z.string(),
       sourceStatus: z.string(),
       description: z.string(),
       action: z.string(),
     })
   ).default([]),
-
-  // V5: Needs validation (renamed from assumptions, with validation step)
   needsValidation: z.array(
     z.object({
       title: z.string(),
-      sourceDomain: z.enum(['market', 'product', 'gtm', 'operations', 'financials']),
+      sourceDomain: domainEnum,
       sourceTopic: z.string(),
       description: z.string(),
       validationStep: z.string(),
     })
   ).default([]),
-
-  // Legacy assumptions (kept for backwards compatibility)
   assumptions: z.array(
     z.object({
       title: z.string(),
-      sourceDomain: z.enum(['market', 'product', 'gtm', 'operations', 'financials']),
+      sourceDomain: domainEnum,
       sourceTopic: z.string(),
       description: z.string(),
       validation: z.string(),
     })
   ).default([]),
-
-  // V5: 90-day roadmap phases
   roadmapPhase1: z.array(
     z.object({
       action: z.string(),
       rationale: z.string(),
-      sourceDomain: z.enum(['market', 'product', 'gtm', 'operations', 'financials']),
+      sourceDomain: domainEnum,
       sourceTopic: z.string(),
     })
   ).default([]),
-
   roadmapPhase2: z.array(
     z.object({
       action: z.string(),
       rationale: z.string(),
-      sourceDomain: z.enum(['market', 'product', 'gtm', 'operations', 'financials']),
+      sourceDomain: domainEnum,
       sourceTopic: z.string(),
-    })
-  ).default([]),
-
-  // Legacy 30-day action plan
-  actionPlan: z.array(
-    z.object({
-      week: z.number().min(1).max(4),
-      action: z.string(),
-      sourceDomain: z.enum(['market', 'product', 'gtm', 'operations', 'financials']),
-      sourceTopic: z.string(),
-      unblocks: z.string(),
     })
   ).default([]),
 });
@@ -202,20 +175,34 @@ export async function POST(request: NextRequest) {
     const domainResults = calculateDomainResults(inputs);
     console.log('[Snapshot] V3 Assessment status:', assessmentStatus.status);
 
-    // Generate V3 structured snapshot (single API call to avoid timeout)
+    // Generate V3 structured snapshot — use schema matched to assessment status
     const v3UserPrompt = buildSynthesisV3UserPrompt(inputs);
-    console.log('[Snapshot] Calling Claude API with model:', models.synthesis);
-    let generatedV3Snapshot;
+    const isAssessable = assessmentStatus.status === 'assessable';
+    console.log('[Snapshot] Calling Claude API with model:', models.synthesis, '| assessable:', isAssessable);
+
+    let generatedV3Snapshot: z.infer<typeof incompleteSnapshotSchema> | z.infer<typeof assessableSnapshotSchema>;
     try {
-      const v3Result = await generateObject({
-        model: anthropic(models.synthesis),
-        schema: snapshotV3Schema,
-        system: SYNTHESIS_V3_SYSTEM_PROMPT,
-        prompt: v3UserPrompt,
-        maxTokens: modelConfig.synthesis.maxTokens,
-        temperature: modelConfig.synthesis.temperature,
-      });
-      generatedV3Snapshot = v3Result.object;
+      if (isAssessable) {
+        const v3Result = await generateObject({
+          model: anthropic(models.synthesis),
+          schema: assessableSnapshotSchema,
+          system: SYNTHESIS_V3_SYSTEM_PROMPT,
+          prompt: v3UserPrompt,
+          maxTokens: modelConfig.synthesis.maxTokens,
+          temperature: modelConfig.synthesis.temperature,
+        });
+        generatedV3Snapshot = v3Result.object;
+      } else {
+        const v3Result = await generateObject({
+          model: anthropic(models.synthesis),
+          schema: incompleteSnapshotSchema,
+          system: SYNTHESIS_V3_SYSTEM_PROMPT,
+          prompt: v3UserPrompt,
+          maxTokens: modelConfig.synthesis.maxTokens,
+          temperature: modelConfig.synthesis.temperature,
+        });
+        generatedV3Snapshot = v3Result.object;
+      }
       console.log('[Snapshot] V3 snapshot generated');
     } catch (aiError) {
       const msg = aiError instanceof Error ? aiError.message : String(aiError);
@@ -223,8 +210,13 @@ export async function POST(request: NextRequest) {
       throw new Error(`AI generation failed: ${msg}`);
     }
 
+    // For incomplete assessments, cast to access topicResults/earlySignals/recommendedTopics
+    const incompleteData = isAssessable ? null : generatedV3Snapshot as z.infer<typeof incompleteSnapshotSchema>;
+    // For assessable reports, cast to access V5 fields
+    const assessableData = isAssessable ? generatedV3Snapshot as z.infer<typeof assessableSnapshotSchema> : null;
+
     // Count critical actions for key stats (derived from V3)
-    const criticalGapsCount = (generatedV3Snapshot.criticalActions || []).length;
+    const criticalGapsCount = (assessableData?.criticalActions || []).length;
 
     // Transform coverage summary to match DB schema
     const dbCoverageSummary = {
@@ -261,43 +253,42 @@ export async function POST(request: NextRequest) {
     };
 
     // Transform V3 data to V2-compatible DB schema for backwards compatibility
-    const topicResults = generatedV3Snapshot.topicResults || [];
-    const criticalActions = generatedV3Snapshot.criticalActions || [];
-    const assumptions = generatedV3Snapshot.assumptions || [];
-    const actionPlan = generatedV3Snapshot.actionPlan || [];
+    const topicResults = incompleteData?.topicResults || [];
+    const criticalActions = assessableData?.criticalActions || [];
+    const assumptions = assessableData?.assumptions || [];
 
-    // Key findings: derive from V3 topic results that have key insights
+    // Key findings: derive from topic results (incomplete path only)
     const dbKeyFindings = topicResults
-      .filter((t: { keyInsight?: string }) => t.keyInsight)
+      .filter((t) => t.keyInsight)
       .slice(0, 5)
-      .map((t: { domain: DomainType; keyInsight?: string; confidence?: ConfidenceLevel }) => ({
-        domain: t.domain,
+      .map((t) => ({
+        domain: t.domain as DomainType,
         finding: t.keyInsight || '',
-        confidence: t.confidence || 'medium',
+        confidence: (t.confidence || 'medium') as ConfidenceLevel,
       }));
 
-    // Strengths: derive from high-confidence covered topics
+    // Strengths: derive from high-confidence covered topics (incomplete path)
     const dbStrengths = topicResults
-      .filter((t: { status: string; confidence?: ConfidenceLevel }) => t.status === 'covered' && t.confidence === 'high')
+      .filter((t) => t.status === 'covered' && t.confidence === 'high')
       .slice(0, 5)
-      .map((t: { domain: DomainType; topicLabel: string; keyInsight?: string }) => ({
-        domain: t.domain,
+      .map((t) => ({
+        domain: t.domain as DomainType,
         item: t.topicLabel,
         evidence: t.keyInsight || '',
         user_quote: null,
       }));
 
     // Assumptions: derive from V3 assumptions
-    const dbAssumptions = assumptions.map((a: { sourceDomain: DomainType; title: string; description: string; validation: string }) => ({
-      domain: a.sourceDomain,
+    const dbAssumptions = assumptions.map((a) => ({
+      domain: a.sourceDomain as DomainType,
       item: a.title,
       risk: a.description,
       validation_suggestion: a.validation,
     }));
 
     // Gaps: derive from V3 critical actions
-    const dbGaps = criticalActions.map((ca: { sourceDomain: DomainType; title: string; description: string; action: string }) => ({
-      domain: ca.sourceDomain,
+    const dbGaps = criticalActions.map((ca) => ({
+      domain: ca.sourceDomain as DomainType,
       item: ca.title,
       importance: 'critical' as const,
       recommendation: ca.description,
@@ -305,14 +296,8 @@ export async function POST(request: NextRequest) {
       execution_action: ca.action,
     }));
 
-    // Next steps: derive from V3 action plan
-    const dbNextSteps = actionPlan.map((ap: { week: number; action: string; sourceDomain: DomainType; unblocks: string }, index: number) => ({
-      priority: index + 1,
-      action: ap.action,
-      domain: ap.sourceDomain,
-      rationale: ap.unblocks,
-      week: ap.week,
-    }));
+    // Next steps: empty for V5 (roadmap replaces action plan)
+    const dbNextSteps: Array<{ priority: number; action: string; domain: DomainType; rationale: string; week: number }> = [];
 
     // Key stats with actual critical gaps count
     const dbKeyStats = {
@@ -322,7 +307,7 @@ export async function POST(request: NextRequest) {
       critical_gaps_count: criticalGapsCount,
     };
 
-    // Calculate expansion positioning (5-tier scale)
+    // Calculate expansion positioning (5-tier scale, assessable only)
     const calculateExpansionPositioning = (): ExpansionPositioning => {
       const domains: DomainType[] = ['market', 'product', 'gtm', 'operations', 'financials'];
       let highDomains = 0;
@@ -332,8 +317,8 @@ export async function POST(request: NextRequest) {
         if (dr.confidence_level === 'high') highDomains++;
         if (dr.confidence_level === 'low') lowDomains++;
       }
-      const criticalCount = (generatedV3Snapshot.criticalActions || []).length;
-      const validationCount = (generatedV3Snapshot.needsValidation || []).length;
+      const criticalCount = criticalGapsCount;
+      const validationCount = (assessableData?.needsValidation || []).length;
 
       if (highDomains >= 4 && criticalCount === 0 && validationCount <= 1) return 'expansion_ready';
       if (highDomains >= 3 && criticalCount <= 1 && validationCount <= 3) return 'well_positioned';
@@ -342,11 +327,9 @@ export async function POST(request: NextRequest) {
       return 'early_exploration';
     };
 
-    // Calculate readiness level based on actual data (override AI if needed)
+    // Calculate readiness level based on actual data (assessable only)
     const calculateReadinessLevel = (): 'ready' | 'ready_with_caveats' | 'not_ready' => {
       const domains: DomainType[] = ['market', 'product', 'gtm', 'operations', 'financials'];
-
-      // Count domains by confidence level
       let highConfidenceDomains = 0;
       let lowConfidenceDomains = 0;
       let domainsWithNoHighTopics = 0;
@@ -358,52 +341,28 @@ export async function POST(request: NextRequest) {
         if (dr.confidence_breakdown.high === 0 && dr.topics_covered > 0) domainsWithNoHighTopics++;
       }
 
-      const assumptionsCount = (generatedV3Snapshot.assumptions || []).length;
+      const assumptionsCount = (assessableData?.assumptions || []).length;
+      console.log('[Snapshot] Readiness calc:', { highConfidenceDomains, lowConfidenceDomains, domainsWithNoHighTopics, criticalGapsCount, assumptionsCount });
 
-      console.log('[Snapshot] Readiness calc:', {
-        highConfidenceDomains,
-        lowConfidenceDomains,
-        domainsWithNoHighTopics,
-        criticalGapsCount,
-        assumptionsCount,
-        aiReadinessLevel: generatedV3Snapshot.readinessLevel,
-      });
-
-      // Apply rules:
-      // not_ready: >= 2 domains LOW, OR >= 3 critical gaps, OR any domain with 0 HIGH topics
-      if (lowConfidenceDomains >= 2 || criticalGapsCount >= 3 || domainsWithNoHighTopics > 0) {
-        return 'not_ready';
-      }
-
-      // ready: >= 4 domains HIGH, 0 critical gaps, <= 2 assumptions
-      if (highConfidenceDomains >= 4 && criticalGapsCount === 0 && assumptionsCount <= 2) {
-        return 'ready';
-      }
-
-      // ready_with_caveats: everything else that's assessable
+      if (lowConfidenceDomains >= 2 || criticalGapsCount >= 3 || domainsWithNoHighTopics > 0) return 'not_ready';
+      if (highConfidenceDomains >= 4 && criticalGapsCount === 0 && assumptionsCount <= 2) return 'ready';
       return 'ready_with_caveats';
     };
 
-    const calculatedReadinessLevel = assessmentStatus.status === 'assessable'
-      ? calculateReadinessLevel()
-      : undefined;
+    const calculatedReadinessLevel = isAssessable ? calculateReadinessLevel() : undefined;
+    const calculatedPositioning = isAssessable ? calculateExpansionPositioning() : undefined;
+    console.log('[Snapshot] Final readiness level:', calculatedReadinessLevel, '| positioning:', calculatedPositioning);
 
-    const calculatedPositioning = assessmentStatus.status === 'assessable'
-      ? calculateExpansionPositioning()
-      : undefined;
-
-    console.log('[Snapshot] Final readiness level:', calculatedReadinessLevel);
-
-    // Build V3 data structure
+    // Build V3 data structure — topics derived purely server-side for assessable reports
     const v3Data = {
       assessment_status: assessmentStatus.status,
       coverage_percentage: assessmentStatus.coverage_percentage,
       topics_covered: assessmentStatus.topics_covered,
       topics_total: assessmentStatus.topics_total,
       readiness_level: calculatedReadinessLevel,
-      verdict_summary: assessmentStatus.status === 'assessable' ? generatedV3Snapshot.verdictSummary : undefined,
+      verdict_summary: isAssessable ? assessableData?.verdictSummary : undefined,
       expansion_positioning: calculatedPositioning,
-      executive_summary: assessmentStatus.status === 'assessable' ? generatedV3Snapshot.executiveSummary : undefined,
+      executive_summary: isAssessable ? assessableData?.executiveSummary : undefined,
       domains: Object.fromEntries(
         (['market', 'product', 'gtm', 'operations', 'financials'] as DomainType[]).map((domain) => {
           const dr = domainResults[domain];
@@ -411,15 +370,10 @@ export async function POST(request: NextRequest) {
           const domainInputs = inputs.filter(i => i.domain === domain);
 
           const topics = topicDefs.map((td) => {
-            // Check AI response first
-            const topicResult = (generatedV3Snapshot.topicResults || []).find(
-              (tr: { topicId: string }) => tr.topicId === td.id
-            );
-            // Fallback: check if we have an actual input for this topic
+            // For incomplete: use AI topicResults if available
+            const topicResult = incompleteData?.topicResults?.find(tr => tr.topicId === td.id);
             const hasInput = domainInputs.some(i => i.question_id === td.id);
             const matchingInput = domainInputs.find(i => i.question_id === td.id);
-
-            // Determine status: use AI result, or fallback to input presence
             const isCovered = topicResult?.status === 'covered' || hasInput;
 
             return {
@@ -427,8 +381,7 @@ export async function POST(request: NextRequest) {
               topic_label: td.label,
               status: isCovered ? 'covered' : 'not_covered',
               confidence: topicResult?.confidence || (matchingInput?.confidence_level as ConfidenceLevel | undefined),
-              key_insight: topicResult?.keyInsight || (matchingInput ? `User provided input on this topic.` : undefined),
-              // Requirements derived from topic definitions
+              key_insight: topicResult?.keyInsight || undefined,
               requirements: td.requirements.map((req, idx) => ({
                 requirement_id: `${td.id}_req_${idx}`,
                 label: req,
@@ -446,63 +399,56 @@ export async function POST(request: NextRequest) {
           }];
         })
       ),
-      strengths: (generatedV3Snapshot.strengths || []).map((s: { title: string; description: string; sourceDomain: DomainType; sourceTopic: string; confidence: ConfidenceLevel }) => ({
+      strengths: (assessableData?.strengths || []).map(s => ({
         title: s.title,
         description: s.description,
-        source_domain: s.sourceDomain,
+        source_domain: s.sourceDomain as DomainType,
         source_topic: s.sourceTopic,
-        confidence: s.confidence,
+        confidence: s.confidence as ConfidenceLevel,
       })),
-      risks: (generatedV3Snapshot.risks || []).map((r: { title: string; description: string; sourceDomain: DomainType; sourceTopic: string }) => ({
+      risks: (assessableData?.risks || []).map(r => ({
         title: r.title,
         description: r.description,
-        source_domain: r.sourceDomain,
+        source_domain: r.sourceDomain as DomainType,
         source_topic: r.sourceTopic,
       })),
-      critical_actions: (generatedV3Snapshot.criticalActions || []).map((ca: { priority: number; title: string; sourceDomain: DomainType; sourceTopic: string; sourceStatus: string; description: string; action: string }) => ({
+      critical_actions: (assessableData?.criticalActions || []).map(ca => ({
         priority: ca.priority,
         title: ca.title,
-        source_domain: ca.sourceDomain,
+        source_domain: ca.sourceDomain as DomainType,
         source_topic: ca.sourceTopic,
         source_status: ca.sourceStatus,
         description: ca.description,
         action: ca.action,
       })),
-      needs_validation: (generatedV3Snapshot.needsValidation || []).map((nv: { title: string; sourceDomain: DomainType; sourceTopic: string; description: string; validationStep: string }) => ({
+      needs_validation: (assessableData?.needsValidation || []).map(nv => ({
         title: nv.title,
-        source_domain: nv.sourceDomain,
+        source_domain: nv.sourceDomain as DomainType,
         source_topic: nv.sourceTopic,
         description: nv.description,
         validation_step: nv.validationStep,
       })),
-      assumptions: (generatedV3Snapshot.assumptions || []).map((a: { title: string; sourceDomain: DomainType; sourceTopic: string; description: string; validation: string }) => ({
+      assumptions: (assessableData?.assumptions || []).map(a => ({
         title: a.title,
-        source_domain: a.sourceDomain,
+        source_domain: a.sourceDomain as DomainType,
         source_topic: a.sourceTopic,
         description: a.description,
         validation: a.validation,
       })),
-      roadmap_phase1: (generatedV3Snapshot.roadmapPhase1 || []).map((r: { action: string; rationale: string; sourceDomain: DomainType; sourceTopic: string }) => ({
+      roadmap_phase1: (assessableData?.roadmapPhase1 || []).map(r => ({
         action: r.action,
         rationale: r.rationale,
-        source_domain: r.sourceDomain,
+        source_domain: r.sourceDomain as DomainType,
         source_topic: r.sourceTopic,
       })),
-      roadmap_phase2: (generatedV3Snapshot.roadmapPhase2 || []).map((r: { action: string; rationale: string; sourceDomain: DomainType; sourceTopic: string }) => ({
+      roadmap_phase2: (assessableData?.roadmapPhase2 || []).map(r => ({
         action: r.action,
         rationale: r.rationale,
-        source_domain: r.sourceDomain,
+        source_domain: r.sourceDomain as DomainType,
         source_topic: r.sourceTopic,
       })),
-      action_plan: (generatedV3Snapshot.actionPlan || []).map((ap: { week: number; action: string; sourceDomain: DomainType; sourceTopic: string; unblocks: string }) => ({
-        week: ap.week,
-        action: ap.action,
-        source_domain: ap.sourceDomain,
-        source_topic: ap.sourceTopic,
-        unblocks: ap.unblocks,
-      })),
-      // V4 fields for incomplete assessments
-      early_signals: (generatedV3Snapshot.earlySignals || []).map((es: { type: string; title: string; description: string; derivedFrom: string[]; blockedBy?: DomainType[]; implication: string }) => ({
+      action_plan: [] as Array<{ week: number; action: string; source_domain: DomainType; source_topic: string; unblocks: string }>,
+      early_signals: (incompleteData?.earlySignals || []).map(es => ({
         type: es.type,
         title: es.title,
         description: es.description,
@@ -510,8 +456,8 @@ export async function POST(request: NextRequest) {
         blocked_by: es.blockedBy,
         implication: es.implication,
       })),
-      recommended_topics: (generatedV3Snapshot.recommendedTopics || []).map((rt: { domain: DomainType; topicId: string; topicLabel: string; impact: string; why: string; unlocks: string[] }) => ({
-        domain: rt.domain,
+      recommended_topics: (incompleteData?.recommendedTopics || []).map(rt => ({
+        domain: rt.domain as DomainType,
         topic_id: rt.topicId,
         topic_label: rt.topicLabel,
         impact: rt.impact,
@@ -538,7 +484,7 @@ export async function POST(request: NextRequest) {
           v3: v3Data,  // Store the transformed v3Data with domains, not raw AI output
           key_stats: dbKeyStats,
           readiness_level: calculatedReadinessLevel || 'not_ready',
-          verdict_summary: generatedV3Snapshot.verdictSummary || 'Assessment incomplete',
+          verdict_summary: assessableData?.verdictSummary || 'Assessment incomplete',
         }),
       })
       .select()
