@@ -213,7 +213,9 @@ packages/types/node_modules
 ## Recent Commits
 
 ```
-4976c83 feat: Style 'Why This Matters' section with two-shade grey block UI
+152a950 fix: Remove duplicate confidence pill from bottom of expanded topic card
+d3ae2f0 feat: Style 'Why This Matters' section with two-shade grey block UI
+3b0e0b4 docs: auto-update MVP documentation [skip ci]
 54ef9ac fix: Remove 'My Assessment' label and inline snapshot CTA, upgrade to Sonnet 4.6
 d0c610f Fix missing InlineSnapshotCTA import in ContentPanel
 851757a docs: auto-update MVP documentation [skip ci]
@@ -221,7 +223,5 @@ efe1cf0 fix: Remove duplicate report button and keep Assessment section visible
 72ed455 docs: auto-update MVP documentation [skip ci]
 376174b feat: Integrate readiness report into workspace with single entry point
 9637e7e docs: Add V5 Readiness Report PRD and Design Review
-f458c5f docs: auto-update MVP documentation [skip ci]
-c4130c2 Show positive "Ready to Execute" message when no blockers/assumptions
 ```
 <!-- /AUTO:RECENT_CHANGES -->

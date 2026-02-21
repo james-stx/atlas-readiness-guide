@@ -417,22 +417,6 @@ export function TopicCard({
               </div>
             )}
 
-            {/* Confidence explanation */}
-            {confidenceCfg && (
-              <div className="flex items-center gap-2 pt-2 border-t border-[#F1F0EC]">
-                <span className={cn(
-                  'inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium',
-                  confidenceCfg.bgColor,
-                  confidenceCfg.color
-                )}>
-                  <Star className={cn('h-3 w-3', confidenceCfg.iconColor)} fill="currentColor" />
-                  {confidenceCfg.label}
-                </span>
-                <span className="text-[12px] text-[#9B9A97]">
-                  {confidenceCfg.description}
-                </span>
-              </div>
-            )}
           </div>
 
           {/* Action Options */}
