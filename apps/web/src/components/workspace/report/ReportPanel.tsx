@@ -91,7 +91,7 @@ export function ReportPanel() {
   // ── Loading ────────────────────────────────────────────────────────────────
   if (isLoadingSnapshot || isGenerating || isLoading) {
     return (
-      <div className="flex-1 overflow-y-auto bg-white">
+      <div className="overflow-y-auto bg-white workspace-panel">
         <div className="max-w-[720px] mx-auto px-8 py-12 text-center">
           <Loader2 className="w-8 h-8 animate-spin text-[#37352F] mx-auto mb-4" />
           <h2 className="text-[18px] font-semibold text-[#37352F] mb-2">
@@ -110,7 +110,7 @@ export function ReportPanel() {
   // ── Error ──────────────────────────────────────────────────────────────────
   if (error) {
     return (
-      <div className="flex-1 overflow-y-auto bg-white">
+      <div className="overflow-y-auto bg-white workspace-panel">
         <div className="max-w-[720px] mx-auto px-8 py-12">
           <div className="bg-[#FBE4E4] rounded-lg p-6 text-center">
             <AlertCircle className="w-8 h-8 text-[#E03E3E] mx-auto mb-3" />
@@ -128,7 +128,7 @@ export function ReportPanel() {
   // ── Not ready ──────────────────────────────────────────────────────────────
   if (!canGenerateReport && !snapshot) {
     return (
-      <div className="flex-1 overflow-y-auto bg-white">
+      <div className="overflow-y-auto bg-white workspace-panel">
         <div className="max-w-[720px] mx-auto px-8 py-8">
           <div className="text-center mb-8">
             <div className="w-12 h-12 bg-[#F7F6F3] rounded-lg flex items-center justify-center mx-auto mb-4">
@@ -184,7 +184,7 @@ export function ReportPanel() {
   // ── Ready to generate (first time) ────────────────────────────────────────
   if (canGenerateReport && !snapshot) {
     return (
-      <div className="flex-1 overflow-y-auto bg-white">
+      <div className="overflow-y-auto bg-white workspace-panel">
         <div className="max-w-[720px] mx-auto px-8 py-8">
           <div className="text-center mb-8">
             <div className="w-12 h-12 bg-[#DDEDEA] rounded-lg flex items-center justify-center mx-auto mb-4">
@@ -219,7 +219,7 @@ export function ReportPanel() {
 
   if (!v3) {
     return (
-      <div className="flex-1 overflow-y-auto bg-white">
+      <div className="overflow-y-auto bg-white workspace-panel">
         <div className="max-w-[720px] mx-auto px-8 py-8">
           <div className="bg-white rounded-lg border border-[#E8E6E1] p-6 text-center">
             <p className="text-[14px] text-[#5C5A56] mb-4">
@@ -243,7 +243,7 @@ export function ReportPanel() {
     : null;
 
   return (
-    <div className="flex-1 overflow-y-auto bg-[#F7F6F3]">
+    <div className="overflow-y-auto bg-[#F7F6F3] workspace-panel">
       <div className="max-w-[720px] mx-auto px-8 py-8">
 
         {/* ── Page header ── */}
