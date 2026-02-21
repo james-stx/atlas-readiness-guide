@@ -60,9 +60,10 @@ export function handleApiError(error: unknown): NextResponse {
     );
   }
 
-  // Generic error
+  // Generic error — include detail temporarily for debugging
+  const detail = error instanceof Error ? error.message : String(error);
   return NextResponse.json(
-    { error: 'Internal server error', code: 'INTERNAL_ERROR' },
+    { error: 'Internal server error', code: 'INTERNAL_ERROR', detail },
     { status: 500 }
   );
 }
