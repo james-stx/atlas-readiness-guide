@@ -213,7 +213,9 @@ packages/types/node_modules
 ## Recent Commits
 
 ```
-6663f5d feat: Comprehensive Readiness Report V5 redesign
+04c8d2f feat: Graceful legacy report handling for pre-V5 snapshots
+68c890b feat: Comprehensive Readiness Report V5 redesign
+8859866 docs: auto-update MVP documentation [skip ci]
 9369771 feat: Improve stale report UX with clearer update CTA
 81d9390 fix: Remove duplicate confidence pill from bottom of expanded topic card
 d3ae2f0 feat: Style 'Why This Matters' section with two-shade grey block UI
@@ -221,7 +223,5 @@ d3ae2f0 feat: Style 'Why This Matters' section with two-shade grey block UI
 54ef9ac fix: Remove 'My Assessment' label and inline snapshot CTA, upgrade to Sonnet 4.6
 d0c610f Fix missing InlineSnapshotCTA import in ContentPanel
 851757a docs: auto-update MVP documentation [skip ci]
-efe1cf0 fix: Remove duplicate report button and keep Assessment section visible
-72ed455 docs: auto-update MVP documentation [skip ci]
 ```
 <!-- /AUTO:RECENT_CHANGES -->

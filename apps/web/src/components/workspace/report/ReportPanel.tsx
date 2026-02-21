@@ -234,6 +234,9 @@ export function ReportPanel() {
     );
   }
 
+  // Legacy report: assessable but generated before V5 (no expansion_positioning)
+  const isLegacyReport = v3.assessment_status === 'assessable' && !v3.expansion_positioning;
+
   const isIncomplete = v3.assessment_status === 'incomplete';
   const reportDate = snapshot?.created_at
     ? new Date(snapshot.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
@@ -305,8 +308,57 @@ export function ReportPanel() {
             />
             <ExportSection sessionId={session?.id || ''} email={session?.email || ''} keyStats={snapshot?.key_stats} readinessLevel={v3.readiness_level} />
           </div>
+        ) : isLegacyReport ? (
+          // ── Legacy report layout (pre-V5) ────────────────────────────────
+          <div className="space-y-6">
+
+            {/* Upgrade prompt */}
+            <div className="bg-[#F7F6F3] border border-[#E8E6E1] rounded-lg p-5">
+              <p className="text-[13px] font-semibold text-[#37352F] mb-1">
+                New report format available
+              </p>
+              <p className="text-[13px] text-[#5C5A56] leading-relaxed mb-4">
+                This report was generated with an earlier version of Atlas. Regenerate to get the full V5 report — including your Expansion Positioning, Strengths, Risks, Needs Validation, and 90-Day Roadmap.
+              </p>
+              <button
+                onClick={handleGenerate}
+                disabled={isGenerating}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#37352F] hover:bg-[#2F2D29] text-white rounded-md text-[13px] font-semibold transition-colors disabled:opacity-50"
+              >
+                <RefreshCw className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
+                Regenerate Report
+              </button>
+            </div>
+
+            {/* Assessment Coverage (works with old data) */}
+            <ReportCoverage v3={v3} onCompleteTopics={switchToAssessment} />
+
+            {/* Legacy verdict summary */}
+            {v3.verdict_summary && (
+              <section>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[#9B9A97] mb-3">
+                  Summary
+                </p>
+                <div className="bg-white rounded-lg border border-[#E8E6E1] p-5">
+                  <p className="text-[14px] leading-[1.7] text-[#37352F]">{v3.verdict_summary}</p>
+                </div>
+              </section>
+            )}
+
+            {/* Legacy critical actions */}
+            {v3.critical_actions && v3.critical_actions.length > 0 && (
+              <ReportCritical criticalActions={v3.critical_actions} />
+            )}
+
+            <ExportSection
+              sessionId={session?.id || ''}
+              email={session?.email || ''}
+              keyStats={snapshot?.key_stats}
+              readinessLevel={v3.readiness_level}
+            />
+          </div>
         ) : (
-          // ── Full report layout ─────────────────────────────────────────────
+          // ── Full V5 report layout ──────────────────────────────────────────
           <div className="space-y-6">
 
             {/* 1. Executive Summary */}
