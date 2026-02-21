@@ -72,7 +72,7 @@ Australian companies considering U.S. expansion often don't know what they don't
 | Frontend | What users see and interact with | Next.js (React) |
 | Backend/API | Processes requests, talks to AI | Next.js API Routes |
 | Database | Stores user sessions and responses | Supabase (PostgreSQL) |
-| AI | Powers the conversational assessment | Anthropic Claude 4.5 |
+| AI | Powers the conversational assessment | Anthropic Claude 4.6 |
 | Email | Sends snapshot to users | Resend |
 | Hosting | Makes the app available on the internet | Vercel |
 
@@ -423,6 +423,10 @@ If a user leaves and returns:
 - **Hover States**: Subtle border color transitions on form elements
 - **Icons**: Integrated Lucide React icons for consistent iconography
 
+### TopBar Simplification
+
+The TopBar has been simplified to remove the 'My Assessment' / 'Readiness Assessment' subtitle, presenting a cleaner interface focused on the Atlas branding and progress indicators. The inline 'View your Readiness Report' CTA has also been removed from domain content areas, reducing UI clutter and making the report access more intentional through other navigation paths.
+
 ## V3 Readiness Report Design System
 
 The readiness report implements a comprehensive visual design system:
@@ -657,7 +661,7 @@ This separation allows users to browse content freely without accidentally trigg
                     ▼                           ▼                   ▼
            ┌───────────────┐          ┌───────────────┐    ┌───────────────┐
            │   Supabase    │          │   Anthropic   │    │    Resend     │
-           │  (Database)   │          │ (Claude 4.5)  │    │   (Email)     │
+           │  (Database)   │          │ (Claude 4.6)  │    │   (Email)     │
            └───────────────┘          └───────────────┘    └───────────────┘
 ```
 
@@ -754,9 +758,11 @@ The synthesis model configuration has been optimized with increased token limits
 This dual-path approach ensures report reliability even when the AI model (Haiku) has processing issues.
 
 **AI Model Configuration:**
-- Conversation: Claude Sonnet 4.5 (high capability)
-- Classification: Claude Haiku 4.5 (fast, deterministic)
-- Synthesis: Claude Haiku 4.5 (optimized for speed, 10-20s generation time vs 40-60s with Sonnet)
+- Conversation model upgraded to `claude-sonnet-4-6` (latest)
+- Classification: `claude-haiku-4-5-20251001`
+- Synthesis: `claude-haiku-4-5-20251001`
+
+The conversation model upgrade to Claude Sonnet 4.6 provides enhanced AI capabilities for user interactions and topic discussions.
 
 **Performance Considerations:**
 - Synthesis uses Haiku model to avoid 60-second timeouts
@@ -781,8 +787,8 @@ The conversation agent uses Vercel AI SDK's `streamText()` with tool support:
 
 **Automatic Domain Transitions**: The system now includes explicit instructions for the AI to automatically transition between assessment domains after covering 3-4 key topics, improving conversation flow and completion rates.
 
-The AI service layer utilizes Anthropic's Claude 4.5 models for different purposes:
-- **Sonnet 4.5**: Primary model for conversations and content synthesis (higher capability)
+The AI service layer utilizes Anthropic's Claude 4.6 models for different purposes:
+- **Sonnet 4.6**: Primary model for conversations and content synthesis (higher capability)
 - **Haiku 4.5**: Lightweight model for fast classification tasks (optimized for speed)
 
 #### Database (Supabase)
@@ -790,9 +796,9 @@ The AI service layer utilizes Anthropic's Claude 4.5 models for different purpos
 - **Technology**: PostgreSQL via Supabase
 - **Stores**: Sessions, messages, inputs, snapshots
 
-#### AI (Anthropic Claude 4.5)
+#### AI (Anthropic Claude 4.6)
 - **Purpose**: Conversational intelligence
-- **Models**: Claude 4.5 Sonnet and Haiku
+- **Models**: Claude 4.6 Sonnet and Haiku 4.5
 - **Uses**: Conversation flow, input extraction, confidence classification, snapshot synthesis
 
 #### Email (Resend)
@@ -1198,11 +1204,11 @@ The V3 snapshot schema now includes:
 - Generate snapshot synthesis
 
 **AI Models (Anthropic Claude)**
-- **Conversation Model**: `claude-sonnet-4-5-20250929` - Used for natural language conversations with users
+- **Conversation Model**: `claude-sonnet-4-6` - Used for natural language conversations with users
 - **Classification Model**: `claude-haiku-4-5-20251001` - Used for fast content classification and routing
 - **Synthesis Model**: `claude-sonnet-4-5-20250929` - Used for generating summaries and synthesized responses
 
-All models use Claude 4.5 architecture, providing improved performance and capabilities over previous versions.
+All models use Claude 4.5/4.6 architecture, providing improved performance and capabilities over previous versions.
 
 **Configuration**:
 - API Key from Anthropic Console
@@ -1487,7 +1493,7 @@ Both applications need environment variables to function. These are set differen
 | `SUPABASE_URL` | Your Supabase project URL | Supabase Dashboard → Settings → API |
 | `SUPABASE_ANON_KEY` | Public Supabase key | Supabase Dashboard → Settings → API |
 | `SUPABASE_SERVICE_ROLE_KEY` | Private Supabase key (keep secret!) | Supabase Dashboard → Settings → API |
-| `ANTHROPIC_API_KEY` | Required API key for accessing Claude 4.5 models (Sonnet and Haiku variants) | console.anthropic.com → API Keys |
+| `ANTHROPIC_API_KEY` | Required API key for accessing Claude 4.6 models and the latest Claude capabilities. Also required for the auto-documentation update workflow. | console.anthropic.com → API Keys |
 | `RESEND_API_KEY` | Email service key | resend.com → API Keys |
 
 #### Web Environment Variables
@@ -1514,7 +1520,7 @@ Both applications need environment variables to function. These are set differen
 **AI Model Settings:**
 ```typescript
 models: {
-  conversation: 'claude-sonnet-4-5-20250929',
+  conversation: 'claude-sonnet-4-6',
   classification: 'claude-haiku-4-5-20251001', 
   synthesis: 'claude-haiku-4-5-20251001' // Fast model for timeout avoidance
 }
@@ -1614,13 +1620,4 @@ This installs all packages for all apps in the monorepo.
 ```sql
 -- Create enum types
 CREATE TYPE session_status AS ENUM ('active', 'synthesizing', 'completed');
-CREATE TYPE domain_type AS ENUM ('market', 'product', 'gtm', 'operations', 'financials');
-CREATE TYPE confidence_level AS ENUM ('high', 'medium', 'low');
-CREATE TYPE message_role AS ENUM ('user', 'assistant', 'system');
-
--- Sessions table
-CREATE TABLE sessions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  email VARCHAR(255) NOT NULL,
-  status session_status DEFAULT 'active',
-  current_domain domain_type
+CREATE TYPE domain_type AS ENUM ('market', 'product', 'gtm',
