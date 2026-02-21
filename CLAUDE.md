@@ -58,6 +58,8 @@ All agents, hooks, and automations are documented in **`AGENTS.md`** at the proj
 
 ```
 .
+.claude
+.claude/settings.local.json
 .git
 .github
 .github/workflows
@@ -135,8 +137,6 @@ packages/config/src/index.ts
 packages/config/tsconfig.json
 packages/types
 packages/types/node_modules
-packages/types/package.json
-packages/types/src
 ```
 <!-- /AUTO:STRUCTURE -->
 
@@ -213,7 +213,8 @@ packages/types/src
 ## Recent Commits
 
 ```
-edaf649 fix: Remove 'My Assessment' label and inline snapshot CTA, upgrade to Sonnet 4.6
+4976c83 feat: Style 'Why This Matters' section with two-shade grey block UI
+54ef9ac fix: Remove 'My Assessment' label and inline snapshot CTA, upgrade to Sonnet 4.6
 d0c610f Fix missing InlineSnapshotCTA import in ContentPanel
 851757a docs: auto-update MVP documentation [skip ci]
 efe1cf0 fix: Remove duplicate report button and keep Assessment section visible
@@ -222,6 +223,5 @@ efe1cf0 fix: Remove duplicate report button and keep Assessment section visible
 9637e7e docs: Add V5 Readiness Report PRD and Design Review
 f458c5f docs: auto-update MVP documentation [skip ci]
 c4130c2 Show positive "Ready to Execute" message when no blockers/assumptions
-01fbc2f Fix readiness level calculation with server-side logic
 ```
 <!-- /AUTO:RECENT_CHANGES -->

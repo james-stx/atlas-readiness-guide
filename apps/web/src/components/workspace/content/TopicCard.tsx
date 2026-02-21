@@ -316,13 +316,17 @@ export function TopicCard({
           <div className="p-4 space-y-4">
             {/* Why This Matters */}
             {topicConfig?.description && (
-              <div>
-                <h4 className="text-[11px] font-medium uppercase tracking-wide text-[#9B9A97] mb-1.5">
-                  Why This Matters
-                </h4>
-                <p className="text-[13px] leading-relaxed text-[#5C5A56]">
-                  {topicConfig.description}
-                </p>
+              <div className="rounded-md overflow-hidden border border-[#E8E6E1]">
+                <div className="bg-[#E8E6E1] px-3 py-1.5">
+                  <h4 className="text-[11px] font-semibold uppercase tracking-wide text-[#787674]">
+                    Why This Matters
+                  </h4>
+                </div>
+                <div className="bg-[#F7F6F3] px-3 py-2.5">
+                  <p className="text-[13px] leading-relaxed text-[#5C5A56]">
+                    {topicConfig.description}
+                  </p>
+                </div>
               </div>
             )}
 
