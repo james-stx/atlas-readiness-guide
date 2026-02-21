@@ -376,34 +376,40 @@ export function ReportPanel() {
             </div>
           </div>
 
-          <button
-            onClick={handleGenerate}
-            disabled={isGenerating}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors ${
-              isReportStale
-                ? 'bg-[#FAEBDD] text-[#D9730D] hover:bg-[#F5DCC3]'
-                : 'text-[#5C5A56] hover:bg-[#F7F6F3]'
-            }`}
-          >
-            <RefreshCw className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
-            {isReportStale ? 'Refresh Required' : 'Refresh'}
-          </button>
+          {!isReportStale && (
+            <button
+              onClick={handleGenerate}
+              disabled={isGenerating}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[13px] font-medium text-[#5C5A56] hover:bg-[#F7F6F3] transition-colors"
+            >
+              <RefreshCw className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
+              Refresh
+            </button>
+          )}
         </div>
 
         {/* Stale warning banner */}
         {isReportStale && (
-          <div className="bg-[#FAEBDD] border border-[#D9730D]/20 rounded-lg p-4 mb-6">
-            <div className="flex items-start gap-3">
+          <div className="bg-[#FAEBDD] border border-[#D9730D]/30 rounded-lg p-4 mb-6">
+            <div className="flex items-start gap-3 mb-4">
               <AlertCircle className="w-5 h-5 text-[#D9730D] flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-[13px] font-medium text-[#D9730D]">
-                  Assessment updated since this report was generated
+                <p className="text-[13px] font-semibold text-[#D9730D]">
+                  Your report is out of date
                 </p>
                 <p className="text-[12px] text-[#5C5A56] mt-1">
-                  Click "Refresh Required" to regenerate with your latest inputs.
+                  You've added new inputs since this report was generated. Update it now to reflect your latest assessment.
                 </p>
               </div>
             </div>
+            <button
+              onClick={handleGenerate}
+              disabled={isGenerating}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#D9730D] hover:bg-[#C0620B] text-white rounded-md text-[13px] font-semibold transition-colors disabled:opacity-50"
+            >
+              <RefreshCw className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
+              Update Report
+            </button>
           </div>
         )}
 

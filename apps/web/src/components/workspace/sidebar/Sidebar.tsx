@@ -53,7 +53,7 @@ export function Sidebar() {
           })
         : '';
       return {
-        label: isReportStale ? 'Needs refresh' : `Generated ${date}`,
+        label: isReportStale ? 'Ready to be updated' : `Generated ${date}`,
         color: isReportStale ? 'text-[#D9730D]' : 'text-[#0F7B6C]',
       };
     }
@@ -146,12 +146,21 @@ export function Sidebar() {
               : 'hover:bg-[#EBEBEA]/50'
           }`}
         >
-          <div className={`w-8 h-8 rounded-md flex items-center justify-center ${
-            activeView === 'report' ? 'bg-[#37352F]' : 'bg-[#E8E6E1]'
-          }`}>
-            <FileText className={`w-4 h-4 ${
-              activeView === 'report' ? 'text-white' : 'text-[#37352F]'
-            }`} />
+          <div className="relative">
+            <div className={`w-8 h-8 rounded-md flex items-center justify-center ${
+              isReportStale
+                ? 'bg-[#FAEBDD]'
+                : activeView === 'report' ? 'bg-[#37352F]' : 'bg-[#E8E6E1]'
+            }`}>
+              <FileText className={`w-4 h-4 ${
+                isReportStale
+                  ? 'text-[#D9730D]'
+                  : activeView === 'report' ? 'text-white' : 'text-[#37352F]'
+              }`} />
+            </div>
+            {isReportStale && (
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#D9730D] animate-pulse" />
+            )}
           </div>
           <div className="flex-1 min-w-0">
             <div className={`text-[13px] font-medium ${
