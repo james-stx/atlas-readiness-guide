@@ -145,73 +145,95 @@ export const TOPIC_DEFINITIONS: Record<DomainType, TopicDefinition[]> = {
   ],
 };
 
-export const SYNTHESIS_V3_SYSTEM_PROMPT = `You synthesize U.S. expansion readiness assessments into structured reports.
+export const SYNTHESIS_V3_SYSTEM_PROMPT = `You synthesize U.S. expansion readiness assessments into structured reports for Australian companies.
 
-Given inputs tagged with confidence (High/Medium/Low), generate a V3 Readiness Report with:
+Given inputs tagged with confidence (High/Medium/Low), generate a structured Readiness Report.
 
 ## Assessment Status Rules
 
-FIRST, determine assessment status based on coverage:
-- **INCOMPLETE**: < 60% topics covered (< 15/25), OR any domain has < 2 topics covered
+FIRST, determine assessment status:
+- **INCOMPLETE**: < 60% topics covered OR any domain has < 2 topics covered
 - **ASSESSABLE**: >= 60% topics covered AND every domain has >= 2 topics
 
-## Readiness Level Rules (only if ASSESSABLE)
+## Per-Topic Analysis (always required)
 
-- **not_ready**: >= 2 domains with majority LOW confidence, OR >= 3 critical gaps, OR any domain with 0 HIGH confidence topics
-- **ready_with_caveats**: No domain with majority LOW confidence, <= 2 critical gaps, >= 2 domains with majority HIGH confidence
-- **ready**: >= 4 domains with majority HIGH confidence, 0 critical gaps, <= 2 important assumptions
-
-## Per-Topic Analysis
-
-For each of the 25 topics, determine:
+For each covered topic:
 1. Status: "covered" or "not_covered"
-2. Confidence level (if covered): HIGH, MEDIUM, or LOW
-3. Key insight (if covered): One sentence summary
-4. Requirements status: For each topic requirement, mark as:
-   - "addressed": Clear evidence in user's response
-   - "partial": Some evidence but incomplete
-   - "not_addressed": No evidence or mentioned as unknown
+2. Confidence: HIGH, MEDIUM, or LOW
+3. keyInsight: One sentence summary of what was shared
 
-## For INCOMPLETE Assessments: Cross-Domain Synthesis
+## For INCOMPLETE Assessments
 
-When assessment is incomplete, generate synthesis outputs that transform partial data into insights:
+Generate:
+- earlySignals (2-4): Cross-domain patterns — NOT per-topic summaries. Find connections.
+  Types: strength | pattern | risk | unknown
+  Each needs: derivedFrom (topic IDs), blockedBy (domains), implication
+- recommendedTopics (3): Most valuable next topics given current coverage
+  Each needs: domain, topicId, topicLabel, impact (high|medium), why, unlocks
 
-### early_signals (2-4 items)
-DO NOT repeat individual topic insights. Instead, find PATTERNS across covered topics:
+## For ASSESSABLE Assessments — Full Report Sections
 
-- **strength**: Positive pattern emerging from multiple topics (e.g., "Strong product-market foundation" from Market + Product alignment)
-- **pattern**: Interesting correlation or trend (e.g., "Existing traction validates demand but GTM is undefined")
-- **risk**: Potential issue visible from partial data (e.g., "Financial assumptions appear optimistic without GTM clarity")
-- **unknown**: Important things that can't be assessed due to missing domains
+### executiveSummary (string, 2-3 sentences)
+A compelling narrative about this company's current U.S. expansion position.
+- Open with their strongest validated advantage (be specific, not generic)
+- Acknowledge where they need to strengthen (name the actual gap areas)
+- End with the implication — what this means for their path forward
+Do NOT use generic phrases like "strong foundation". Be direct and specific.
 
-Each signal MUST include:
-- derived_from: Which topic IDs contributed to this insight
-- blocked_by: Which domains need coverage for deeper analysis
-- implication: The "so what?" - why this pattern matters for their expansion
+### strengths (array, 3-5 items)
+HIGH-confidence validated advantages for U.S. expansion. Only include items where the user provided clear, specific evidence.
+Each item:
+- title: Short label (e.g. "Validated U.S. demand signal")
+- description: 1-2 sentences explaining WHY this is a genuine advantage for U.S. expansion specifically
+- sourceDomain: domain key
+- sourceTopic: topic label
+- confidence: "high"
 
-### recommended_topics (3 items)
-Based on current coverage, recommend the 3 MOST VALUABLE topics to cover next:
+### risks (array, 2-4 items)
+MEDIUM-confidence items that are concerning but don't block expansion today. These are signals that will compound if ignored.
+Each item:
+- title: Short label
+- description: 1-2 sentences on the risk and its specific implication for U.S. expansion
+- sourceDomain: domain key
+- sourceTopic: topic label
 
-- Prioritize topics that will unlock cross-domain insights
-- Consider dependencies (e.g., GTM strategy enables revenue projections)
-- Explain WHY each topic matters given what they've already covered
-- List what completing each topic will UNLOCK
+### criticalActions (array)
+Hard blockers that MUST be resolved before committing capital. Low-confidence or missing topics that are genuine prerequisites.
+Each item:
+- priority (1-5)
+- title
+- sourceDomain, sourceTopic, sourceStatus
+- description: Why this is a hard blocker
+- action: Specific first step
 
-## Critical Actions & Assumptions (for ASSESSABLE only)
+### needsValidation (array, 2-4 items)
+Assumptions the user has made that need to be tested before they can be treated as fact.
+Each item:
+- title
+- sourceDomain, sourceTopic
+- description: What the assumption is and why it matters if wrong
+- validationStep: One specific, concrete action to validate it (start with a verb)
 
-Generate actions WITH source traceability:
-- Link each critical action to a specific topic (domain + topic label + status)
-- Link each assumption to its source topic
-- Be specific about what's missing and what to do
+### roadmapPhase1 (array, 3-4 items)
+Specific actions for Days 1-30: focused on resolving critical blockers.
+Each item:
+- action: Specific, concrete task (start with a verb)
+- rationale: What this unblocks or why it matters
+- sourceDomain, sourceTopic
+
+### roadmapPhase2 (array, 3-4 items)
+Specific actions for Days 31-60: focused on testing key assumptions.
+Each item:
+- action: Specific, concrete task (start with a verb)
+- rationale: What this unblocks or why it matters
+- sourceDomain, sourceTopic
 
 ## Output Rules
-
-- Use conservative assessments - don't inflate readiness
-- If a topic wasn't discussed, mark it as "not_covered"
-- If information is vague, mark confidence as LOW
-- Critical gaps come from: not covered topics AND low confidence topics
-- Assumptions come from: medium confidence topics where user made claims without evidence
-- For incomplete assessments: SYNTHESIZE patterns, don't summarize topics`;
+- Conservative assessments — don't inflate readiness
+- Not covered topics = "not_covered", vague responses = LOW confidence
+- Every insight must trace back to a specific domain and topic
+- Strengths from HIGH confidence only, Risks from MEDIUM confidence
+- Critical from LOW confidence or missing prerequisite topics`;
 
 // Truncate text to max length
 function truncate(text: string, maxLen: number): string {
@@ -263,14 +285,17 @@ export function buildSynthesisV3UserPrompt(inputs: Input[]): string {
     prompt += `\n## INCOMPLETE ASSESSMENT - Generate synthesis outputs:\n`;
     prompt += `2. earlySignals: 2-4 cross-domain patterns (type: strength|pattern|risk|unknown, title, description, derivedFrom: topic IDs, blockedBy: domain names, implication)\n`;
     prompt += `3. recommendedTopics: 3 highest-value topics to cover next (domain, topicId, topicLabel, impact: high|medium, why, unlocks: array of strings)\n`;
-    prompt += `\nIMPORTANT: earlySignals should be CROSS-DOMAIN PATTERNS, not per-topic summaries. Find connections between what's covered.\n`;
-    prompt += `\nSkip criticalActions, assumptions, actionPlan for incomplete assessments.\n`;
+    prompt += `\nIMPORTANT: earlySignals should be CROSS-DOMAIN PATTERNS, not per-topic summaries.\n`;
+    prompt += `\nSkip all other sections for incomplete assessments.\n`;
   } else {
-    prompt += `2. criticalActions: Array of blockers (priority 1-5, title, sourceDomain, sourceTopic, sourceStatus, description, action)\n`;
-    prompt += `3. assumptions: Array of things to validate (title, sourceDomain, sourceTopic, description, validation)\n`;
-    prompt += `4. actionPlan: 30-day plan items (week 1-4, action, sourceDomain, sourceTopic, unblocks)\n`;
-    prompt += `5. readinessLevel: "ready", "ready_with_caveats", or "not_ready"\n`;
-    prompt += `6. verdictSummary: One sentence summary\n`;
+    prompt += `\n## FULL REPORT - Generate all sections:\n`;
+    prompt += `2. executiveSummary: 2-3 compelling sentences on current position and where to strengthen\n`;
+    prompt += `3. strengths: HIGH-confidence validated advantages (title, description, sourceDomain, sourceTopic, confidence: "high")\n`;
+    prompt += `4. risks: MEDIUM-confidence concerning signals (title, description, sourceDomain, sourceTopic)\n`;
+    prompt += `5. criticalActions: Hard blockers (priority, title, sourceDomain, sourceTopic, sourceStatus, description, action)\n`;
+    prompt += `6. needsValidation: Assumptions to test (title, sourceDomain, sourceTopic, description, validationStep)\n`;
+    prompt += `7. roadmapPhase1: Days 1-30 actions for critical blockers (action, rationale, sourceDomain, sourceTopic)\n`;
+    prompt += `8. roadmapPhase2: Days 31-60 actions for testing assumptions (action, rationale, sourceDomain, sourceTopic)\n`;
   }
 
   return prompt;

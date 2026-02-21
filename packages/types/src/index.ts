@@ -25,6 +25,13 @@ export type GapImportance = 'critical' | 'important' | 'nice-to-have';
 
 export type ReadinessLevel = 'ready' | 'ready_with_caveats' | 'not_ready';
 
+export type ExpansionPositioning =
+  | 'expansion_ready'
+  | 'well_positioned'
+  | 'conditionally_positioned'
+  | 'foundation_building'
+  | 'early_exploration';
+
 export type AssessmentStatus = 'incomplete' | 'assessable';
 
 export type TopicStatus = 'covered' | 'not_covered';
@@ -203,6 +210,37 @@ export interface ActionPlanItem {
   unblocks: string;
 }
 
+// V5 Report types
+export interface StrengthItem {
+  title: string;
+  description: string;
+  source_domain: DomainType;
+  source_topic: string;
+  confidence: ConfidenceLevel;
+}
+
+export interface RiskItem {
+  title: string;
+  description: string;
+  source_domain: DomainType;
+  source_topic: string;
+}
+
+export interface NeedsValidationItem {
+  title: string;
+  description: string;
+  source_domain: DomainType;
+  source_topic: string;
+  validation_step: string;
+}
+
+export interface RoadmapAction {
+  action: string;
+  rationale: string;
+  source_domain: DomainType;
+  source_topic: string;
+}
+
 export interface SnapshotV3 {
   // Assessment status
   assessment_status: AssessmentStatus;
@@ -214,10 +252,21 @@ export interface SnapshotV3 {
   readiness_level?: ReadinessLevel;
   verdict_summary?: string;
 
+  // V5: Expansion positioning (replaces readiness_level in display)
+  expansion_positioning?: ExpansionPositioning;
+  executive_summary?: string;
+
   // Domain details (structured)
   domains: Record<DomainType, DomainResult>;
 
-  // Actions (derived from structured analysis)
+  // V5: New report sections
+  strengths?: StrengthItem[];
+  risks?: RiskItem[];
+  needs_validation?: NeedsValidationItem[];
+  roadmap_phase1?: RoadmapAction[];
+  roadmap_phase2?: RoadmapAction[];
+
+  // Legacy actions (kept for backwards compatibility)
   critical_actions: CriticalAction[];
   assumptions: AssumptionV3[];
   action_plan: ActionPlanItem[];

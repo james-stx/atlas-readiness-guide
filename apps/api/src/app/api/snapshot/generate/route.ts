@@ -17,7 +17,7 @@ import { getValidSession, updateSessionStatus } from '@/lib/db/session';
 import { getSessionInputs } from '@/lib/db/inputs';
 import { supabase } from '@/lib/db/supabase';
 import { handleApiError, ValidationError } from '@/lib/errors';
-import type { DomainType, ConfidenceLevel } from '@atlas/types';
+import type { DomainType, ConfidenceLevel, ExpansionPositioning } from '@atlas/types';
 
 // Increase timeout for this route (Vercel Pro: up to 300s, Hobby: 10s max)
 export const maxDuration = 60;
@@ -64,6 +64,30 @@ const snapshotV3Schema = z.object({
     })
   ).default([]),
 
+  // V5: Executive summary narrative
+  executiveSummary: z.string().optional(),
+
+  // V5: Strengths (high-confidence advantages)
+  strengths: z.array(
+    z.object({
+      title: z.string(),
+      description: z.string(),
+      sourceDomain: z.enum(['market', 'product', 'gtm', 'operations', 'financials']),
+      sourceTopic: z.string(),
+      confidence: z.enum(['high', 'medium', 'low']).default('high'),
+    })
+  ).default([]),
+
+  // V5: Risks (medium-confidence concerns)
+  risks: z.array(
+    z.object({
+      title: z.string(),
+      description: z.string(),
+      sourceDomain: z.enum(['market', 'product', 'gtm', 'operations', 'financials']),
+      sourceTopic: z.string(),
+    })
+  ).default([]),
+
   // Critical actions with source traceability
   criticalActions: z.array(
     z.object({
@@ -77,7 +101,18 @@ const snapshotV3Schema = z.object({
     })
   ).default([]),
 
-  // Assumptions with source traceability
+  // V5: Needs validation (renamed from assumptions, with validation step)
+  needsValidation: z.array(
+    z.object({
+      title: z.string(),
+      sourceDomain: z.enum(['market', 'product', 'gtm', 'operations', 'financials']),
+      sourceTopic: z.string(),
+      description: z.string(),
+      validationStep: z.string(),
+    })
+  ).default([]),
+
+  // Legacy assumptions (kept for backwards compatibility)
   assumptions: z.array(
     z.object({
       title: z.string(),
@@ -88,7 +123,26 @@ const snapshotV3Schema = z.object({
     })
   ).default([]),
 
-  // 30-day action plan
+  // V5: 90-day roadmap phases
+  roadmapPhase1: z.array(
+    z.object({
+      action: z.string(),
+      rationale: z.string(),
+      sourceDomain: z.enum(['market', 'product', 'gtm', 'operations', 'financials']),
+      sourceTopic: z.string(),
+    })
+  ).default([]),
+
+  roadmapPhase2: z.array(
+    z.object({
+      action: z.string(),
+      rationale: z.string(),
+      sourceDomain: z.enum(['market', 'product', 'gtm', 'operations', 'financials']),
+      sourceTopic: z.string(),
+    })
+  ).default([]),
+
+  // Legacy 30-day action plan
   actionPlan: z.array(
     z.object({
       week: z.number().min(1).max(4),
@@ -268,6 +322,26 @@ export async function POST(request: NextRequest) {
       critical_gaps_count: criticalGapsCount,
     };
 
+    // Calculate expansion positioning (5-tier scale)
+    const calculateExpansionPositioning = (): ExpansionPositioning => {
+      const domains: DomainType[] = ['market', 'product', 'gtm', 'operations', 'financials'];
+      let highDomains = 0;
+      let lowDomains = 0;
+      for (const domain of domains) {
+        const dr = domainResults[domain];
+        if (dr.confidence_level === 'high') highDomains++;
+        if (dr.confidence_level === 'low') lowDomains++;
+      }
+      const criticalCount = (generatedV3Snapshot.criticalActions || []).length;
+      const validationCount = (generatedV3Snapshot.needsValidation || []).length;
+
+      if (highDomains >= 4 && criticalCount === 0 && validationCount <= 1) return 'expansion_ready';
+      if (highDomains >= 3 && criticalCount <= 1 && validationCount <= 3) return 'well_positioned';
+      if (highDomains >= 2 && criticalCount <= 2) return 'conditionally_positioned';
+      if (lowDomains >= 2 || criticalCount >= 3) return 'foundation_building';
+      return 'early_exploration';
+    };
+
     // Calculate readiness level based on actual data (override AI if needed)
     const calculateReadinessLevel = (): 'ready' | 'ready_with_caveats' | 'not_ready' => {
       const domains: DomainType[] = ['market', 'product', 'gtm', 'operations', 'financials'];
@@ -314,6 +388,10 @@ export async function POST(request: NextRequest) {
       ? calculateReadinessLevel()
       : undefined;
 
+    const calculatedPositioning = assessmentStatus.status === 'assessable'
+      ? calculateExpansionPositioning()
+      : undefined;
+
     console.log('[Snapshot] Final readiness level:', calculatedReadinessLevel);
 
     // Build V3 data structure
@@ -324,6 +402,8 @@ export async function POST(request: NextRequest) {
       topics_total: assessmentStatus.topics_total,
       readiness_level: calculatedReadinessLevel,
       verdict_summary: assessmentStatus.status === 'assessable' ? generatedV3Snapshot.verdictSummary : undefined,
+      expansion_positioning: calculatedPositioning,
+      executive_summary: assessmentStatus.status === 'assessable' ? generatedV3Snapshot.executiveSummary : undefined,
       domains: Object.fromEntries(
         (['market', 'product', 'gtm', 'operations', 'financials'] as DomainType[]).map((domain) => {
           const dr = domainResults[domain];
@@ -366,6 +446,19 @@ export async function POST(request: NextRequest) {
           }];
         })
       ),
+      strengths: (generatedV3Snapshot.strengths || []).map((s: { title: string; description: string; sourceDomain: DomainType; sourceTopic: string; confidence: ConfidenceLevel }) => ({
+        title: s.title,
+        description: s.description,
+        source_domain: s.sourceDomain,
+        source_topic: s.sourceTopic,
+        confidence: s.confidence,
+      })),
+      risks: (generatedV3Snapshot.risks || []).map((r: { title: string; description: string; sourceDomain: DomainType; sourceTopic: string }) => ({
+        title: r.title,
+        description: r.description,
+        source_domain: r.sourceDomain,
+        source_topic: r.sourceTopic,
+      })),
       critical_actions: (generatedV3Snapshot.criticalActions || []).map((ca: { priority: number; title: string; sourceDomain: DomainType; sourceTopic: string; sourceStatus: string; description: string; action: string }) => ({
         priority: ca.priority,
         title: ca.title,
@@ -375,12 +468,31 @@ export async function POST(request: NextRequest) {
         description: ca.description,
         action: ca.action,
       })),
+      needs_validation: (generatedV3Snapshot.needsValidation || []).map((nv: { title: string; sourceDomain: DomainType; sourceTopic: string; description: string; validationStep: string }) => ({
+        title: nv.title,
+        source_domain: nv.sourceDomain,
+        source_topic: nv.sourceTopic,
+        description: nv.description,
+        validation_step: nv.validationStep,
+      })),
       assumptions: (generatedV3Snapshot.assumptions || []).map((a: { title: string; sourceDomain: DomainType; sourceTopic: string; description: string; validation: string }) => ({
         title: a.title,
         source_domain: a.sourceDomain,
         source_topic: a.sourceTopic,
         description: a.description,
         validation: a.validation,
+      })),
+      roadmap_phase1: (generatedV3Snapshot.roadmapPhase1 || []).map((r: { action: string; rationale: string; sourceDomain: DomainType; sourceTopic: string }) => ({
+        action: r.action,
+        rationale: r.rationale,
+        source_domain: r.sourceDomain,
+        source_topic: r.sourceTopic,
+      })),
+      roadmap_phase2: (generatedV3Snapshot.roadmapPhase2 || []).map((r: { action: string; rationale: string; sourceDomain: DomainType; sourceTopic: string }) => ({
+        action: r.action,
+        rationale: r.rationale,
+        source_domain: r.sourceDomain,
+        source_topic: r.sourceTopic,
       })),
       action_plan: (generatedV3Snapshot.actionPlan || []).map((ap: { week: number; action: string; sourceDomain: DomainType; sourceTopic: string; unblocks: string }) => ({
         week: ap.week,

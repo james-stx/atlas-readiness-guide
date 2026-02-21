@@ -165,7 +165,7 @@ packages/types/node_modules
 - **components/workspace/chat/** (4): ChatHeader,ChatPanel,InputCapturedIndicator,TopicTransitionBanner
 - **components/workspace/mobile/** (1): MobileTabBar
 - **components/ui/** (13): button,confidence-badge,confirm-dialog,error-card,input,network-banner,overflow-menu,progress-bar-mini,progress,skeleton-loader,skeleton,status-indicator,tooltip
-- **components/snapshot/** (21): ActionPlanSection,ActionPlanSectionV3,ActionPlanUnified,AssessmentOverview,AssessmentProgress,assumptions-section,AttentionSection,coverage-overview,CriticalActionsSection,DomainDetailSection,EarlySignals,export-section,gaps-section,key-findings,next-steps-section,PreliminaryInsights,ReadinessOverview,RecommendedTopics,strengths-section,UnlockPreview,ValidatedSection
+- **components/snapshot/** (28): ActionPlanSection,ActionPlanSectionV3,ActionPlanUnified,AssessmentOverview,AssessmentProgress,assumptions-section,AttentionSection,coverage-overview,CriticalActionsSection,DomainDetailSection,EarlySignals,export-section,gaps-section,key-findings,next-steps-section,PreliminaryInsights,ReadinessOverview,RecommendedTopics,report-coverage,report-critical,report-executive-summary,report-needs-validation,report-risks,report-roadmap,report-strengths,strengths-section,UnlockPreview,ValidatedSection
 
 <!-- /AUTO:COMPONENTS -->
 
@@ -213,7 +213,8 @@ packages/types/node_modules
 ## Recent Commits
 
 ```
-55d8715 feat: Improve stale report UX with clearer update CTA
+6663f5d feat: Comprehensive Readiness Report V5 redesign
+9369771 feat: Improve stale report UX with clearer update CTA
 81d9390 fix: Remove duplicate confidence pill from bottom of expanded topic card
 d3ae2f0 feat: Style 'Why This Matters' section with two-shade grey block UI
 3b0e0b4 docs: auto-update MVP documentation [skip ci]
@@ -222,6 +223,5 @@ d0c610f Fix missing InlineSnapshotCTA import in ContentPanel
 851757a docs: auto-update MVP documentation [skip ci]
 efe1cf0 fix: Remove duplicate report button and keep Assessment section visible
 72ed455 docs: auto-update MVP documentation [skip ci]
-376174b feat: Integrate readiness report into workspace with single entry point
 ```
 <!-- /AUTO:RECENT_CHANGES -->
