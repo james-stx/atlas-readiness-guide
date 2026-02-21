@@ -9,9 +9,9 @@ export const anthropic = createAnthropic({
 });
 
 // Model configurations
-// Claude 4.5 models - latest and most capable
+// Claude 4.6 / 4.5 models - latest and most capable
 export const models = {
-  conversation: 'claude-sonnet-4-5-20250929',
+  conversation: 'claude-sonnet-4-6',
   classification: 'claude-haiku-4-5-20251001',
   synthesis: 'claude-haiku-4-5-20251001', // Use Haiku for faster synthesis (avoid timeout)
 } as const;

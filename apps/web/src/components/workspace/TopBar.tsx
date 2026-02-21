@@ -2,13 +2,11 @@
 
 import { Compass, PanelRightOpen, PanelRightClose, MessageSquare, Clock } from 'lucide-react';
 import { useWorkspace } from '@/lib/context/workspace-context';
-import { useAssessment } from '@/lib/context/assessment-context';
 import { useMemo } from 'react';
 import { cn } from '@/lib/utils';
 
 export function TopBar() {
   const { progressState, toggleChat, isChatOpen } = useWorkspace();
-  const { session } = useAssessment();
 
   const progress = progressState.overallProgress;
 
@@ -34,10 +32,6 @@ export function TopBar() {
           </div>
           <span className="text-[14px] font-semibold text-[#37352F]">Atlas</span>
         </div>
-        <span className="hidden text-[#D4D1CB] sm:block">·</span>
-        <span className="hidden max-w-[200px] truncate text-[13px] text-[#787671] sm:block">
-          {session?.email ? 'My Assessment' : 'Readiness Assessment'}
-        </span>
       </div>
 
       {/* Center: Progress */}

@@ -213,7 +213,9 @@ packages/types/src
 ## Recent Commits
 
 ```
-b48e86a Fix missing InlineSnapshotCTA import in ContentPanel
+edaf649 fix: Remove 'My Assessment' label and inline snapshot CTA, upgrade to Sonnet 4.6
+d0c610f Fix missing InlineSnapshotCTA import in ContentPanel
+851757a docs: auto-update MVP documentation [skip ci]
 efe1cf0 fix: Remove duplicate report button and keep Assessment section visible
 72ed455 docs: auto-update MVP documentation [skip ci]
 376174b feat: Integrate readiness report into workspace with single entry point
@@ -221,7 +223,5 @@ efe1cf0 fix: Remove duplicate report button and keep Assessment section visible
 f458c5f docs: auto-update MVP documentation [skip ci]
 c4130c2 Show positive "Ready to Execute" message when no blockers/assumptions
 01fbc2f Fix readiness level calculation with server-side logic
-c84e159 Improve message when report needs refresh
-37577ca docs: auto-update MVP documentation [skip ci]
 ```
 <!-- /AUTO:RECENT_CHANGES -->

@@ -6,7 +6,6 @@ import { DOMAIN_TOPICS } from '@/lib/progress';
 import { EmptyState } from './EmptyState';
 import { ContentDomainHeader } from './ContentDomainHeader';
 import { TopicCard } from './TopicCard';
-import { InlineSnapshotCTA } from './InlineSnapshotCTA';
 import { ReportPanel } from '../report/ReportPanel';
 import { useEffect, useRef, useCallback, useMemo } from 'react';
 import { useSkippedTopics } from '@/lib/hooks/use-skipped-topics';
@@ -48,8 +47,6 @@ export function ContentPanel() {
   const domainInputs = inputs.filter((i) => i.domain === selectedDomain);
   const count = getDomainInputCount(selectedDomain);
   const dp = progressState.domainProgress[selectedDomain];
-  const showSnapshotCTA = count.total > 0 && count.current / count.total >= 0.6;
-
   // Open chat and start discussing a topic - explicit user action via "Talk to Atlas" button
   const handleDiscussTopic = useCallback((topicId: string) => {
     discussTopic(selectedDomain, topicId);
@@ -133,14 +130,6 @@ export function ContentPanel() {
           })}
         </div>
 
-        {/* Snapshot CTA */}
-        {showSnapshotCTA && (
-          <InlineSnapshotCTA
-            domainLabel={dp.status === 'adequate' ? 'this domain' : selectedDomain}
-            covered={count.current}
-            total={count.total}
-          />
-        )}
       </div>
     </div>
   );
