@@ -264,6 +264,15 @@ This replaces the previous empty state that would show no content when all items
    - Provides domain names in user-friendly format (e.g., "Go-to-Market" not "gtm")
    - Prioritizes domains in logical order: Market, Product, Go-to-Market, Operations, Financials
 
+### Legacy Report Viewing
+
+For users with pre-V5 assessments:
+1. Navigate to Report tab
+2. System detects legacy snapshot format
+3. Display upgrade prompt with "Regenerate Assessment" CTA
+4. Show available legacy data (coverage, verdict summary, critical actions)
+5. User can regenerate to access full V5 report features
+
 ### Auto-Navigation Behavior
 
 **Auto-Navigation Behavior:**
@@ -694,6 +703,8 @@ This separation allows users to browse content freely without accidentally trigg
   - Real-time streaming display
   - Local storage for session recovery
   - Responsive design
+
+**Snapshot Version Compatibility**: The ReportPanel component includes version detection logic to handle pre-V5 snapshots gracefully. Legacy snapshots are identified by the absence of `expansion_positioning` data and trigger a simplified rendering path with upgrade prompts rather than attempting to render modern report components that would fail.
 
 #### API (Backend)
 - **Purpose**: Business logic and integrations
@@ -1589,23 +1600,4 @@ NEXT_PUBLIC_API_URL=http://localhost:3001
 
 ---
 
-## 11. Local Development Setup
-
-### Prerequisites
-
-Before starting, you need:
-
-1. **Node.js** (version 18 or higher)
-   - Download from: https://nodejs.org
-   - Verify: `node --version`
-
-2. **pnpm** (package manager)
-   - Install: `npm install -g pnpm`
-   - Verify: `pnpm --version`
-
-3. **Git** (version control)
-   - Usually pre-installed on Mac
-   - Verify: `git --version`
-
-4. **Accounts** (for API keys)
-   - Supabase account: https://su
+## 
