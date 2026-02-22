@@ -213,7 +213,8 @@ packages/types/node_modules
 ## Recent Commits
 
 ```
-9473d56 fix: Rewrite PDF export to render V5 report data
+25e9726 fix: Restore snapshot on session recovery so report persists across refreshes
+22f9f50 fix: Rewrite PDF export to render V5 report data
 951b900 fix: Add workspace-panel class to ReportPanel for correct scroll height
 484cdaa revert: Remove debug error detail from 500 response
 0ae8ee9 debug: Expose error detail in 500 response temporarily
@@ -222,6 +223,5 @@ a8a1d02 perf: Skip topicResults generation for assessable reports, bump maxDurat
 9c1193b docs: auto-update MVP documentation [skip ci]
 6578b6d feat: Graceful legacy report handling for pre-V5 snapshots
 68c890b feat: Comprehensive Readiness Report V5 redesign
-8859866 docs: auto-update MVP documentation [skip ci]
 ```
 <!-- /AUTO:RECENT_CHANGES -->

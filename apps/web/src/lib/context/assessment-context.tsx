@@ -227,6 +227,16 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
       dispatch({ type: 'SET_MESSAGES', payload: messages });
       dispatch({ type: 'SET_INPUTS', payload: inputs });
 
+      // Restore snapshot if one exists for this session
+      try {
+        const { snapshot: existingSnapshot } = await api.getSnapshot(session.id);
+        if (existingSnapshot) {
+          dispatch({ type: 'SET_SNAPSHOT', payload: existingSnapshot });
+        }
+      } catch {
+        // No snapshot yet — that's fine
+      }
+
       return true;
     } catch (error) {
       // Clear invalid session from storage
