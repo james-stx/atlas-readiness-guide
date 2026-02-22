@@ -213,7 +213,8 @@ packages/types/node_modules
 ## Recent Commits
 
 ```
-a3876a7 fix: Add workspace-panel class to ReportPanel for correct scroll height
+9473d56 fix: Rewrite PDF export to render V5 report data
+951b900 fix: Add workspace-panel class to ReportPanel for correct scroll height
 484cdaa revert: Remove debug error detail from 500 response
 0ae8ee9 debug: Expose error detail in 500 response temporarily
 7505a29 fix: Split snapshot schema by assessment status to resolve 500 error
@@ -222,6 +223,5 @@ a8a1d02 perf: Skip topicResults generation for assessable reports, bump maxDurat
 6578b6d feat: Graceful legacy report handling for pre-V5 snapshots
 68c890b feat: Comprehensive Readiness Report V5 redesign
 8859866 docs: auto-update MVP documentation [skip ci]
-9369771 feat: Improve stale report UX with clearer update CTA
 ```
 <!-- /AUTO:RECENT_CHANGES -->

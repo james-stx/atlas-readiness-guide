@@ -37,10 +37,26 @@ export async function GET(
       throw new ValidationError('No snapshot found for this session. Please generate a snapshot first.');
     }
 
+    // Parse raw_output to inject v3, key_stats, readiness_level, verdict_summary
+    let enrichedSnapshot = { ...snapshot } as Snapshot;
+    if (snapshot.raw_output) {
+      try {
+        const rawData = typeof snapshot.raw_output === 'string'
+          ? JSON.parse(snapshot.raw_output)
+          : snapshot.raw_output;
+        if (rawData.v3) enrichedSnapshot.v3 = rawData.v3;
+        if (rawData.key_stats) enrichedSnapshot.key_stats = rawData.key_stats;
+        if (rawData.readiness_level) enrichedSnapshot.readiness_level = rawData.readiness_level;
+        if (rawData.verdict_summary) enrichedSnapshot.verdict_summary = rawData.verdict_summary;
+      } catch {
+        // raw_output not parseable — proceed with base snapshot fields
+      }
+    }
+
     // Generate the PDF
     const pdfBuffer = await renderToBuffer(
       SnapshotDocument({
-        snapshot: snapshot as Snapshot,
+        snapshot: enrichedSnapshot,
         session: session as Session,
       })
     );

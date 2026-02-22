@@ -6,13 +6,11 @@ import {
   View,
   StyleSheet,
 } from '@react-pdf/renderer';
-import type { Snapshot, Session, DomainType, ConfidenceLevel, GapImportance } from '@atlas/types';
+import type { Snapshot, Session, DomainType } from '@atlas/types';
 import {
   pdfColors,
   fontSizes,
   commonStyles,
-  confidenceStyles,
-  importanceStyles,
 } from './theme';
 
 interface SnapshotDocumentProps {
@@ -28,25 +26,53 @@ const DOMAIN_LABELS: Record<DomainType, string> = {
   financials: 'Financials',
 };
 
+const POSITIONING_LABELS: Record<string, string> = {
+  expansion_ready: 'Expansion Ready',
+  well_positioned: 'Well Positioned',
+  conditionally_positioned: 'Conditionally Positioned',
+  foundation_building: 'Foundation Building',
+  early_exploration: 'Early Exploration',
+};
+
 const styles = StyleSheet.create({
+  // Positioning badge
+  positioningBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+    alignSelf: 'flex-start',
+    marginBottom: 12,
+  },
+  positioningText: {
+    fontSize: fontSizes.sm,
+    fontWeight: 'bold',
+  },
+  // Executive summary
+  execSummary: {
+    backgroundColor: '#F9F8F5',
+    borderLeftWidth: 3,
+    borderLeftColor: pdfColors.primary,
+    padding: 12,
+    marginBottom: 20,
+    borderRadius: 4,
+  },
   // Coverage grid
   coverageGrid: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
+    gap: 6,
     marginBottom: 16,
   },
   coverageItem: {
-    width: '18%',
+    flex: 1,
     padding: 8,
     backgroundColor: pdfColors.slate50,
-    borderRadius: 6,
+    borderRadius: 4,
     alignItems: 'center',
   },
   coverageLabel: {
     fontSize: fontSizes.xs,
     color: pdfColors.slate500,
-    marginBottom: 4,
+    marginBottom: 2,
     textTransform: 'uppercase',
   },
   coverageValue: {
@@ -54,368 +80,413 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: pdfColors.slate900,
   },
-  // Progress bar
-  progressBar: {
-    height: 8,
-    backgroundColor: pdfColors.slate200,
-    borderRadius: 4,
-    marginTop: 4,
-    overflow: 'hidden',
+  coverageSub: {
+    fontSize: fontSizes.xs,
+    color: pdfColors.slate500,
   },
-  progressFill: {
-    height: '100%',
-    borderRadius: 4,
+  // Domain badge
+  domainBadge: {
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+    borderRadius: 3,
+    backgroundColor: pdfColors.slate100,
   },
-  // Findings
-  findingRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 8,
-    paddingBottom: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: pdfColors.slate100,
+  domainBadgeText: {
+    fontSize: fontSizes.xs,
+    color: pdfColors.slate500,
   },
-  findingContent: {
-    flex: 1,
-    marginRight: 8,
-  },
-  // Two column layout
-  twoColumn: {
-    flexDirection: 'row',
-    gap: 16,
-  },
-  column: {
-    flex: 1,
-  },
-  // Strength/Assumption item
-  listItem: {
-    flexDirection: 'row',
-    marginBottom: 8,
-    paddingLeft: 8,
-  },
-  bullet: {
-    width: 16,
-    fontSize: fontSizes.base,
-    color: pdfColors.primary,
-  },
-  listContent: {
-    flex: 1,
-  },
-  // Gap card
-  gapCard: {
+  // Strength card
+  strengthCard: {
+    backgroundColor: '#F0FDF4',
+    borderLeftWidth: 3,
+    borderLeftColor: pdfColors.green600,
     padding: 10,
     marginBottom: 8,
     borderRadius: 4,
-    borderLeftWidth: 4,
   },
-  gapHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 6,
+  // Risk card
+  riskCard: {
+    backgroundColor: '#FFFBEB',
+    borderLeftWidth: 3,
+    borderLeftColor: pdfColors.amber600,
+    padding: 10,
+    marginBottom: 8,
+    borderRadius: 4,
   },
-  // Next step
-  stepRow: {
-    flexDirection: 'row',
-    marginBottom: 12,
+  // Critical action card
+  criticalCard: {
+    borderWidth: 1,
+    borderColor: pdfColors.slate300,
+    borderRadius: 4,
+    padding: 10,
+    marginBottom: 8,
   },
-  stepNumber: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+  priorityBadge: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
     backgroundColor: pdfColors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 10,
+    marginRight: 8,
   },
-  stepNumberText: {
+  priorityText: {
     color: pdfColors.white,
-    fontSize: fontSizes.sm,
+    fontSize: fontSizes.xs,
     fontWeight: 'bold',
   },
-  stepContent: {
+  // Validation card
+  validationCard: {
+    backgroundColor: pdfColors.slate50,
+    borderLeftWidth: 3,
+    borderLeftColor: pdfColors.slate500,
+    padding: 10,
+    marginBottom: 8,
+    borderRadius: 4,
+  },
+  // Roadmap phase
+  phaseHeader: {
+    backgroundColor: pdfColors.slate100,
+    padding: 8,
+    borderRadius: 4,
+    marginBottom: 8,
+  },
+  roadmapItem: {
+    flexDirection: 'row',
+    marginBottom: 8,
+    paddingLeft: 4,
+  },
+  bullet: {
+    width: 14,
+    fontSize: fontSizes.base,
+    color: pdfColors.primary,
+  },
+  itemContent: {
     flex: 1,
-    paddingTop: 2,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    gap: 6,
+    marginTop: 4,
+    flexWrap: 'wrap',
+  },
+  // Two column
+  twoCol: {
+    flexDirection: 'row',
+    gap: 14,
+  },
+  col: {
+    flex: 1,
+  },
+  // Empty state
+  emptyNote: {
+    fontSize: fontSizes.sm,
+    color: pdfColors.slate500,
+    fontStyle: 'italic',
+    paddingVertical: 4,
   },
 });
 
-function ConfidenceBadge({ level }: { level: ConfidenceLevel }) {
-  const style = confidenceStyles[level];
-  return (
-    <View style={[commonStyles.badge, { backgroundColor: style.backgroundColor }]}>
-      <Text style={{ color: style.color, fontSize: fontSizes.xs, textTransform: 'uppercase' }}>
-        {level}
-      </Text>
-    </View>
-  );
-}
-
 function DomainBadge({ domain }: { domain: DomainType }) {
   return (
-    <View style={[commonStyles.badge, { backgroundColor: pdfColors.slate100 }]}>
-      <Text style={{ color: pdfColors.slate600, fontSize: fontSizes.xs }}>
-        {DOMAIN_LABELS[domain]}
-      </Text>
+    <View style={styles.domainBadge}>
+      <Text style={styles.domainBadgeText}>{DOMAIN_LABELS[domain]}</Text>
     </View>
   );
 }
 
-function CoverageSection({ coverage }: { coverage: Snapshot['coverage_summary'] }) {
+function SectionTitle({ title, description }: { title: string; description?: string }) {
   return (
-    <View style={commonStyles.section}>
-      <Text style={commonStyles.sectionTitle}>Coverage Overview</Text>
-      <Text style={commonStyles.sectionDescription}>
-        Your readiness across the five key domains for U.S. expansion
-      </Text>
-
-      <View style={styles.coverageGrid}>
-        {(Object.entries(coverage) as [DomainType, { high_confidence: number; medium_confidence: number; low_confidence: number; questions_answered: number }][]).map(
-          ([domain, levels]) => {
-            const total = levels.high_confidence + levels.medium_confidence + levels.low_confidence;
-            const highPct = total > 0 ? (levels.high_confidence / total) * 100 : 0;
-            const medPct = total > 0 ? (levels.medium_confidence / total) * 100 : 0;
-
-            return (
-              <View key={domain} style={styles.coverageItem}>
-                <Text style={styles.coverageLabel}>{DOMAIN_LABELS[domain]}</Text>
-                <Text style={styles.coverageValue}>{total}</Text>
-                <Text style={[commonStyles.textSm, { marginBottom: 4 }]}>inputs</Text>
-                <View style={styles.progressBar}>
-                  <View
-                    style={[
-                      styles.progressFill,
-                      {
-                        width: `${highPct + medPct}%`,
-                        backgroundColor: highPct > 50 ? pdfColors.green600 : pdfColors.amber600,
-                      },
-                    ]}
-                  />
-                </View>
-              </View>
-            );
-          }
-        )}
-      </View>
-    </View>
-  );
-}
-
-function KeyFindingsSection({ findings }: { findings: Snapshot['key_findings'] }) {
-  return (
-    <View style={commonStyles.section}>
-      <Text style={commonStyles.sectionTitle}>Key Findings</Text>
-      <Text style={commonStyles.sectionDescription}>
-        The most important insights from your assessment
-      </Text>
-
-      {findings.map((finding, index) => (
-        <View key={index} style={styles.findingRow}>
-          <View style={styles.findingContent}>
-            <Text style={commonStyles.text}>{finding.finding}</Text>
-          </View>
-          <View style={{ flexDirection: 'row', gap: 4 }}>
-            <ConfidenceBadge level={finding.confidence} />
-            <DomainBadge domain={finding.domain} />
-          </View>
-        </View>
-      ))}
-    </View>
-  );
-}
-
-function StrengthsSection({ strengths }: { strengths: Snapshot['strengths'] }) {
-  return (
-    <View style={styles.column}>
-      <Text style={commonStyles.sectionTitle}>Strengths</Text>
-      <Text style={commonStyles.sectionDescription}>Areas where you have solid knowledge</Text>
-
-      {strengths.length === 0 ? (
-        <Text style={commonStyles.textSm}>No clear strengths identified yet.</Text>
-      ) : (
-        strengths.map((strength, index) => (
-          <View key={index} style={styles.listItem}>
-            <Text style={styles.bullet}>•</Text>
-            <View style={styles.listContent}>
-              <Text style={commonStyles.text}>{strength.item}</Text>
-              <View style={{ flexDirection: 'row', marginTop: 4 }}>
-                <DomainBadge domain={strength.domain} />
-              </View>
-            </View>
-          </View>
-        ))
+    <View style={{ marginBottom: 10 }}>
+      <Text style={commonStyles.sectionTitle}>{title}</Text>
+      {description && (
+        <Text style={[commonStyles.textSm, { marginTop: 2 }]}>{description}</Text>
       )}
-    </View>
-  );
-}
-
-function AssumptionsSection({ assumptions }: { assumptions: Snapshot['assumptions'] }) {
-  return (
-    <View style={styles.column}>
-      <Text style={commonStyles.sectionTitle}>Assumptions to Validate</Text>
-      <Text style={commonStyles.sectionDescription}>Areas needing verification</Text>
-
-      {assumptions.length === 0 ? (
-        <Text style={commonStyles.textSm}>No assumptions requiring validation.</Text>
-      ) : (
-        assumptions.map((assumption, index) => (
-          <View key={index} style={[commonStyles.card, { backgroundColor: pdfColors.amber100 }]}>
-            <Text style={[commonStyles.text, commonStyles.bold]}>{assumption.item}</Text>
-            <Text style={[commonStyles.textSm, { marginTop: 4 }]}>Risk: {assumption.risk}</Text>
-            <Text style={[commonStyles.textSm, { color: pdfColors.amber600, marginTop: 2 }]}>
-              To validate: {assumption.validation_suggestion}
-            </Text>
-          </View>
-        ))
-      )}
-    </View>
-  );
-}
-
-function GapsSection({ gaps }: { gaps: Snapshot['gaps'] }) {
-  // Sort by importance
-  const sortedGaps = [...gaps].sort((a, b) => {
-    const order: Record<GapImportance, number> = { critical: 0, important: 1, 'nice-to-have': 2 };
-    return order[a.importance] - order[b.importance];
-  });
-
-  return (
-    <View style={commonStyles.section}>
-      <Text style={commonStyles.sectionTitle}>Gaps to Address</Text>
-      <Text style={commonStyles.sectionDescription}>
-        Information you need but don't have yet
-      </Text>
-
-      {sortedGaps.length === 0 ? (
-        <Text style={commonStyles.textSm}>No significant gaps identified.</Text>
-      ) : (
-        sortedGaps.map((gap, index) => {
-          const style = importanceStyles[gap.importance];
-          return (
-            <View
-              key={index}
-              style={[
-                styles.gapCard,
-                {
-                  backgroundColor: style.backgroundColor,
-                  borderLeftColor: style.borderColor,
-                },
-              ]}
-            >
-              <View style={styles.gapHeader}>
-                <View style={[commonStyles.badge, { backgroundColor: style.backgroundColor }]}>
-                  <Text
-                    style={{
-                      color: style.badgeColor,
-                      fontSize: fontSizes.xs,
-                      textTransform: 'uppercase',
-                    }}
-                  >
-                    {gap.importance}
-                  </Text>
-                </View>
-                <DomainBadge domain={gap.domain} />
-              </View>
-              <Text style={[commonStyles.text, commonStyles.bold]}>{gap.item}</Text>
-              <Text style={[commonStyles.textSm, { marginTop: 4 }]}>
-                Recommendation: {gap.recommendation}
-              </Text>
-            </View>
-          );
-        })
-      )}
-    </View>
-  );
-}
-
-function NextStepsSection({ steps }: { steps: Snapshot['next_steps'] }) {
-  const sortedSteps = [...steps].sort((a, b) => a.priority - b.priority);
-
-  return (
-    <View style={commonStyles.section}>
-      <Text style={commonStyles.sectionTitle}>Recommended Next Steps</Text>
-      <Text style={commonStyles.sectionDescription}>
-        Prioritized actions to improve your readiness
-      </Text>
-
-      {sortedSteps.map((step) => (
-        <View key={step.priority} style={styles.stepRow}>
-          <View style={styles.stepNumber}>
-            <Text style={styles.stepNumberText}>{step.priority}</Text>
-          </View>
-          <View style={styles.stepContent}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
-              <Text style={[commonStyles.text, commonStyles.bold, { flex: 1 }]}>{step.action}</Text>
-              <DomainBadge domain={step.domain} />
-            </View>
-            <Text style={commonStyles.textSm}>{step.rationale}</Text>
-          </View>
-        </View>
-      ))}
     </View>
   );
 }
 
 export function SnapshotDocument({ snapshot, session }: SnapshotDocumentProps) {
+  const v3 = snapshot.v3;
   const generatedDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   });
 
+  // Derive positioning display
+  const positioning = v3?.expansion_positioning;
+  const positioningLabel = positioning ? POSITIONING_LABELS[positioning] : null;
+  const isAssessable = v3?.assessment_status === 'assessable';
+
+  // Coverage per domain (from v3.domains if available, else from legacy coverage_summary)
+  const domains: DomainType[] = ['market', 'product', 'gtm', 'operations', 'financials'];
+
   return (
     <Document>
+      {/* ─── PAGE 1: Header + Overview ─── */}
       <Page size="A4" style={commonStyles.page}>
         {/* Header */}
         <View style={commonStyles.header}>
           <View style={commonStyles.logo}>
             <Text style={commonStyles.logoText}>A</Text>
           </View>
-          <Text style={commonStyles.title}>Your Readiness Snapshot</Text>
+          <Text style={commonStyles.title}>U.S. Expansion Readiness Report</Text>
           <Text style={commonStyles.subtitle}>
-            A summary of what you know vs. what you're assuming about U.S. expansion
+            Assessment for {session.email}
           </Text>
-          <Text style={[commonStyles.textSm, { marginTop: 8 }]}>
-            Generated for {session.email} on {generatedDate}
+          <Text style={[commonStyles.textSm, { marginTop: 6 }]}>
+            Generated on {generatedDate}
           </Text>
         </View>
 
-        {/* Coverage */}
-        <CoverageSection coverage={snapshot.coverage_summary} />
+        {/* Positioning badge + executive summary (V5 assessable only) */}
+        {isAssessable && positioningLabel && (
+          <View style={[styles.positioningBadge, { backgroundColor: '#EDE9FE' }]}>
+            <Text style={[styles.positioningText, { color: '#5B21B6' }]}>
+              {positioningLabel}
+            </Text>
+          </View>
+        )}
 
-        {/* Key Findings */}
-        <KeyFindingsSection findings={snapshot.key_findings} />
+        {isAssessable && v3?.executive_summary && (
+          <View style={styles.execSummary}>
+            <Text style={[commonStyles.text, { lineHeight: 1.6 }]}>
+              {v3.executive_summary}
+            </Text>
+          </View>
+        )}
 
-        {/* Footer for page 1 */}
+        {/* Coverage overview */}
+        <View style={commonStyles.section}>
+          <SectionTitle
+            title="Coverage Overview"
+            description="Topics assessed across the five key domains"
+          />
+          <View style={styles.coverageGrid}>
+            {domains.map((domain) => {
+              const dr = v3?.domains?.[domain];
+              const covered = dr ? dr.topics_covered : 0;
+              const total = dr ? dr.topics_total : 5;
+              const legacyCoverage = snapshot.coverage_summary?.[domain];
+              const legacyTotal = legacyCoverage
+                ? legacyCoverage.high_confidence + legacyCoverage.medium_confidence + legacyCoverage.low_confidence
+                : 0;
+              const displayCovered = dr ? covered : legacyTotal;
+              return (
+                <View key={domain} style={styles.coverageItem}>
+                  <Text style={styles.coverageLabel}>{DOMAIN_LABELS[domain]}</Text>
+                  <Text style={styles.coverageValue}>{displayCovered}</Text>
+                  <Text style={styles.coverageSub}>{dr ? `/ ${total} topics` : 'inputs'}</Text>
+                </View>
+              );
+            })}
+          </View>
+
+          {v3 && (
+            <Text style={commonStyles.textSm}>
+              Overall coverage: {v3.topics_covered}/{v3.topics_total} topics ({v3.coverage_percentage}%)
+              {' · '}
+              Status: {v3.assessment_status === 'assessable' ? 'Full Assessment' : 'In Progress'}
+            </Text>
+          )}
+        </View>
+
+        {/* Incomplete assessment note */}
+        {v3 && !isAssessable && (
+          <View style={{ backgroundColor: '#FEF3C7', padding: 12, borderRadius: 6, marginBottom: 16 }}>
+            <Text style={[commonStyles.text, { fontWeight: 'bold', marginBottom: 4 }]}>
+              Assessment In Progress
+            </Text>
+            <Text style={commonStyles.textSm}>
+              {v3.topics_covered} of {v3.topics_total} topics covered. Complete at least 15 topics across all domains to unlock the full readiness report.
+            </Text>
+          </View>
+        )}
+
+        {/* Early signals for incomplete assessments */}
+        {!isAssessable && v3?.early_signals && v3.early_signals.length > 0 && (
+          <View style={commonStyles.section}>
+            <SectionTitle title="Early Signals" description="Cross-domain patterns identified so far" />
+            {v3.early_signals.map((signal, i) => (
+              <View key={i} style={[styles.riskCard, { marginBottom: 8 }]}>
+                <Text style={[commonStyles.text, { fontWeight: 'bold', marginBottom: 4 }]}>
+                  {signal.title}
+                </Text>
+                <Text style={commonStyles.textSm}>{signal.description}</Text>
+                <Text style={[commonStyles.textSm, { color: pdfColors.amber600, marginTop: 4 }]}>
+                  Implication: {signal.implication}
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* Footer */}
         <View style={commonStyles.footer}>
-          <Text>
-            Generated by Atlas Readiness Guide | This snapshot reflects your self-reported
-            information.
-          </Text>
+          <Text>Atlas Readiness Guide · This report reflects your self-reported information.</Text>
           <Text>It is not a score or recommendation to expand.</Text>
         </View>
       </Page>
 
-      <Page size="A4" style={commonStyles.page}>
-        {/* Strengths and Assumptions - Two Column */}
-        <View style={styles.twoColumn}>
-          <StrengthsSection strengths={snapshot.strengths} />
-          <AssumptionsSection assumptions={snapshot.assumptions} />
-        </View>
+      {/* ─── PAGE 2: Strengths + Risks (assessable only) ─── */}
+      {isAssessable && (
+        <Page size="A4" style={commonStyles.page}>
+          {/* Strengths */}
+          <View style={commonStyles.section}>
+            <SectionTitle
+              title="Strengths"
+              description="High-confidence validated advantages for U.S. expansion"
+            />
+            {(!v3?.strengths || v3.strengths.length === 0) ? (
+              <Text style={styles.emptyNote}>No clear strengths identified yet.</Text>
+            ) : (
+              v3.strengths.map((s, i) => (
+                <View key={i} style={styles.strengthCard}>
+                  <Text style={[commonStyles.text, { fontWeight: 'bold', marginBottom: 4 }]}>
+                    {s.title}
+                  </Text>
+                  <Text style={commonStyles.textSm}>{s.description}</Text>
+                  <View style={styles.metaRow}>
+                    <DomainBadge domain={s.source_domain} />
+                    <Text style={commonStyles.textSm}>{s.source_topic}</Text>
+                  </View>
+                </View>
+              ))
+            )}
+          </View>
 
-        {/* Gaps */}
-        <GapsSection gaps={snapshot.gaps} />
+          {/* Risks */}
+          <View style={commonStyles.section}>
+            <SectionTitle
+              title="Risks"
+              description="Signals that will compound if ignored"
+            />
+            {(!v3?.risks || v3.risks.length === 0) ? (
+              <Text style={styles.emptyNote}>No significant risks identified.</Text>
+            ) : (
+              v3.risks.map((r, i) => (
+                <View key={i} style={styles.riskCard}>
+                  <Text style={[commonStyles.text, { fontWeight: 'bold', marginBottom: 4 }]}>
+                    {r.title}
+                  </Text>
+                  <Text style={commonStyles.textSm}>{r.description}</Text>
+                  <View style={styles.metaRow}>
+                    <DomainBadge domain={r.source_domain} />
+                    <Text style={commonStyles.textSm}>{r.source_topic}</Text>
+                  </View>
+                </View>
+              ))
+            )}
+          </View>
 
-        {/* Next Steps */}
-        <NextStepsSection steps={snapshot.next_steps} />
+          <View style={commonStyles.footer}>
+            <Text>Atlas Readiness Guide · This report reflects your self-reported information.</Text>
+            <Text>It is not a score or recommendation to expand.</Text>
+          </View>
+        </Page>
+      )}
 
-        {/* Footer for page 2 */}
-        <View style={commonStyles.footer}>
-          <Text>
-            Generated by Atlas Readiness Guide | This snapshot reflects your self-reported
-            information.
-          </Text>
-          <Text>It is not a score or recommendation to expand.</Text>
-        </View>
-      </Page>
+      {/* ─── PAGE 3: Critical Actions + Validation + Roadmap (assessable only) ─── */}
+      {isAssessable && (
+        <Page size="A4" style={commonStyles.page}>
+          {/* Critical Actions */}
+          {v3?.critical_actions && v3.critical_actions.length > 0 && (
+            <View style={commonStyles.section}>
+              <SectionTitle
+                title="Critical Actions"
+                description="Hard blockers that must be resolved before committing capital"
+              />
+              {v3.critical_actions.map((ca, i) => (
+                <View key={i} style={styles.criticalCard}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
+                    <View style={styles.priorityBadge}>
+                      <Text style={styles.priorityText}>{ca.priority}</Text>
+                    </View>
+                    <Text style={[commonStyles.text, { fontWeight: 'bold', flex: 1 }]}>{ca.title}</Text>
+                    <DomainBadge domain={ca.source_domain} />
+                  </View>
+                  <Text style={commonStyles.textSm}>{ca.description}</Text>
+                  <Text style={[commonStyles.textSm, { color: pdfColors.primary, marginTop: 6, fontWeight: 'bold' }]}>
+                    Next step: {ca.action}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          )}
+
+          {/* Needs Validation */}
+          {v3?.needs_validation && v3.needs_validation.length > 0 && (
+            <View style={commonStyles.section}>
+              <SectionTitle
+                title="Needs Validation"
+                description="Assumptions to test before treating as fact"
+              />
+              {v3.needs_validation.map((nv, i) => (
+                <View key={i} style={styles.validationCard}>
+                  <Text style={[commonStyles.text, { fontWeight: 'bold', marginBottom: 4 }]}>
+                    {nv.title}
+                  </Text>
+                  <Text style={commonStyles.textSm}>{nv.description}</Text>
+                  <Text style={[commonStyles.textSm, { color: pdfColors.slate700, marginTop: 4, fontWeight: 'bold' }]}>
+                    Validate: {nv.validation_step}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          )}
+
+          {/* Roadmap */}
+          {((v3?.roadmap_phase1 && v3.roadmap_phase1.length > 0) || (v3?.roadmap_phase2 && v3.roadmap_phase2.length > 0)) && (
+            <View style={commonStyles.section}>
+              <SectionTitle title="90-Day Roadmap" />
+              <View style={styles.twoCol}>
+                {/* Phase 1 */}
+                <View style={styles.col}>
+                  <View style={styles.phaseHeader}>
+                    <Text style={[commonStyles.text, { fontWeight: 'bold' }]}>Days 1–30</Text>
+                    <Text style={commonStyles.textSm}>Resolve critical blockers</Text>
+                  </View>
+                  {(v3?.roadmap_phase1 || []).map((item, i) => (
+                    <View key={i} style={styles.roadmapItem}>
+                      <Text style={styles.bullet}>›</Text>
+                      <View style={styles.itemContent}>
+                        <Text style={commonStyles.textSm}>{item.action}</Text>
+                        <Text style={[commonStyles.textSm, { color: pdfColors.slate500, marginTop: 2 }]}>
+                          {item.rationale}
+                        </Text>
+                      </View>
+                    </View>
+                  ))}
+                </View>
+                {/* Phase 2 */}
+                <View style={styles.col}>
+                  <View style={styles.phaseHeader}>
+                    <Text style={[commonStyles.text, { fontWeight: 'bold' }]}>Days 31–60</Text>
+                    <Text style={commonStyles.textSm}>Test key assumptions</Text>
+                  </View>
+                  {(v3?.roadmap_phase2 || []).map((item, i) => (
+                    <View key={i} style={styles.roadmapItem}>
+                      <Text style={styles.bullet}>›</Text>
+                      <View style={styles.itemContent}>
+                        <Text style={commonStyles.textSm}>{item.action}</Text>
+                        <Text style={[commonStyles.textSm, { color: pdfColors.slate500, marginTop: 2 }]}>
+                          {item.rationale}
+                        </Text>
+                      </View>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            </View>
+          )}
+
+          <View style={commonStyles.footer}>
+            <Text>Atlas Readiness Guide · This report reflects your self-reported information.</Text>
+            <Text>It is not a score or recommendation to expand.</Text>
+          </View>
+        </Page>
+      )}
     </Document>
   );
 }

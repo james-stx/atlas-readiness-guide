@@ -10,6 +10,7 @@ export const pdfColors = {
   slate700: '#334155',
   slate500: '#64748b',
   slate300: '#cbd5e1',
+  slate200: '#e2e8f0',
   slate100: '#f1f5f9',
   slate50: '#f8fafc',
   white: '#ffffff',
