@@ -527,6 +527,28 @@ The assessment progress component shows different states based on completion:
 - Visual representation of locked insights
 - Clear call-to-action to continue assessment
 
+### V5 PDF Report Design
+
+**Visual Hierarchy:**
+- **Positioning Badge**: Color-coded status indicator at top of report
+- **Executive Summary**: Highlighted callout box with key insights
+- **Coverage Grid**: Metrics display with domain breakdown
+- **Card-based Sections**: 
+  - Strengths: Green-accented cards with domain tags
+  - Risks: Amber-accented warning cards
+  - Critical Actions: Numbered priority cards
+  - Validation Needs: Gray informational cards
+
+**Color System:**
+- Added `slate200` for section borders
+- Positioning-specific color schemes
+- Consistent domain color coding throughout report
+
+**Typography & Layout:**
+- Improved section hierarchy with better spacing
+- Enhanced readability for complex structured content
+- Responsive card layouts for different content types
+
 ### Page-Specific Design Updates
 
 #### Start Page (`/start`)
@@ -834,6 +856,20 @@ The AI service layer utilizes Anthropic's Claude 4.6 models for different purpos
 #### Email (Resend)
 - **Purpose**: Transactional email delivery
 - **Features**: HTML emails with PDF download links
+
+**PDF Generation Architecture:**
+
+**Enhanced Data Flow:**
+1. Session validation and snapshot retrieval
+2. **Raw output parsing** - Extracts V5 structured data from `raw_output` JSON
+3. **Data enrichment** - Merges parsed fields into snapshot object
+4. **V5 template rendering** - Uses @react-pdf/renderer with new section layouts
+5. PDF buffer generation and download response
+
+**Key Components:**
+- `SnapshotDocument`: Completely rewritten for V5 format
+- Enhanced error handling for legacy/incomplete data
+- New styling system with positioning badges, strength/risk cards, and validation sections
 
 ### Workspace Context Auto-Navigation
 
@@ -1183,6 +1219,23 @@ The V3 snapshot schema now includes:
 - `recommended_topics`: Array of TopicRecommendation for incomplete assessments
 - Backward compatibility with existing complete assessment fields
 
+**Enhanced Snapshot Processing:**
+
+The PDF export now leverages the `raw_output` field more extensively:
+
+```typescript
+// Fields extracted from raw_output for V5 reports:
+- v3: Complete V5 analysis sections
+- key_stats: Coverage and readiness metrics
+- readiness_level: Overall positioning assessment
+- verdict_summary: Executive summary content
+```
+
+**V5 Report Data Structure:**
+- **Positioning**: Classification levels (expansion_ready, well_positioned, conditionally_positioned, foundation_building, early_exploration)
+- **Sections**: Structured content for strengths, risks, critical actions, validation needs, and roadmap phases
+- **Domain Mapping**: Links insights to specific domains (Market, Product, GTM, Operations, Financials)
+
 ### Data Lifecycle
 
 ```
@@ -1476,11 +1529,28 @@ Retrieves existing snapshot for a session.
 
 ---
 
-#### Download PDF
-```
-GET /api/export/pdf/[sessionId]
-```
-Downloads snapshot as PDF file.
+**GET /api/export/pdf/[sessionId]**
+
+Generates and downloads a PDF report for a given session.
+
+**Enhanced Data Processing:**
+- Parses `raw_output` field from snapshot to inject additional V5 report data
+- Enriches snapshot with `v3`, `key_stats`, `readiness_level`, and `verdict_summary` fields
+- Gracefully handles legacy/incomplete reports with fallback display
+
+**Response Format:**
+- Content-Type: application/pdf
+- Filename: `atlas-readiness-snapshot-{sessionId-prefix}.pdf`
+
+**V5 Report Sections:**
+- Positioning badge and status
+- Executive summary with key insights
+- Coverage metrics grid
+- Strengths analysis with domain categorization
+- Risk assessment with priority levels
+- Critical actions with numbered priorities
+- Items needing validation
+- Two-phase roadmap planning
 
 ---
 
@@ -1530,74 +1600,4 @@ Both applications need environment variables to function. These are set differen
 
 | Variable | Description | Value |
 |----------|-------------|-------|
-| `NEXT_PUBLIC_API_URL` | URL of the API | `https://atlas-readiness-guide-api.vercel.app` (production) or `http://localhost:3001` (local) |
-
-#### Documentation Update Workflow
-- `ANTHROPIC_API_KEY`: Required for the auto-documentation update workflow. Must be set as a GitHub repository secret to enable automatic documentation updates via Claude API.
-
-### Progress System Configuration
-
-**Domain Topics** (`DOMAIN_TOPICS`): Predefined lists of topics for each business domain used to calculate coverage percentages.
-
-**Readiness Thresholds**: Configuration for determining when domains and overall assessment reach "adequate" status based on input count and topic coverage.
-
-**Animation Durations**: Configurable timing for UI animations including toast auto-dismiss (3s), slide transitions (150-200ms), and progress bar updates (300ms).
-
-**Conversation History Limit**: Set to 10 messages to balance context retention with token usage
-
-**AI Interaction Mode**: Single-step execution to minimize API calls
-
-**AI Model Settings:**
-```typescript
-models: {
-  conversation: 'claude-sonnet-4-6',
-  classification: 'claude-haiku-4-5-20251001', 
-  synthesis: 'claude-haiku-4-5-20251001' // Fast model for timeout avoidance
-}
-
-modelConfig: {
-  synthesis: {
-    maxTokens: 2048, // Reduced for performance
-    temperature: 0.3
-  }
-}
-```
-
-### Email Configuration
-
-**Build-time Environment Variables**: The Resend email client is now lazy-initialized to prevent build failures when RESEND_API_KEY is not available during the build process. The client is only instantiated when actually sending emails, not at module load time.
-
-### Setting Variables Locally
-
-Create `.env.local` files in each app directory:
-
-**`apps/api/.env.local`**:
-```
-SUPABASE_URL=https://xxxxx.supabase.co
-SUPABASE_ANON_KEY=eyJhbG...
-SUPABASE_SERVICE_ROLE_KEY=eyJhbG...
-ANTHROPIC_API_KEY=sk-ant-...
-RESEND_API_KEY=re_...
-```
-
-**`apps/web/.env.local`**:
-```
-NEXT_PUBLIC_API_URL=http://localhost:3001
-```
-
-### Setting Variables on Vercel
-
-1. Go to your project in Vercel
-2. Click **Settings** → **Environment Variables**
-3. Add each variable with its value
-4. Ensure variables are enabled for Production, Preview, and Development
-
-### Security Notes
-
-- **Never commit** `.env.local` files to git (they're in `.gitignore`)
-- **Never share** service role keys or API keys publicly
-- **Rotate keys** if accidentally exposed
-
----
-
-## 
+|
