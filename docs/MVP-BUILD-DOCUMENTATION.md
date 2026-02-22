@@ -301,7 +301,18 @@ For users with pre-V5 assessments:
 
 **Key Distinction:** Topic selection (navigation) is now separate from topic discussion (AI chat initiation)
 
-### Session Recovery Flow
+### Session Recovery Flow (Enhanced)
+
+**Session Recovery Flow (Enhanced)**
+1. User refreshes browser or returns to application
+2. System checks for existing session in local storage
+3. If session exists:
+   - Restores session metadata
+   - Fetches and restores chat messages from API
+   - Fetches and restores form inputs from API
+   - **NEW**: Fetches and restores latest report snapshot from API
+4. User can immediately access their report without regeneration
+5. All previous state is maintained across browser sessions
 
 If a user leaves and returns:
 1. App checks for stored recovery token
@@ -743,6 +754,14 @@ This separation allows users to browse content freely without accidentally trigg
 - Uses localStorage as fallback when React context is unavailable
 - Automatic fallback to /start route when session cannot be recovered
 
+**Session Recovery Enhancement**
+
+The session recovery mechanism has been enhanced to include snapshot restoration:
+- On page refresh, the system now fetches the latest report snapshot along with messages and inputs
+- This ensures that generated reports persist across browser refreshes
+- Users can navigate directly to the report view without waiting for regeneration
+- The recovery process maintains complete application state consistency
+
 **Chat Interface Technical Details:**
 
 *Input Handling:*
@@ -1149,6 +1168,16 @@ Stores generated readiness snapshots.
 | `gaps` | JSONB | Low confidence items |
 | `next_steps` | JSONB | Recommended actions |
 | `created_at` | TIMESTAMP | When generated |
+
+### Session Recovery Data Flow
+
+During session recovery, the following data is restored from the API:
+- Session metadata (from local storage)
+- Chat messages (via API call)
+- Form inputs (via API call)  
+- **Report snapshots (via API call)** - *newly added*
+
+This ensures complete state restoration and eliminates the need to regenerate reports after page refreshes.
 
 ### V3 Readiness Report Data Structure
 
@@ -1575,29 +1604,4 @@ Sends snapshot email to user.
 - `GET /snapshot` - Redirects to `/workspace?view=report`
 
 **Parameter Handling:**
-- URL parameters cleared after view switch to maintain clean URLs
-- Direct links to report view supported via ?view=report parameter
-
----
-
-## 10. Configuration & Secrets
-
-### Environment Variables
-
-Both applications need environment variables to function. These are set differently for local development vs production.
-
-#### API Environment Variables
-
-| Variable | Description | Where to Get It |
-|----------|-------------|-----------------|
-| `SUPABASE_URL` | Your Supabase project URL | Supabase Dashboard → Settings → API |
-| `SUPABASE_ANON_KEY` | Public Supabase key | Supabase Dashboard → Settings → API |
-| `SUPABASE_SERVICE_ROLE_KEY` | Private Supabase key (keep secret!) | Supabase Dashboard → Settings → API |
-| `ANTHROPIC_API_KEY` | Required API key for accessing Claude 4.6 models and the latest Claude capabilities. Also required for the auto-documentation update workflow. | console.anthropic.com → API Keys |
-| `RESEND_API_KEY` | Email service key | resend.com → API Keys |
-
-#### Web Environment Variables
-
-| Variable | Description | Value |
-|----------|-------------|-------|
-|
+- URL parameters cleared
