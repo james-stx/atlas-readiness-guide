@@ -107,6 +107,17 @@ A reference for technical terms used throughout this documentation.
 | **Recovery Token** | A secret code that lets users return to their session. |
 | **Streaming** | Sending data piece by piece instead of all at once (makes AI responses appear word by word). |
 
+### Business Terms
+
+**Expansion Positioning Labels**: User-facing readiness signals that indicate how prepared a company is for international expansion:
+- **Too Early**: Company lacks foundational elements needed for expansion consideration
+- **Traction Needed**: Company has basic foundation but needs to demonstrate market traction
+- **Early Signs**: Company shows conditional positioning with some positive indicators
+- **Well Positioned**: Company has strong fundamentals and readiness indicators
+- **Expansion Ready**: Company is fully prepared and positioned for international expansion
+
+These labels replaced the previous abstract tier system (Early Exploration, Foundation Building, etc.) to provide clearer readiness signals to users.
+
 ### Technology Terms
 
 | Term | Definition |
@@ -461,6 +472,13 @@ If a user leaves and returns:
 - Report panel replaces subtle refresh button with prominent full-width "Update Report" CTA when stale
 - Current reports show standard refresh button and "Generated [date]" status
 - Action-oriented banner copy encourages immediate report updates
+
+### Positioning Label Updates
+
+The expansion positioning labels have been redesigned to use readiness-oriented language that clearly communicates preparation status to users:
+- Labels focus on actionability and clear next steps
+- Color coding and visual hierarchy remain consistent with the previous system
+- The tier progression scale maintains the same 5-level structure but with more intuitive naming
 
 ### TopBar Simplification
 
@@ -1265,6 +1283,8 @@ The PDF export now leverages the `raw_output` field more extensively:
 - **Sections**: Structured content for strengths, risks, critical actions, validation needs, and roadmap phases
 - **Domain Mapping**: Links insights to specific domains (Market, Product, GTM, Operations, Financials)
 
+The `ExpansionPositioning` enum values remain unchanged in the database (`early_exploration`, `foundation_building`, `conditionally_positioned`, `well_positioned`, `expansion_ready`), but the user-facing labels have been updated to readiness-oriented language. The mapping is handled in the presentation layer through `POSITIONING_LABELS` and `POSITIONING_CONFIG` constants.
+
 ### Data Lifecycle
 
 ```
@@ -1561,47 +1581,3 @@ Retrieves existing snapshot for a session.
 **GET /api/export/pdf/[sessionId]**
 
 Generates and downloads a PDF report for a given session.
-
-**Enhanced Data Processing:**
-- Parses `raw_output` field from snapshot to inject additional V5 report data
-- Enriches snapshot with `v3`, `key_stats`, `readiness_level`, and `verdict_summary` fields
-- Gracefully handles legacy/incomplete reports with fallback display
-
-**Response Format:**
-- Content-Type: application/pdf
-- Filename: `atlas-readiness-snapshot-{sessionId-prefix}.pdf`
-
-**V5 Report Sections:**
-- Positioning badge and status
-- Executive summary with key insights
-- Coverage metrics grid
-- Strengths analysis with domain categorization
-- Risk assessment with priority levels
-- Critical actions with numbered priorities
-- Items needing validation
-- Two-phase roadmap planning
-
----
-
-#### Send Email
-```
-POST /api/export/send/[sessionId]
-```
-Sends snapshot email to user.
-
-**Response**:
-```json
-{
-  "success": true,
-  "message": "Snapshot sent to user@example.com"
-}
-```
-
-### URL Parameters
-
-**Workspace View Switching:**
-- `GET /workspace?view=report` - Opens workspace in report view
-- `GET /snapshot` - Redirects to `/workspace?view=report`
-
-**Parameter Handling:**
-- URL parameters cleared
