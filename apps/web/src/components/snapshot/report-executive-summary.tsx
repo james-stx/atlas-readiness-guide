@@ -9,11 +9,11 @@ const POSITIONING_CONFIG: Record<ExpansionPositioning, {
   bg: string;
   border: string;
 }> = {
-  early_exploration:       { label: 'Early Exploration',       index: 0, color: '#9B9A97', bg: '#F7F6F3', border: '#E8E6E1' },
-  foundation_building:     { label: 'Foundation Building',     index: 1, color: '#D9730D', bg: '#FAEBDD', border: '#D9730D' },
-  conditionally_positioned:{ label: 'Conditionally Positioned',index: 2, color: '#9A6700', bg: '#FBF3DB', border: '#E9B949' },
-  well_positioned:         { label: 'Well Positioned',         index: 3, color: '#0F7B6C', bg: '#DDEDEA', border: '#0F7B6C' },
-  expansion_ready:         { label: 'Expansion Ready',         index: 4, color: '#0F7B6C', bg: '#DDEDEA', border: '#0F7B6C' },
+  early_exploration:       { label: 'Too Early',       index: 0, color: '#9B9A97', bg: '#F7F6F3', border: '#E8E6E1' },
+  foundation_building:     { label: 'Traction Needed', index: 1, color: '#D9730D', bg: '#FAEBDD', border: '#D9730D' },
+  conditionally_positioned:{ label: 'Early Signs',     index: 2, color: '#9A6700', bg: '#FBF3DB', border: '#E9B949' },
+  well_positioned:         { label: 'Well Positioned', index: 3, color: '#0F7B6C', bg: '#DDEDEA', border: '#0F7B6C' },
+  expansion_ready:         { label: 'Expansion Ready', index: 4, color: '#166534', bg: '#DCFCE7', border: '#16A34A' },
 };
 
 const TIERS: ExpansionPositioning[] = [

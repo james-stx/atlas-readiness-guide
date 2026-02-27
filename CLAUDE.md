@@ -213,7 +213,9 @@ packages/types/node_modules
 ## Recent Commits
 
 ```
-25e9726 fix: Restore snapshot on session recovery so report persists across refreshes
+d37e93a feat: Redesign expansion positioning labels to readiness-oriented language
+117edd3 fix: Restore snapshot on session recovery so report persists across refreshes
+3f8d28e docs: auto-update MVP documentation [skip ci]
 22f9f50 fix: Rewrite PDF export to render V5 report data
 951b900 fix: Add workspace-panel class to ReportPanel for correct scroll height
 484cdaa revert: Remove debug error detail from 500 response
@@ -221,7 +223,5 @@ packages/types/node_modules
 7505a29 fix: Split snapshot schema by assessment status to resolve 500 error
 a8a1d02 perf: Skip topicResults generation for assessable reports, bump maxDuration to 120s
 9c1193b docs: auto-update MVP documentation [skip ci]
-6578b6d feat: Graceful legacy report handling for pre-V5 snapshots
-68c890b feat: Comprehensive Readiness Report V5 redesign
 ```
 <!-- /AUTO:RECENT_CHANGES -->

@@ -29,9 +29,9 @@ const DOMAIN_LABELS: Record<DomainType, string> = {
 const POSITIONING_LABELS: Record<string, string> = {
   expansion_ready: 'Expansion Ready',
   well_positioned: 'Well Positioned',
-  conditionally_positioned: 'Conditionally Positioned',
-  foundation_building: 'Foundation Building',
-  early_exploration: 'Early Exploration',
+  conditionally_positioned: 'Early Signs',
+  foundation_building: 'Traction Needed',
+  early_exploration: 'Too Early',
 };
 
 const styles = StyleSheet.create({

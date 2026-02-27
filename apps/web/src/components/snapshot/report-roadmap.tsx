@@ -11,16 +11,16 @@ const DOMAIN_LABELS: Record<DomainType, string> = {
 };
 
 const POSITIONING_LABELS: Record<ExpansionPositioning, string> = {
-  early_exploration: 'Early Exploration',
-  foundation_building: 'Foundation Building',
-  conditionally_positioned: 'Conditionally Positioned',
+  early_exploration: 'Too Early',
+  foundation_building: 'Traction Needed',
+  conditionally_positioned: 'Early Signs',
   well_positioned: 'Well Positioned',
   expansion_ready: 'Expansion Ready',
 };
 
 const NEXT_TIER: Partial<Record<ExpansionPositioning, string>> = {
-  early_exploration: 'Foundation Building',
-  foundation_building: 'Conditionally Positioned',
+  early_exploration: 'Traction Needed',
+  foundation_building: 'Early Signs',
   conditionally_positioned: 'Well Positioned',
   well_positioned: 'Expansion Ready',
 };
