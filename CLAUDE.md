@@ -75,6 +75,8 @@ apps/api/.env.local
 apps/api/.eslintrc.json
 apps/api/.next
 apps/api/.turbo
+apps/api/migrations
+apps/api/migrations/001_add_guest_session_fields.sql
 apps/api/next-env.d.ts
 apps/api/next.config.js
 apps/api/node_modules
@@ -135,8 +137,6 @@ packages/config/node_modules
 packages/config/package.json
 packages/config/src
 packages/config/src/index.ts
-packages/config/tsconfig.json
-packages/types
 ```
 <!-- /AUTO:STRUCTURE -->
 
@@ -144,6 +144,7 @@ packages/types
 
 ## App Routes (Web)
 
+- /auth/callback — apps/web/src/app/auth/callback/page.tsx
 - /chat — apps/web/src/app/chat/page.tsx
 - /how-it-works — apps/web/src/app/how-it-works/page.tsx
 - / — apps/web/src/app/page.tsx
@@ -213,7 +214,8 @@ packages/types
 ## Recent Commits
 
 ```
-02005a2 fix(F0): Remove broken PDF download; promote email report as sole export
+5562f8d feat(F1): Workspace entry modal — Sign In (magic link) vs Guest
+3c987bd fix(F0): Remove broken PDF download; promote email report as sole export
 13418a6 docs: Add PRD and design spec for auth, guest mode, and PDF email fix
 af7cf32 feat: Redesign expansion positioning labels to readiness-oriented language
 c1b514d docs: auto-update MVP documentation [skip ci]
@@ -222,6 +224,5 @@ c1b514d docs: auto-update MVP documentation [skip ci]
 22f9f50 fix: Rewrite PDF export to render V5 report data
 951b900 fix: Add workspace-panel class to ReportPanel for correct scroll height
 484cdaa revert: Remove debug error detail from 500 response
-0ae8ee9 debug: Expose error detail in 500 response temporarily
 ```
 <!-- /AUTO:RECENT_CHANGES -->

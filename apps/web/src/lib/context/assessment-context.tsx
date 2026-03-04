@@ -122,8 +122,10 @@ function assessmentReducer(
 interface AssessmentContextValue extends AssessmentState {
   // Session actions
   startSession: (email: string) => Promise<void>;
+  startGuestSession: () => Promise<void>;
   recoverSession: () => Promise<boolean>;
   clearSession: () => void;
+  isGuest: boolean;
 
   // Chat actions
   initChat: () => Promise<void>;
@@ -191,6 +193,46 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
         type: 'SET_ERROR',
         payload:
           error instanceof Error ? error.message : 'Failed to start session',
+      });
+      throw error;
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }
+  }, []);
+
+  // Start an anonymous guest session (no email, is_guest: true)
+  const startGuestSession = useCallback(async () => {
+    dispatch({ type: 'SET_LOADING', payload: true });
+    dispatch({ type: 'SET_ERROR', payload: null });
+
+    try {
+      const { session } = await api.createSession('', { isGuest: true });
+
+      // Guest sessions use sessionStorage so they don't persist across browser sessions
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('atlas_guest_session_id', session.id);
+      }
+
+      dispatch({
+        type: 'SET_SESSION',
+        payload: {
+          id: session.id,
+          email: '',
+          status: session.status,
+          current_domain: session.currentDomain,
+          created_at: session.createdAt,
+          updated_at: session.createdAt,
+          expires_at: session.expiresAt,
+          metadata: {},
+          recovery_token_hash: null,
+          is_guest: true,
+        } as Session,
+      });
+    } catch (error) {
+      dispatch({
+        type: 'SET_ERROR',
+        payload:
+          error instanceof Error ? error.message : 'Failed to start guest session',
       });
       throw error;
     } finally {
@@ -519,8 +561,10 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
   const value: AssessmentContextValue = {
     ...state,
     startSession,
+    startGuestSession,
     recoverSession: recoverSessionAction,
     clearSession,
+    isGuest: state.session?.is_guest === true,
     initChat: initChatAction,
     sendMessage: sendMessageAction,
     addMessage,

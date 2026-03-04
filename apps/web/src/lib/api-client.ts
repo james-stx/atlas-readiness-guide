@@ -37,12 +37,16 @@ async function handleResponse<T>(response: Response): Promise<T> {
 // ============================================
 
 export async function createSession(
-  email: string
+  email: string,
+  options?: { isGuest?: boolean }
 ): Promise<CreateSessionResponse> {
+  const body: CreateSessionRequest = options?.isGuest
+    ? { isGuest: true }
+    : { email };
   const response = await fetch(`${API_URL}/api/session`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email } as CreateSessionRequest),
+    body: JSON.stringify(body),
   });
   return handleResponse<CreateSessionResponse>(response);
 }
