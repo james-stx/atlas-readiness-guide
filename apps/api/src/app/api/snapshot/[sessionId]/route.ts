@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/db/supabase';
 import { getValidSession } from '@/lib/db/session';
-import { handleApiError, ValidationError } from '@/lib/errors';
+import { handleApiError, ValidationError, GuestAccessError } from '@/lib/errors';
 
 // GET /api/snapshot/[sessionId] - Get snapshot for a session
 export async function GET(
@@ -18,8 +18,11 @@ export async function GET(
       throw new ValidationError('Invalid session ID format');
     }
 
-    // Validate session exists
-    await getValidSession(sessionId);
+    // Validate session exists and is not a guest session
+    const session = await getValidSession(sessionId);
+    if ((session as any).is_guest) {
+      throw new GuestAccessError('reports');
+    }
 
     // Get the most recent snapshot for this session
     const { data: snapshot, error } = await supabase

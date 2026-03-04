@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Download, Mail, Check, Loader2, Copy } from 'lucide-react';
-import { getPdfDownloadUrl, sendSnapshotEmail } from '@/lib/api-client';
+import { Mail, Check, Loader2, Copy } from 'lucide-react';
+import { sendSnapshotEmail } from '@/lib/api-client';
 import type { KeyStats, ReadinessLevel } from '@atlas/types';
 
 interface ExportSectionProps {
@@ -28,40 +28,9 @@ export function ExportSection({
   readinessLevel,
   className,
 }: ExportSectionProps) {
-  const [downloadState, setDownloadState] = useState<'idle' | 'loading' | 'done'>('idle');
   const [emailState, setEmailState] = useState<'idle' | 'loading' | 'done' | 'error'>('idle');
   const [emailError, setEmailError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-
-  async function handleDownload() {
-    setDownloadState('loading');
-
-    try {
-      const url = getPdfDownloadUrl(sessionId);
-      const response = await fetch(url);
-
-      if (!response.ok) {
-        throw new Error('Failed to download PDF');
-      }
-
-      const blob = await response.blob();
-      const downloadUrl = URL.createObjectURL(blob);
-
-      const a = document.createElement('a');
-      a.href = downloadUrl;
-      a.download = `atlas-readiness-report-${sessionId.slice(0, 8)}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(downloadUrl);
-
-      setDownloadState('done');
-      setTimeout(() => setDownloadState('idle'), 3000);
-    } catch (error) {
-      console.error('Download failed:', error);
-      setDownloadState('idle');
-    }
-  }
 
   async function handleEmailSend() {
     setEmailState('loading');
@@ -103,39 +72,23 @@ export function ExportSection({
         Share & Export
       </h3>
       <p className="text-[13px] text-[#5C5A56] mb-4">
-        Download or email your report to share with your team.
+        Your report will be delivered as a PDF to your inbox.
       </p>
 
-      <div className="flex flex-col sm:flex-row gap-3 mb-6">
-        <Button
-          onClick={handleDownload}
-          disabled={downloadState === 'loading'}
-          className="flex-1 bg-[#2383E2] hover:bg-[#1a6fc0] text-white"
-        >
-          {downloadState === 'loading' ? (
-            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-          ) : downloadState === 'done' ? (
-            <Check className="w-4 h-4 mr-2" />
-          ) : (
-            <Download className="w-4 h-4 mr-2" />
-          )}
-          {downloadState === 'done' ? 'Downloaded!' : 'Download PDF'}
-        </Button>
-
+      <div className="mb-6">
         <Button
           onClick={handleEmailSend}
           disabled={emailState === 'loading' || emailState === 'done'}
-          variant="outline"
-          className="flex-1 border-[#E8E6E1] hover:border-[#D4D1CB] hover:bg-[#FAF9F7] text-[#37352F]"
+          className="w-full bg-[#2383E2] hover:bg-[#1a6fc0] text-white"
         >
           {emailState === 'loading' ? (
             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
           ) : emailState === 'done' ? (
-            <Check className="w-4 h-4 mr-2 text-[#0F7B6C]" />
+            <Check className="w-4 h-4 mr-2" />
           ) : (
             <Mail className="w-4 h-4 mr-2" />
           )}
-          {emailState === 'done' ? 'Sent!' : 'Email Report'}
+          {emailState === 'loading' ? 'Sending...' : emailState === 'done' ? 'Sent!' : 'Email Report'}
         </Button>
       </div>
 

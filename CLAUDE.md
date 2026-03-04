@@ -75,6 +75,8 @@ apps/api/.env.local
 apps/api/.eslintrc.json
 apps/api/.next
 apps/api/.turbo
+apps/api/migrations
+apps/api/migrations/001_add_guest_session_fields.sql
 apps/api/next-env.d.ts
 apps/api/next.config.js
 apps/api/node_modules
@@ -90,7 +92,6 @@ apps/web
 apps/web/.env.example
 apps/web/.env.local
 apps/web/.eslintrc.json
-apps/web/.next
 apps/web/.turbo
 apps/web/next-env.d.ts
 apps/web/next.config.js
@@ -108,11 +109,13 @@ apps/web/vercel.json
 CLAUDE.md
 docs
 docs/CONTENT-PANEL-V3-SPEC.md
+docs/DESIGN-Auth-Guest-Flow-Wireframes.md
 docs/DESIGN-OVERHAUL-BRIEF.md
 docs/DESIGN-SYSTEM-V3.md
 docs/FOUNDER-FEEDBACK-V3-PLAN.md
 docs/MVP-BUILD-DOCUMENTATION.md
 docs/POST-MORTEM-V3-REPORT.md
+docs/PRD-Auth-Guest-Flow-and-Data-Capture.md
 docs/PRD-Progress-Visibility-Feature.md
 docs/product
 docs/product/central-console-feedback-v1.md
@@ -134,9 +137,6 @@ packages/config/node_modules
 packages/config/package.json
 packages/config/src
 packages/config/src/index.ts
-packages/config/tsconfig.json
-packages/types
-packages/types/node_modules
 ```
 <!-- /AUTO:STRUCTURE -->
 
@@ -144,6 +144,7 @@ packages/types/node_modules
 
 ## App Routes (Web)
 
+- /auth/callback — apps/web/src/app/auth/callback/page.tsx
 - /chat — apps/web/src/app/chat/page.tsx
 - /how-it-works — apps/web/src/app/how-it-works/page.tsx
 - / — apps/web/src/app/page.tsx
@@ -159,7 +160,7 @@ packages/types/node_modules
 
 ## Component Inventory (Web)
 
-- **components/workspace/** (3): TopBar,WelcomeModal,WorkspaceLayout
+- **components/workspace/** (4): SaveProgressPopup,TopBar,WelcomeModal,WorkspaceLayout
 - **components/workspace/sidebar/** (4): Sidebar,SidebarDomainItem,SidebarFooter,SidebarTopicItem
 - **components/workspace/content/** (8): CategoryCard,ContentDomainHeader,ContentPanel,EmptyState,InlineSnapshotCTA,InsightCard,NotStartedCard,TopicCard
 - **components/workspace/chat/** (4): ChatHeader,ChatPanel,InputCapturedIndicator,TopicTransitionBanner
@@ -179,6 +180,7 @@ packages/types/node_modules
 - /api/export/pdf/[sessionId] — apps/api/src/app/api/export/pdf/[sessionId]/route.ts
 - /api/export/send/[sessionId] — apps/api/src/app/api/export/send/[sessionId]/route.ts
 - /api/health — apps/api/src/app/api/health/route.ts
+- /api/session/[id]/claim — apps/api/src/app/api/session/[id]/claim/route.ts
 - /api/session/[id] — apps/api/src/app/api/session/[id]/route.ts
 - /api/session/recover — apps/api/src/app/api/session/recover/route.ts
 - /api/session — apps/api/src/app/api/session/route.ts
@@ -213,15 +215,15 @@ packages/types/node_modules
 ## Recent Commits
 
 ```
-d37e93a feat: Redesign expansion positioning labels to readiness-oriented language
+c908c05 feat(F5): Guest-to-auth session migration (session takeover)
+d4abe55 feat(F4): Update send route — enrich V3 data, personalised subject, remove downloadUrl
+bcabd25 feat(F3): Gate Readiness Report behind auth; show inline sign-up overlay for guests
+2daac15 feat(F2): Guest indicator + Save progress CTA in TopBar
+7b83672 feat(F1): Workspace entry modal — Sign In (magic link) vs Guest
+3c987bd fix(F0): Remove broken PDF download; promote email report as sole export
+13418a6 docs: Add PRD and design spec for auth, guest mode, and PDF email fix
+af7cf32 feat: Redesign expansion positioning labels to readiness-oriented language
+c1b514d docs: auto-update MVP documentation [skip ci]
 117edd3 fix: Restore snapshot on session recovery so report persists across refreshes
-3f8d28e docs: auto-update MVP documentation [skip ci]
-22f9f50 fix: Rewrite PDF export to render V5 report data
-951b900 fix: Add workspace-panel class to ReportPanel for correct scroll height
-484cdaa revert: Remove debug error detail from 500 response
-0ae8ee9 debug: Expose error detail in 500 response temporarily
-7505a29 fix: Split snapshot schema by assessment status to resolve 500 error
-a8a1d02 perf: Skip topicResults generation for assessable reports, bump maxDuration to 120s
-9c1193b docs: auto-update MVP documentation [skip ci]
 ```
 <!-- /AUTO:RECENT_CHANGES -->

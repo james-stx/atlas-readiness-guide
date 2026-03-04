@@ -21,6 +21,7 @@ import { RecommendedTopics } from '@/components/snapshot/RecommendedTopics';
 import { UnlockPreview } from '@/components/snapshot/UnlockPreview';
 
 import type { Snapshot, SnapshotV3 } from '@atlas/types';
+import { ReportGateOverlay } from './ReportGateOverlay';
 
 export function ReportPanel() {
   const {
@@ -37,6 +38,7 @@ export function ReportPanel() {
     snapshot: contextSnapshot,
     generateSnapshot,
     isLoading,
+    isGuest,
   } = useAssessment();
 
   const [snapshot, setSnapshot] = useState<Snapshot | null>(contextSnapshot);
@@ -87,6 +89,11 @@ export function ReportPanel() {
       setIsGenerating(false);
     }
   };
+
+  // ── Guest gate ─────────────────────────────────────────────────────────────
+  if (isGuest) {
+    return <ReportGateOverlay />;
+  }
 
   // ── Loading ────────────────────────────────────────────────────────────────
   if (isLoadingSnapshot || isGenerating || isLoading) {

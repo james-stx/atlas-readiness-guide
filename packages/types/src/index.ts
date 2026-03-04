@@ -52,6 +52,7 @@ export interface Session {
   metadata: Record<string, unknown>;
   expires_at: string;
   recovery_token_hash: string | null;
+  is_guest?: boolean;
 }
 
 export interface Input {
@@ -305,7 +306,8 @@ export interface TopicRecommendation {
 // ============================================
 
 export interface CreateSessionRequest {
-  email: string;
+  email?: string;
+  isGuest?: boolean;
 }
 
 export interface CreateSessionResponse {

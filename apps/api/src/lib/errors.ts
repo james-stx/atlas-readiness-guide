@@ -29,6 +29,12 @@ export class SessionExpiredError extends AppError {
   }
 }
 
+export class GuestAccessError extends AppError {
+  constructor(resource = 'this resource') {
+    super(`Guest sessions cannot access ${resource}`, 403, 'GUEST_ACCESS_DENIED');
+  }
+}
+
 export class RateLimitError extends AppError {
   constructor() {
     super('Too many requests', 429, 'RATE_LIMITED');

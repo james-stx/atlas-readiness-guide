@@ -24,7 +24,7 @@ export async function POST(
     const session = await getValidSession(sessionId);
 
     // Get the snapshot
-    const { data: snapshot, error } = await supabase
+    const { data: rawSnapshot, error } = await supabase
       .from('snapshots')
       .select('*')
       .eq('session_id', sessionId)
@@ -32,32 +32,45 @@ export async function POST(
       .limit(1)
       .single();
 
-    if (error || !snapshot) {
+    if (error || !rawSnapshot) {
       throw new ValidationError('No snapshot found for this session. Please generate a snapshot first.');
     }
 
-    // Build the PDF download URL
-    const baseUrl = process.env.API_URL || process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : 'http://localhost:3001';
-    const downloadUrl = `${baseUrl}/api/export/pdf/${sessionId}`;
+    // Enrich snapshot with V3 data from raw_output (same pattern as GET /snapshot/[sessionId])
+    let snapshot: Snapshot = { ...rawSnapshot } as Snapshot;
+    if (rawSnapshot.raw_output) {
+      try {
+        const rawData = typeof rawSnapshot.raw_output === 'string'
+          ? JSON.parse(rawSnapshot.raw_output)
+          : rawSnapshot.raw_output;
+        if (rawData.v3) (snapshot as any).v3 = rawData.v3;
+        if (rawData.key_stats) (snapshot as any).key_stats = rawData.key_stats;
+        if (rawData.readiness_level) (snapshot as any).readiness_level = rawData.readiness_level;
+        if (rawData.verdict_summary) (snapshot as any).verdict_summary = rawData.verdict_summary;
+      } catch {
+        // Non-fatal — continue with un-enriched snapshot
+      }
+    }
+
+    // Subject includes the email domain for personalisation
+    const emailDomain = session.email.includes('@') ? session.email.split('@')[1] : session.email;
+    const subject = `Your Atlas Readiness Report — ${emailDomain}`;
 
     // Render email HTML
     const emailHtml = renderSnapshotEmail({
-      snapshot: snapshot as Snapshot,
+      snapshot,
       email: session.email,
-      downloadUrl,
     });
 
     // Get plain text version
-    const emailText = getPlainTextVersion(snapshot as Snapshot, session.email);
+    const emailText = getPlainTextVersion(snapshot, session.email);
 
     // Send the email
     const { data: emailResult, error: emailError } = await getResendClient().emails.send({
       from: EMAIL_CONFIG.from,
       to: session.email,
       replyTo: EMAIL_CONFIG.replyTo,
-      subject: 'Your Atlas Readiness Snapshot',
+      subject,
       html: emailHtml,
       text: emailText,
     });
