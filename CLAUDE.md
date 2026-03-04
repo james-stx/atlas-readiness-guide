@@ -160,7 +160,7 @@ packages/config/src/index.ts
 
 ## Component Inventory (Web)
 
-- **components/workspace/** (3): TopBar,WelcomeModal,WorkspaceLayout
+- **components/workspace/** (4): SaveProgressPopup,TopBar,WelcomeModal,WorkspaceLayout
 - **components/workspace/sidebar/** (4): Sidebar,SidebarDomainItem,SidebarFooter,SidebarTopicItem
 - **components/workspace/content/** (8): CategoryCard,ContentDomainHeader,ContentPanel,EmptyState,InlineSnapshotCTA,InsightCard,NotStartedCard,TopicCard
 - **components/workspace/chat/** (4): ChatHeader,ChatPanel,InputCapturedIndicator,TopicTransitionBanner
@@ -214,7 +214,8 @@ packages/config/src/index.ts
 ## Recent Commits
 
 ```
-5562f8d feat(F1): Workspace entry modal — Sign In (magic link) vs Guest
+bdbfbb3 feat(F2): Guest indicator + Save progress CTA in TopBar
+7b83672 feat(F1): Workspace entry modal — Sign In (magic link) vs Guest
 3c987bd fix(F0): Remove broken PDF download; promote email report as sole export
 13418a6 docs: Add PRD and design spec for auth, guest mode, and PDF email fix
 af7cf32 feat: Redesign expansion positioning labels to readiness-oriented language
@@ -223,6 +224,5 @@ c1b514d docs: auto-update MVP documentation [skip ci]
 3f8d28e docs: auto-update MVP documentation [skip ci]
 22f9f50 fix: Rewrite PDF export to render V5 report data
 951b900 fix: Add workspace-panel class to ReportPanel for correct scroll height
-484cdaa revert: Remove debug error detail from 500 response
 ```
 <!-- /AUTO:RECENT_CHANGES -->
