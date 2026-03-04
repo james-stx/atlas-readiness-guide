@@ -95,5 +95,8 @@ async function createAtlasSession(email: string, router: ReturnType<typeof useRo
       email: session.email,
     });
   }
-  router.replace('/workspace');
+  // Honour a next-path set by the gate overlay (e.g. /workspace?view=report)
+  const next = sessionStorage.getItem('atlas-auth-next') || '/workspace';
+  sessionStorage.removeItem('atlas-auth-next');
+  router.replace(next);
 }

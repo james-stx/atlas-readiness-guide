@@ -214,7 +214,8 @@ packages/config/src/index.ts
 ## Recent Commits
 
 ```
-bdbfbb3 feat(F2): Guest indicator + Save progress CTA in TopBar
+5f474c0 feat(F3): Gate Readiness Report behind auth; show inline sign-up overlay for guests
+2daac15 feat(F2): Guest indicator + Save progress CTA in TopBar
 7b83672 feat(F1): Workspace entry modal — Sign In (magic link) vs Guest
 3c987bd fix(F0): Remove broken PDF download; promote email report as sole export
 13418a6 docs: Add PRD and design spec for auth, guest mode, and PDF email fix
@@ -223,6 +224,5 @@ c1b514d docs: auto-update MVP documentation [skip ci]
 117edd3 fix: Restore snapshot on session recovery so report persists across refreshes
 3f8d28e docs: auto-update MVP documentation [skip ci]
 22f9f50 fix: Rewrite PDF export to render V5 report data
-951b900 fix: Add workspace-panel class to ReportPanel for correct scroll height
 ```
 <!-- /AUTO:RECENT_CHANGES -->

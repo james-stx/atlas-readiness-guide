@@ -16,7 +16,7 @@ import {
 import { getValidSession, updateSessionStatus } from '@/lib/db/session';
 import { getSessionInputs } from '@/lib/db/inputs';
 import { supabase } from '@/lib/db/supabase';
-import { handleApiError, ValidationError } from '@/lib/errors';
+import { handleApiError, ValidationError, GuestAccessError } from '@/lib/errors';
 import type { DomainType, ConfidenceLevel, ExpansionPositioning } from '@atlas/types';
 
 // Increase timeout for this route (Vercel Pro: up to 300s, Hobby: 10s max)
@@ -149,6 +149,11 @@ export async function POST(request: NextRequest) {
     // Validate session
     const session = await getValidSession(sessionId);
     console.log('[Snapshot] Session validated');
+
+    // Block guest sessions from generating reports
+    if ((session as any).is_guest) {
+      throw new GuestAccessError('report generation');
+    }
 
     // Get all inputs for the session
     const inputs = await getSessionInputs(sessionId);
