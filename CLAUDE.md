@@ -90,7 +90,6 @@ apps/web
 apps/web/.env.example
 apps/web/.env.local
 apps/web/.eslintrc.json
-apps/web/.next
 apps/web/.turbo
 apps/web/next-env.d.ts
 apps/web/next.config.js
@@ -108,11 +107,13 @@ apps/web/vercel.json
 CLAUDE.md
 docs
 docs/CONTENT-PANEL-V3-SPEC.md
+docs/DESIGN-Auth-Guest-Flow-Wireframes.md
 docs/DESIGN-OVERHAUL-BRIEF.md
 docs/DESIGN-SYSTEM-V3.md
 docs/FOUNDER-FEEDBACK-V3-PLAN.md
 docs/MVP-BUILD-DOCUMENTATION.md
 docs/POST-MORTEM-V3-REPORT.md
+docs/PRD-Auth-Guest-Flow-and-Data-Capture.md
 docs/PRD-Progress-Visibility-Feature.md
 docs/product
 docs/product/central-console-feedback-v1.md
@@ -136,7 +137,6 @@ packages/config/src
 packages/config/src/index.ts
 packages/config/tsconfig.json
 packages/types
-packages/types/node_modules
 ```
 <!-- /AUTO:STRUCTURE -->
 
@@ -213,7 +213,9 @@ packages/types/node_modules
 ## Recent Commits
 
 ```
-d37e93a feat: Redesign expansion positioning labels to readiness-oriented language
+821a2ea docs: Add PRD and design spec for auth, guest mode, and PDF email fix
+af7cf32 feat: Redesign expansion positioning labels to readiness-oriented language
+c1b514d docs: auto-update MVP documentation [skip ci]
 117edd3 fix: Restore snapshot on session recovery so report persists across refreshes
 3f8d28e docs: auto-update MVP documentation [skip ci]
 22f9f50 fix: Rewrite PDF export to render V5 report data
@@ -221,7 +223,5 @@ d37e93a feat: Redesign expansion positioning labels to readiness-oriented langua
 484cdaa revert: Remove debug error detail from 500 response
 0ae8ee9 debug: Expose error detail in 500 response temporarily
 7505a29 fix: Split snapshot schema by assessment status to resolve 500 error
-a8a1d02 perf: Skip topicResults generation for assessable reports, bump maxDuration to 120s
-9c1193b docs: auto-update MVP documentation [skip ci]
 ```
 <!-- /AUTO:RECENT_CHANGES -->
