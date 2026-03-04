@@ -213,7 +213,8 @@ packages/types
 ## Recent Commits
 
 ```
-821a2ea docs: Add PRD and design spec for auth, guest mode, and PDF email fix
+02005a2 fix(F0): Remove broken PDF download; promote email report as sole export
+13418a6 docs: Add PRD and design spec for auth, guest mode, and PDF email fix
 af7cf32 feat: Redesign expansion positioning labels to readiness-oriented language
 c1b514d docs: auto-update MVP documentation [skip ci]
 117edd3 fix: Restore snapshot on session recovery so report persists across refreshes
@@ -222,6 +223,5 @@ c1b514d docs: auto-update MVP documentation [skip ci]
 951b900 fix: Add workspace-panel class to ReportPanel for correct scroll height
 484cdaa revert: Remove debug error detail from 500 response
 0ae8ee9 debug: Expose error detail in 500 response temporarily
-7505a29 fix: Split snapshot schema by assessment status to resolve 500 error
 ```
 <!-- /AUTO:RECENT_CHANGES -->

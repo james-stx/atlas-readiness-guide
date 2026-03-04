@@ -159,10 +159,6 @@ export async function getSnapshot(
 // Export API
 // ============================================
 
-export function getPdfDownloadUrl(sessionId: string): string {
-  return `${API_URL}/api/export/pdf/${sessionId}`;
-}
-
 export async function sendSnapshotEmail(
   sessionId: string
 ): Promise<{ success: boolean; message?: string }> {
