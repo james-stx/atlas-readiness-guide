@@ -42,10 +42,17 @@ export function ReportGateOverlay() {
       // Store the desired destination so /auth/callback can redirect there
       sessionStorage.setItem('atlas-auth-next', '/workspace?view=report');
 
+      // Embed the guest session ID in the redirect URL so it survives across tabs
+      // (sessionStorage is tab-scoped; the URL param is not)
+      const guestSessionId = sessionStorage.getItem('atlas_guest_session_id');
+      const callbackUrl = guestSessionId
+        ? `${appUrl}/auth/callback?guestSessionId=${guestSessionId}`
+        : `${appUrl}/auth/callback`;
+
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${appUrl}/auth/callback`,
+          emailRedirectTo: callbackUrl,
           shouldCreateUser: true,
         },
       });

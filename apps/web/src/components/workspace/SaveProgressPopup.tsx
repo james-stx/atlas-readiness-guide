@@ -61,10 +61,18 @@ export function SaveProgressPopup({ isOpen, onClose, onSent }: SaveProgressPopup
 
     try {
       const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+
+      // Embed the guest session ID in the redirect URL so it survives across tabs
+      // (sessionStorage is tab-scoped; the URL param is not)
+      const guestSessionId = sessionStorage.getItem('atlas_guest_session_id');
+      const callbackUrl = guestSessionId
+        ? `${appUrl}/auth/callback?guestSessionId=${guestSessionId}`
+        : `${appUrl}/auth/callback`;
+
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${appUrl}/auth/callback`,
+          emailRedirectTo: callbackUrl,
           shouldCreateUser: true,
         },
       });

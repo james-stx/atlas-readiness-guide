@@ -75,6 +75,18 @@ export async function recoverSession(recoveryToken: string): Promise<{
   }>(response);
 }
 
+export async function claimGuestSession(
+  sessionId: string,
+  email: string
+): Promise<CreateSessionResponse> {
+  const response = await fetch(`${API_URL}/api/session/${sessionId}/claim`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  });
+  return handleResponse<CreateSessionResponse>(response);
+}
+
 export async function updateSession(
   sessionId: string,
   updates: {

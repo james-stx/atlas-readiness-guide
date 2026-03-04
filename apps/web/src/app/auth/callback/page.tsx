@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import { createSession } from '@/lib/api-client';
+import { createSession, claimGuestSession } from '@/lib/api-client';
 import { saveSessionToStorage } from '@/lib/storage';
 
 export default function AuthCallbackPage() {
@@ -87,7 +87,24 @@ export default function AuthCallbackPage() {
 }
 
 async function createAtlasSession(email: string, router: ReturnType<typeof useRouter>) {
-  const { session, recoveryToken } = await createSession(email);
+  // If a guest session ID is in the URL, promote it rather than create a new session.
+  // This preserves all messages/inputs the user built up as a guest.
+  const guestSessionId = new URLSearchParams(window.location.search).get('guestSessionId');
+
+  let session: Awaited<ReturnType<typeof createSession>>['session'];
+  let recoveryToken: string | null;
+
+  if (guestSessionId) {
+    try {
+      ({ session, recoveryToken } = await claimGuestSession(guestSessionId, email));
+    } catch {
+      // Guest session may have expired or already been claimed — fall back to a fresh session
+      ({ session, recoveryToken } = await createSession(email));
+    }
+  } else {
+    ({ session, recoveryToken } = await createSession(email));
+  }
+
   if (recoveryToken) {
     saveSessionToStorage({
       sessionId: session.id,

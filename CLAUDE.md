@@ -180,6 +180,7 @@ packages/config/src/index.ts
 - /api/export/pdf/[sessionId] — apps/api/src/app/api/export/pdf/[sessionId]/route.ts
 - /api/export/send/[sessionId] — apps/api/src/app/api/export/send/[sessionId]/route.ts
 - /api/health — apps/api/src/app/api/health/route.ts
+- /api/session/[id]/claim — apps/api/src/app/api/session/[id]/claim/route.ts
 - /api/session/[id] — apps/api/src/app/api/session/[id]/route.ts
 - /api/session/recover — apps/api/src/app/api/session/recover/route.ts
 - /api/session — apps/api/src/app/api/session/route.ts
@@ -214,7 +215,8 @@ packages/config/src/index.ts
 ## Recent Commits
 
 ```
-ff81f44 feat(F4): Update send route — enrich V3 data, personalised subject, remove downloadUrl
+c908c05 feat(F5): Guest-to-auth session migration (session takeover)
+d4abe55 feat(F4): Update send route — enrich V3 data, personalised subject, remove downloadUrl
 bcabd25 feat(F3): Gate Readiness Report behind auth; show inline sign-up overlay for guests
 2daac15 feat(F2): Guest indicator + Save progress CTA in TopBar
 7b83672 feat(F1): Workspace entry modal — Sign In (magic link) vs Guest
@@ -223,6 +225,5 @@ bcabd25 feat(F3): Gate Readiness Report behind auth; show inline sign-up overlay
 af7cf32 feat: Redesign expansion positioning labels to readiness-oriented language
 c1b514d docs: auto-update MVP documentation [skip ci]
 117edd3 fix: Restore snapshot on session recovery so report persists across refreshes
-3f8d28e docs: auto-update MVP documentation [skip ci]
 ```
 <!-- /AUTO:RECENT_CHANGES -->
