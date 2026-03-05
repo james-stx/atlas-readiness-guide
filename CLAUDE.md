@@ -92,6 +92,7 @@ apps/web
 apps/web/.env.example
 apps/web/.env.local
 apps/web/.eslintrc.json
+apps/web/.next
 apps/web/.turbo
 apps/web/next-env.d.ts
 apps/web/next.config.js
@@ -136,7 +137,6 @@ packages/config
 packages/config/node_modules
 packages/config/package.json
 packages/config/src
-packages/config/src/index.ts
 ```
 <!-- /AUTO:STRUCTURE -->
 
@@ -215,15 +215,15 @@ packages/config/src/index.ts
 ## Recent Commits
 
 ```
-c908c05 feat(F5): Guest-to-auth session migration (session takeover)
-d4abe55 feat(F4): Update send route — enrich V3 data, personalised subject, remove downloadUrl
-bcabd25 feat(F3): Gate Readiness Report behind auth; show inline sign-up overlay for guests
-2daac15 feat(F2): Guest indicator + Save progress CTA in TopBar
-7b83672 feat(F1): Workspace entry modal — Sign In (magic link) vs Guest
-3c987bd fix(F0): Remove broken PDF download; promote email report as sole export
-13418a6 docs: Add PRD and design spec for auth, guest mode, and PDF email fix
+6fbb6f8 fix: commit pnpm lockfile with @supabase/supabase-js for apps/web
+f582a48 feat: Auth, guest mode, data capture & PDF email (F0–F5)
+e8c30b4 docs: auto-update MVP documentation [skip ci]
 af7cf32 feat: Redesign expansion positioning labels to readiness-oriented language
 c1b514d docs: auto-update MVP documentation [skip ci]
 117edd3 fix: Restore snapshot on session recovery so report persists across refreshes
+3f8d28e docs: auto-update MVP documentation [skip ci]
+22f9f50 fix: Rewrite PDF export to render V5 report data
+951b900 fix: Add workspace-panel class to ReportPanel for correct scroll height
+484cdaa revert: Remove debug error detail from 500 response
 ```
 <!-- /AUTO:RECENT_CHANGES -->
