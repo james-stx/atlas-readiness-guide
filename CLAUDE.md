@@ -215,7 +215,9 @@ packages/config/src
 ## Recent Commits
 
 ```
-4e2d81a fix(pdf): Redesign PDF layout and add 90-day Phase 3
+9b12cd1 fix(pdf): Prevent cards splitting across pages; change header to app blue
+4656a92 fix(pdf): Redesign PDF layout and add 90-day Phase 3
+b1676f0 docs: auto-update MVP documentation [skip ci]
 002f5d8 fix(email): Fix blank logo and PDF attachment
 8109ae6 fix(email): Match app content — labels, coverage format, compass logo, PDF attachment
 a4b2940 fix: correct domain from stxlabs.io to stxlabs.co in email config and template
@@ -223,7 +225,5 @@ d1954cb fix: null-safe email template + diagnostic logging for send route
 d6320ab fix: commit pnpm lockfile with @supabase/supabase-js for apps/web
 f582a48 feat: Auth, guest mode, data capture & PDF email (F0–F5)
 e8c30b4 docs: auto-update MVP documentation [skip ci]
-af7cf32 feat: Redesign expansion positioning labels to readiness-oriented language
-c1b514d docs: auto-update MVP documentation [skip ci]
 ```
 <!-- /AUTO:RECENT_CHANGES -->

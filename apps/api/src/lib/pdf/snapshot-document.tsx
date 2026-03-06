@@ -55,9 +55,9 @@ const s = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
 
-  // Dark header band
+  // Blue header band (matches app's primary blue)
   headerBand: {
-    backgroundColor: '#37352F',
+    backgroundColor: '#2383E2',
     paddingTop: 32,
     paddingBottom: 28,
     paddingHorizontal: 44,
@@ -392,12 +392,24 @@ function RoadmapPhase({
   if (!items || items.length === 0) return null;
   return (
     <View style={s.roadmapPhase}>
-      <View style={s.phaseHeader}>
-        <Text style={s.phaseTitle}>{title}</Text>
-        <Text style={s.phaseSub}>{subtitle}</Text>
+      {/* Keep the phase header pinned to its first item */}
+      <View wrap={false} style={{ marginBottom: 0 }}>
+        <View style={s.phaseHeader}>
+          <Text style={s.phaseTitle}>{title}</Text>
+          <Text style={s.phaseSub}>{subtitle}</Text>
+        </View>
+        {items[0] && (
+          <View style={s.roadmapItem}>
+            <Text style={s.roadmapBullet}>›</Text>
+            <View style={s.roadmapBody}>
+              <Text style={s.roadmapAction}>{items[0].action}</Text>
+              <Text style={s.roadmapRationale}>{items[0].rationale}</Text>
+            </View>
+          </View>
+        )}
       </View>
-      {items.map((item, i) => (
-        <View key={i} style={s.roadmapItem}>
+      {items.slice(1).map((item, i) => (
+        <View key={i} wrap={false} style={s.roadmapItem}>
           <Text style={s.roadmapBullet}>›</Text>
           <View style={s.roadmapBody}>
             <Text style={s.roadmapAction}>{item.action}</Text>
@@ -527,7 +539,7 @@ export function SnapshotDocument({ snapshot, session }: { snapshot: Snapshot; se
             <View style={s.section}>
               <SectionLabel>Early Signals</SectionLabel>
               {v3.early_signals.map((sig, i) => (
-                <View key={i} style={[s.cardBase, { backgroundColor: '#FFFBF0', borderLeftColor: '#D9730D' }]}>
+                <View key={i} wrap={false} style={[s.cardBase, { backgroundColor: '#FFFBF0', borderLeftColor: '#D9730D' }]}>
                   <Text style={s.cardTitle}>{sig.title}</Text>
                   <Text style={s.cardBody}>{sig.description}</Text>
                   <Text style={[s.cardHighlight, { color: '#D9730D' }]}>Implication: {sig.implication}</Text>
@@ -562,7 +574,7 @@ export function SnapshotDocument({ snapshot, session }: { snapshot: Snapshot; se
                 <Text style={s.emptyText}>No clear strengths identified yet.</Text>
               ) : (
                 v3.strengths.map((item, i) => (
-                  <View key={i} style={[s.cardBase, { backgroundColor: '#F0FDF8', borderLeftColor: '#0F7B6C' }]}>
+                  <View key={i} wrap={false} style={[s.cardBase, { backgroundColor: '#F0FDF8', borderLeftColor: '#0F7B6C' }]}>
                     <Text style={s.cardTitle}>{item.title}</Text>
                     <Text style={s.cardBody}>{item.description}</Text>
                     <View style={s.cardMeta}>
@@ -581,7 +593,7 @@ export function SnapshotDocument({ snapshot, session }: { snapshot: Snapshot; se
                 <Text style={s.emptyText}>No significant risks identified.</Text>
               ) : (
                 v3.risks.map((item, i) => (
-                  <View key={i} style={[s.cardBase, { backgroundColor: '#FFFBF0', borderLeftColor: '#D9730D' }]}>
+                  <View key={i} wrap={false} style={[s.cardBase, { backgroundColor: '#FFFBF0', borderLeftColor: '#D9730D' }]}>
                     <Text style={s.cardTitle}>{item.title}</Text>
                     <Text style={s.cardBody}>{item.description}</Text>
                     <View style={s.cardMeta}>
@@ -618,7 +630,7 @@ export function SnapshotDocument({ snapshot, session }: { snapshot: Snapshot; se
               <View style={s.section}>
                 <SectionLabel>Critical Actions — Hard blockers to resolve first</SectionLabel>
                 {v3.critical_actions.map((ca, i) => (
-                  <View key={i} style={[s.cardBase, { backgroundColor: '#FFF5F5', borderLeftColor: '#C9372C' }]}>
+                  <View key={i} wrap={false} style={[s.cardBase, { backgroundColor: '#FFF5F5', borderLeftColor: '#C9372C' }]}>
                     <View style={s.priorityRow}>
                       <View style={s.priorityCircle}>
                         <Text style={s.priorityNum}>{ca.priority}</Text>
@@ -643,7 +655,7 @@ export function SnapshotDocument({ snapshot, session }: { snapshot: Snapshot; se
               <View style={s.section}>
                 <SectionLabel>Needs Validation — Assumptions to test before treating as fact</SectionLabel>
                 {v3.needs_validation.map((nv, i) => (
-                  <View key={i} style={[s.cardBase, { backgroundColor: '#FEFCE8', borderLeftColor: '#9A6700' }]}>
+                  <View key={i} wrap={false} style={[s.cardBase, { backgroundColor: '#FEFCE8', borderLeftColor: '#9A6700' }]}>
                     <Text style={s.cardTitle}>{nv.title}</Text>
                     <Text style={s.cardBody}>{nv.description}</Text>
                     <Text style={[s.cardHighlight, { color: '#9A6700' }]}>Validate: {nv.validation_step}</Text>
