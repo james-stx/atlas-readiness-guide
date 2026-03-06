@@ -15,6 +15,6 @@ export function getResendClient(): Resend {
 
 // Email configuration
 export const EMAIL_CONFIG = {
-  from: process.env.EMAIL_FROM || 'Atlas Readiness Guide <atlas@updates.stxlabs.io>',
+  from: process.env.EMAIL_FROM || 'Atlas Readiness Guide <atlas@updates.stxlabs.co>',
   replyTo: 'hello@stxlabs.io',
 };

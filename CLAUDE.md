@@ -215,7 +215,8 @@ packages/config/src
 ## Recent Commits
 
 ```
-abd50a2 fix: null-safe email template + diagnostic logging for send route
+25e76b1 fix: correct domain from stxlabs.io to stxlabs.co in email config and template
+d1954cb fix: null-safe email template + diagnostic logging for send route
 d6320ab fix: commit pnpm lockfile with @supabase/supabase-js for apps/web
 f582a48 feat: Auth, guest mode, data capture & PDF email (F0–F5)
 e8c30b4 docs: auto-update MVP documentation [skip ci]
@@ -224,6 +225,5 @@ c1b514d docs: auto-update MVP documentation [skip ci]
 117edd3 fix: Restore snapshot on session recovery so report persists across refreshes
 3f8d28e docs: auto-update MVP documentation [skip ci]
 22f9f50 fix: Rewrite PDF export to render V5 report data
-951b900 fix: Add workspace-panel class to ReportPanel for correct scroll height
 ```
 <!-- /AUTO:RECENT_CHANGES -->
