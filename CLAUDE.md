@@ -215,7 +215,8 @@ packages/config/src
 ## Recent Commits
 
 ```
-6fbb6f8 fix: commit pnpm lockfile with @supabase/supabase-js for apps/web
+abd50a2 fix: null-safe email template + diagnostic logging for send route
+d6320ab fix: commit pnpm lockfile with @supabase/supabase-js for apps/web
 f582a48 feat: Auth, guest mode, data capture & PDF email (F0–F5)
 e8c30b4 docs: auto-update MVP documentation [skip ci]
 af7cf32 feat: Redesign expansion positioning labels to readiness-oriented language
@@ -224,6 +225,5 @@ c1b514d docs: auto-update MVP documentation [skip ci]
 3f8d28e docs: auto-update MVP documentation [skip ci]
 22f9f50 fix: Rewrite PDF export to render V5 report data
 951b900 fix: Add workspace-panel class to ReportPanel for correct scroll height
-484cdaa revert: Remove debug error detail from 500 response
 ```
 <!-- /AUTO:RECENT_CHANGES -->

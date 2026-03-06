@@ -56,14 +56,21 @@ export async function POST(
     const emailDomain = session.email.includes('@') ? session.email.split('@')[1] : session.email;
     const subject = `Your Atlas Readiness Report — ${emailDomain}`;
 
-    // Render email HTML
-    const emailHtml = renderSnapshotEmail({
-      snapshot,
-      email: session.email,
-    });
-
-    // Get plain text version
-    const emailText = getPlainTextVersion(snapshot, session.email);
+    // Render email HTML — wrapped to surface template errors clearly in logs
+    let emailHtml: string;
+    let emailText: string;
+    try {
+      emailHtml = renderSnapshotEmail({ snapshot, email: session.email });
+      emailText = getPlainTextVersion(snapshot, session.email);
+    } catch (renderErr) {
+      console.error('[Atlas] Email render error:', renderErr, JSON.stringify({
+        has_key_findings: !!snapshot.key_findings,
+        has_next_steps: !!snapshot.next_steps,
+        has_coverage_summary: !!snapshot.coverage_summary,
+        session_email: session.email,
+      }));
+      throw new AppError('Failed to render email template.', 500, 'EMAIL_RENDER_FAILED');
+    }
 
     // Send the email
     const { data: emailResult, error: emailError } = await getResendClient().emails.send({
@@ -76,7 +83,7 @@ export async function POST(
     });
 
     if (emailError) {
-      console.error('Resend error:', emailError);
+      console.error('[Atlas] Resend error:', emailError);
       throw new AppError('Failed to send email. Please try again later.', 500, 'EMAIL_SEND_FAILED');
     }
 
