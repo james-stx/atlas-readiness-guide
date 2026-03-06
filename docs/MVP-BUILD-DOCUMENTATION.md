@@ -558,6 +558,21 @@ The assessment progress component shows different states based on completion:
 
 ### V5 PDF Report Design
 
+**PDF Layout Redesign:**
+- Roadmap changed from 2-column to 3 stacked phases (Days 1-30, 31-60, 61-90)
+- Roadmap moved to dedicated Page 4 for better readability
+- New dark charcoal header band on every page with clear page titles
+- Section labels now use small uppercase with bottom rule (Notion-style)
+- Coverage table uses filled/empty dots per topic with confidence badges and progress bars
+- Cards have color-coded left-border treatment:
+  - Green: strengths
+  - Amber: risks
+  - Red: critical items
+  - Yellow: validation needs
+- Positioning badge colors now match app's POSITIONING_CONFIG exactly
+- Consistent footer on all pages with disclaimer
+- Improved content padding with proper horizontal gutters
+
 **Visual Hierarchy:**
 - **Positioning Badge**: Color-coded status indicator at top of report
 - **Executive Summary**: Highlighted callout box with key insights
@@ -854,6 +869,8 @@ This dual-path approach ensures report reliability even when the AI model (Haiku
 - Synthesis: `claude-haiku-4-5-20251001`
 
 The conversation model upgrade to Claude Sonnet 4.6 provides enhanced AI capabilities for user interactions and topic discussions.
+
+AI synthesis now generates three roadmap phases instead of two, with Phase 3 (days 61-90) focusing on scaling successful strategies. This required updates to the synthesis prompt, Zod schema validation, and data mapping in the generate route.
 
 **Performance Considerations:**
 - Synthesis uses Haiku model to avoid 60-second timeouts
@@ -1268,6 +1285,8 @@ The V3 snapshot schema now includes:
 - `recommended_topics`: Array of TopicRecommendation for incomplete assessments
 - Backward compatibility with existing complete assessment fields
 
+Added `roadmap_phase3` field to SnapshotV3 type to support the new 90-day roadmap phase containing scaling recommendations for days 61-90.
+
 **Enhanced Snapshot Processing:**
 
 The PDF export now leverages the `raw_output` field more extensively:
@@ -1513,6 +1532,8 @@ POST /api/snapshot/generate
 ```
 Generates readiness snapshot from all inputs.
 
+The `/api/snapshot/generate` endpoint now includes `roadmapPhase3` in both the AI synthesis prompt and response schema. This phase focuses on "Scale what's working" for days 61-90 of the expansion roadmap.
+
 **Model Configuration Updates:**
 - Synthesis operations now use 4096 max tokens (increased from 1024) for more comprehensive analysis
 - Snapshot generation includes robust error handling for partial completions
@@ -1530,50 +1551,4 @@ Generates readiness snapshot from all inputs.
 ## AI Prompt Updates for V4
 
 ### Incomplete Assessment Prompts
-When coverage is below 60%, the AI system now generates:
-
-1. **Early Signals** (2-4 cross-domain patterns)
-   - Synthesizes patterns across available inputs
-   - Identifies strengths, risks, and unknowns
-   - Provides implications for expansion readiness
-
-2. **Recommended Topics** (3 highest-value topics)
-   - Prioritizes topics based on current coverage gaps
-   - Explains why each topic is valuable
-   - Previews what insights each topic will unlock
-
-### Synthesis Instructions
-- Explicit instruction to synthesize patterns, not summarize topics
-- Focus on cross-domain implications and insights
-- Provide unique value beyond what the console interface shows
-- Generate actionable guidance for next steps
-
----
-
-#### Get Snapshot
-```
-GET /api/snapshot/[sessionId]
-```
-Retrieves existing snapshot for a session.
-
-**Response Format:**
-```json
-{
-  "snapshot": {
-    "id": "uuid",
-    "session_id": "uuid",
-    "created_at": "timestamp",
-    "raw_output": "json_string",
-    "v3": {
-      // V3 analysis data extracted from raw_output
-    },
-    "key_stats": {
-      // Key statistics extracted from raw_output
-    },
-    "readiness_level": "string",
-    "verdict_summary": "string"
-  }
-}
-```
-
-**Note:** The API extracts V3 data, key_
+When coverage is below 60%, the AI
