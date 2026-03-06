@@ -1,7 +1,10 @@
+import React from 'react';
 import { NextRequest, NextResponse } from 'next/server';
+import { renderToBuffer } from '@react-pdf/renderer';
 import { supabase } from '@/lib/db/supabase';
 import { getValidSession } from '@/lib/db/session';
 import { getResendClient, EMAIL_CONFIG, renderSnapshotEmail, getPlainTextVersion } from '@/lib/email';
+import { SnapshotDocument } from '@/lib/pdf';
 import { handleApiError, ValidationError, AppError } from '@/lib/errors';
 import type { Snapshot } from '@atlas/types';
 
@@ -72,14 +75,31 @@ export async function POST(
       throw new AppError('Failed to render email template.', 500, 'EMAIL_RENDER_FAILED');
     }
 
+    // Generate PDF attachment — non-fatal if it fails
+    let pdfBuffer: Buffer | undefined;
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      pdfBuffer = await renderToBuffer(
+        React.createElement(SnapshotDocument, { snapshot, session }) as any
+      );
+    } catch (pdfErr) {
+      console.error('[Atlas] PDF generation error (non-fatal, email will send without attachment):', pdfErr);
+    }
+
     // Send the email
     const { data: emailResult, error: emailError } = await getResendClient().emails.send({
       from: EMAIL_CONFIG.from,
       to: session.email,
-      replyTo: EMAIL_CONFIG.replyTo,
+      reply_to: EMAIL_CONFIG.replyTo,
       subject,
       html: emailHtml,
       text: emailText,
+      ...(pdfBuffer ? {
+        attachments: [{
+          filename: 'atlas-readiness-report.pdf',
+          content: pdfBuffer,
+        }],
+      } : {}),
     });
 
     if (emailError) {
@@ -91,6 +111,7 @@ export async function POST(
       success: true,
       message: `Snapshot sent to ${session.email}`,
       emailId: emailResult?.id,
+      hasPdf: !!pdfBuffer,
     });
   } catch (error) {
     return handleApiError(error);

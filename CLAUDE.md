@@ -215,7 +215,8 @@ packages/config/src
 ## Recent Commits
 
 ```
-25e76b1 fix: correct domain from stxlabs.io to stxlabs.co in email config and template
+a31cf2d fix(email): Match app content — labels, coverage format, compass logo, PDF attachment
+a4b2940 fix: correct domain from stxlabs.io to stxlabs.co in email config and template
 d1954cb fix: null-safe email template + diagnostic logging for send route
 d6320ab fix: commit pnpm lockfile with @supabase/supabase-js for apps/web
 f582a48 feat: Auth, guest mode, data capture & PDF email (F0–F5)
@@ -224,6 +225,5 @@ af7cf32 feat: Redesign expansion positioning labels to readiness-oriented langua
 c1b514d docs: auto-update MVP documentation [skip ci]
 117edd3 fix: Restore snapshot on session recovery so report persists across refreshes
 3f8d28e docs: auto-update MVP documentation [skip ci]
-22f9f50 fix: Rewrite PDF export to render V5 report data
 ```
 <!-- /AUTO:RECENT_CHANGES -->

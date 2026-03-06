@@ -16,25 +16,33 @@ const DOMAIN_LABELS: Record<DomainType, string> = {
 };
 
 const CONFIDENCE_COLORS: Record<ConfidenceLevel, string> = {
-  high: '#16a34a',
-  medium: '#d97706',
-  low: '#dc2626',
+  high: '#0F7B6C',
+  medium: '#9A6700',
+  low: '#E03E3E',
 };
 
+const CONFIDENCE_BG: Record<ConfidenceLevel, string> = {
+  high: '#DDEDEA',
+  medium: '#FBF3DB',
+  low: '#FFE2DD',
+};
+
+// Labels match app's POSITIONING_CONFIG in report-executive-summary.tsx
 const POSITIONING_LABELS: Record<ExpansionPositioning, string> = {
   expansion_ready: 'Expansion Ready',
   well_positioned: 'Well Positioned',
-  conditionally_positioned: 'Conditionally Positioned',
-  foundation_building: 'Foundation Building',
-  early_exploration: 'Early Exploration',
+  conditionally_positioned: 'Early Signs',
+  foundation_building: 'Traction Needed',
+  early_exploration: 'Too Early',
 };
 
+// Colors match app's POSITIONING_CONFIG
 const POSITIONING_COLORS: Record<ExpansionPositioning, { bg: string; text: string; border: string }> = {
-  expansion_ready:        { bg: '#DCFCE7', text: '#15803D', border: '#BBF7D0' },
-  well_positioned:        { bg: '#D1FAE5', text: '#065F46', border: '#A7F3D0' },
-  conditionally_positioned: { bg: '#FEF3C7', text: '#92400E', border: '#FDE68A' },
-  foundation_building:    { bg: '#FEE2E2', text: '#991B1B', border: '#FECACA' },
-  early_exploration:      { bg: '#F3F4F6', text: '#374151', border: '#E5E7EB' },
+  expansion_ready:          { bg: '#DCFCE7', text: '#166534', border: '#16A34A' },
+  well_positioned:          { bg: '#DDEDEA', text: '#0F7B6C', border: '#0F7B6C' },
+  conditionally_positioned: { bg: '#FBF3DB', text: '#9A6700', border: '#E9B949' },
+  foundation_building:      { bg: '#FAEBDD', text: '#D9730D', border: '#D9730D' },
+  early_exploration:        { bg: '#F7F6F3', text: '#9B9A97', border: '#E8E6E1' },
 };
 
 const READINESS_LABELS: Record<ReadinessLevel, string> = {
@@ -45,9 +53,14 @@ const READINESS_LABELS: Record<ReadinessLevel, string> = {
 
 const READINESS_COLORS: Record<ReadinessLevel, { bg: string; text: string; border: string }> = {
   ready:               { bg: '#DCFCE7', text: '#15803D', border: '#BBF7D0' },
-  ready_with_caveats:  { bg: '#FEF3C7', text: '#92400E', border: '#FDE68A' },
-  not_ready:           { bg: '#FEE2E2', text: '#991B1B', border: '#FECACA' },
+  ready_with_caveats:  { bg: '#FBF3DB', text: '#9A6700', border: '#E9B949' },
+  not_ready:           { bg: '#FFE2DD', text: '#C9372C', border: '#FFBDAD' },
 };
+
+// Inline compass SVG (matches Lucide compass icon used in the app)
+const COMPASS_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>`;
+
+const ALL_DOMAINS: DomainType[] = ['market', 'product', 'gtm', 'operations', 'financials'];
 
 // ─── Main HTML template ─────────────────────────────────────────────────────
 
@@ -74,45 +87,41 @@ export function renderSnapshotEmail({ snapshot, email }: SnapshotEmailProps): st
   const keyFindings = (snapshot.key_findings ?? []).slice(0, 5).map((finding) => `
     <div style="padding: 12px; background-color: #f8fafc; border-radius: 8px; margin-bottom: 10px;">
       <p style="font-size: 14px; color: #334155; margin: 0 0 8px 0; line-height: 1.6;">${escapeHtml(finding.finding)}</p>
-      <div style="display: flex; gap: 8px;">
-        <span style="padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; background-color: ${CONFIDENCE_COLORS[finding.confidence]}20; color: ${CONFIDENCE_COLORS[finding.confidence]};">
-          ${finding.confidence.toUpperCase()}
-        </span>
-        <span style="padding: 2px 8px; border-radius: 4px; font-size: 10px; background-color: #f1f5f9; color: #64748b;">
-          ${DOMAIN_LABELS[finding.domain]}
-        </span>
-      </div>
+      <table cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
+        <tr>
+          <td style="padding-right: 6px;">
+            <span style="display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; background-color: ${CONFIDENCE_BG[finding.confidence]}; color: ${CONFIDENCE_COLORS[finding.confidence]};">
+              ${finding.confidence.toUpperCase()}
+            </span>
+          </td>
+          <td>
+            <span style="display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; background-color: #f1f5f9; color: #64748b;">
+              ${DOMAIN_LABELS[finding.domain]}
+            </span>
+          </td>
+        </tr>
+      </table>
     </div>
   `).join('');
 
-  // Coverage rows
-  const coverageRows = (Object.entries(snapshot.coverage_summary ?? {}) as [DomainType, { high_confidence: number; medium_confidence: number; low_confidence: number }][])
-    .map(([domain, levels]) => {
-      const total = levels.high_confidence + levels.medium_confidence + levels.low_confidence;
-      return `
-        <tr>
-          <td style="padding: 8px 0; font-size: 14px; font-weight: 500; color: #0f172a; border-bottom: 1px solid #e2e8f0;">${DOMAIN_LABELS[domain]}</td>
-          <td style="padding: 8px 12px; font-size: 14px; color: #64748b; border-bottom: 1px solid #e2e8f0; text-align: center;">${total} inputs</td>
-          <td style="padding: 8px 0; font-size: 12px; border-bottom: 1px solid #e2e8f0; text-align: right;">
-            <span style="color: ${CONFIDENCE_COLORS.high};">${levels.high_confidence}H</span>
-            &nbsp;/&nbsp;
-            <span style="color: ${CONFIDENCE_COLORS.medium};">${levels.medium_confidence}M</span>
-            &nbsp;/&nbsp;
-            <span style="color: ${CONFIDENCE_COLORS.low};">${levels.low_confidence}L</span>
-          </td>
-        </tr>
-      `;
-    }).join('');
+  // Coverage section — V3 dot-indicator format if available, otherwise legacy
+  const coverageSection = v3?.domains
+    ? buildV3CoverageSection(v3)
+    : buildLegacyCoverageSection(snapshot);
 
   // Top recommendations
   const recommendations = (snapshot.next_steps ?? []).slice(0, 3).map((step) => `
-    <div style="display: flex; margin-bottom: 16px;">
-      <div style="width: 26px; height: 26px; background-color: #37352F; color: #ffffff; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: bold; margin-right: 12px; flex-shrink: 0; line-height: 26px; text-align: center;">${step.priority}</div>
-      <div style="flex: 1;">
-        <p style="font-size: 14px; font-weight: 500; color: #0f172a; margin: 0 0 4px 0;">${escapeHtml(step.action)}</p>
-        <p style="font-size: 13px; color: #64748b; margin: 0; line-height: 1.5;">${escapeHtml(step.rationale)}</p>
-      </div>
-    </div>
+    <table cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
+      <tr>
+        <td style="width: 32px; vertical-align: top; padding-top: 2px;">
+          <div style="width: 22px; height: 22px; background-color: #37352F; color: #ffffff; border-radius: 50%; font-size: 11px; font-weight: bold; text-align: center; line-height: 22px;">${step.priority}</div>
+        </td>
+        <td style="vertical-align: top;">
+          <p style="font-size: 14px; font-weight: 600; color: #0f172a; margin: 0 0 4px 0;">${escapeHtml(step.action)}</p>
+          <p style="font-size: 13px; color: #64748b; margin: 0; line-height: 1.5;">${escapeHtml(step.rationale)}</p>
+        </td>
+      </tr>
+    </table>
   `).join('');
 
   const hasRecommendations = (snapshot.next_steps ?? []).length > 0;
@@ -131,7 +140,9 @@ export function renderSnapshotEmail({ snapshot, email }: SnapshotEmailProps): st
 
       <!-- ── Header ── -->
       <div style="background-color: #37352F; color: #ffffff; padding: 32px; text-align: center;">
-        <div style="width: 48px; height: 48px; background-color: rgba(255,255,255,0.15); border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 22px; font-weight: bold; margin-bottom: 14px; line-height: 48px;">A</div>
+        <div style="width: 52px; height: 52px; background-color: rgba(255,255,255,0.12); border-radius: 12px; display: inline-block; line-height: 52px; margin-bottom: 14px; vertical-align: middle;">
+          <div style="padding-top: 12px;">${COMPASS_SVG}</div>
+        </div>
         <h1 style="font-size: 22px; font-weight: 700; margin: 0 0 6px 0; letter-spacing: -0.3px;">Your Readiness Report</h1>
         <p style="font-size: 12px; color: rgba(255,255,255,0.5); margin: 0 0 14px 0; letter-spacing: 0.5px; text-transform: uppercase;">Powered by STX Labs</p>
         <p style="font-size: 12px; color: rgba(255,255,255,0.5); margin: 0;">Generated for ${escapeHtml(email)} &middot; ${generatedDate}</p>
@@ -141,7 +152,7 @@ export function renderSnapshotEmail({ snapshot, email }: SnapshotEmailProps): st
       ${positioningBadge || summaryText ? `
       <div style="padding: 24px 32px; border-bottom: 1px solid #e2e8f0; text-align: center;">
         ${positioningBadge}
-        ${summaryText ? `<p style="font-size: 14px; color: #334155; line-height: 1.7; margin: ${positioningBadge ? '14px' : '0'} 0 0 0;">${escapeHtml(summaryText)}</p>` : ''}
+        ${summaryText ? `<p style="font-size: 14px; color: #334155; line-height: 1.7; margin: ${positioningBadge ? '14px' : '0'} 0 0 0; text-align: left;">${escapeHtml(summaryText)}</p>` : ''}
       </div>
       ` : ''}
 
@@ -156,11 +167,7 @@ export function renderSnapshotEmail({ snapshot, email }: SnapshotEmailProps): st
       <!-- ── Coverage Summary ── -->
       <div style="padding: 24px 32px; border-bottom: 1px solid #e2e8f0;">
         <h2 style="font-size: 11px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 14px 0;">Coverage Summary</h2>
-        <table style="width: 100%; border-collapse: collapse;">
-          <tbody>
-            ${coverageRows}
-          </tbody>
-        </table>
+        ${coverageSection}
       </div>
 
       <!-- ── Top Recommendations ── -->
@@ -226,6 +233,95 @@ export function renderSnapshotEmail({ snapshot, email }: SnapshotEmailProps): st
   `.trim();
 }
 
+// ─── Coverage section builders ───────────────────────────────────────────────
+
+function buildV3CoverageSection(v3: SnapshotV3): string {
+  const rows = ALL_DOMAINS.map((domain) => {
+    const dr = v3.domains?.[domain];
+    if (!dr) return '';
+
+    const { topics_covered, topics_total, confidence_level } = dr;
+    const dotColor = CONFIDENCE_COLORS[confidence_level];
+    const confBg = CONFIDENCE_BG[confidence_level];
+
+    // Build dot indicators: ● for covered, ○ for not covered
+    const dots = Array.from({ length: topics_total }, (_, i) =>
+      `<span style="color: ${i < topics_covered ? dotColor : '#CBD5E1'}; font-size: 13px;">${i < topics_covered ? '●' : '○'}</span>`
+    ).join(' ');
+
+    return `
+      <tr>
+        <td style="padding: 10px 0; border-bottom: 1px solid #f1f0ec; vertical-align: middle;">
+          <table cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse;">
+            <tr>
+              <td style="width: 90px; vertical-align: middle;">
+                <span style="font-size: 13px; font-weight: 500; color: #0f172a;">${DOMAIN_LABELS[domain]}</span>
+              </td>
+              <td style="vertical-align: middle; padding: 0 8px;">
+                ${dots}
+              </td>
+              <td style="white-space: nowrap; vertical-align: middle; padding: 0 8px; text-align: right;">
+                <span style="font-size: 12px; color: #64748b;">${topics_covered}/${topics_total} topics</span>
+              </td>
+              <td style="white-space: nowrap; vertical-align: middle; text-align: right;">
+                <span style="display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 700; background-color: ${confBg}; color: ${dotColor};">
+                  ${confidence_level.toUpperCase()}
+                </span>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  const pct = v3.coverage_percentage ?? 0;
+  const barColor = pct >= 70 ? '#0F7B6C' : pct >= 40 ? '#9A6700' : '#E03E3E';
+
+  return `
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 14px;">
+      <tbody>${rows}</tbody>
+    </table>
+    <div style="margin-top: 4px;">
+      <table cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse; margin-bottom: 5px;">
+        <tr>
+          <td style="font-size: 12px; color: #64748b;">Report Confidence</td>
+          <td style="font-size: 12px; font-weight: 600; color: #0f172a; text-align: right;">${pct}%</td>
+        </tr>
+      </table>
+      <div style="height: 6px; background-color: #e2e8f0; border-radius: 3px; overflow: hidden;">
+        <div style="width: ${pct}%; height: 6px; background-color: ${barColor}; border-radius: 3px;"></div>
+      </div>
+    </div>
+  `;
+}
+
+function buildLegacyCoverageSection(snapshot: Snapshot): string {
+  const rows = (Object.entries(snapshot.coverage_summary ?? {}) as [DomainType, { high_confidence: number; medium_confidence: number; low_confidence: number }][])
+    .map(([domain, levels]) => {
+      const total = levels.high_confidence + levels.medium_confidence + levels.low_confidence;
+      return `
+        <tr>
+          <td style="padding: 8px 0; font-size: 14px; font-weight: 500; color: #0f172a; border-bottom: 1px solid #e2e8f0;">${DOMAIN_LABELS[domain]}</td>
+          <td style="padding: 8px 12px; font-size: 14px; color: #64748b; border-bottom: 1px solid #e2e8f0; text-align: center;">${total} inputs</td>
+          <td style="padding: 8px 0; font-size: 12px; border-bottom: 1px solid #e2e8f0; text-align: right;">
+            <span style="color: ${CONFIDENCE_COLORS.high};">${levels.high_confidence}H</span>
+            &nbsp;/&nbsp;
+            <span style="color: ${CONFIDENCE_COLORS.medium};">${levels.medium_confidence}M</span>
+            &nbsp;/&nbsp;
+            <span style="color: ${CONFIDENCE_COLORS.low};">${levels.low_confidence}L</span>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+  return `
+    <table style="width: 100%; border-collapse: collapse;">
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
+
 // ─── Badge helpers ───────────────────────────────────────────────────────────
 
 function buildPositioningBadge(positioning: ExpansionPositioning): string {
@@ -280,12 +376,24 @@ Generated for ${email} on ${generatedDate}
   }
 
   text += `COVERAGE SUMMARY\n----------------\n`;
-  (Object.entries(snapshot.coverage_summary ?? {}) as [DomainType, { high_confidence: number; medium_confidence: number; low_confidence: number }][]).forEach(
-    ([domain, levels]) => {
-      const total = levels.high_confidence + levels.medium_confidence + levels.low_confidence;
-      text += `${DOMAIN_LABELS[domain]}: ${total} inputs (${levels.high_confidence}H / ${levels.medium_confidence}M / ${levels.low_confidence}L)\n`;
+  if (v3?.domains) {
+    ALL_DOMAINS.forEach((domain) => {
+      const dr = v3.domains?.[domain];
+      if (dr) {
+        text += `${DOMAIN_LABELS[domain]}: ${dr.topics_covered}/${dr.topics_total} topics [${dr.confidence_level.toUpperCase()}]\n`;
+      }
+    });
+    if (v3.coverage_percentage != null) {
+      text += `\nReport Confidence: ${v3.coverage_percentage}%\n`;
     }
-  );
+  } else {
+    (Object.entries(snapshot.coverage_summary ?? {}) as [DomainType, { high_confidence: number; medium_confidence: number; low_confidence: number }][]).forEach(
+      ([domain, levels]) => {
+        const total = levels.high_confidence + levels.medium_confidence + levels.low_confidence;
+        text += `${DOMAIN_LABELS[domain]}: ${total} inputs (${levels.high_confidence}H / ${levels.medium_confidence}M / ${levels.low_confidence}L)\n`;
+      }
+    );
+  }
 
   if ((snapshot.next_steps ?? []).length > 0) {
     text += `\nTOP RECOMMENDATIONS\n-------------------\n`;
