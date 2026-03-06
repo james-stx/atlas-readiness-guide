@@ -6,17 +6,9 @@ import {
   View,
   StyleSheet,
 } from '@react-pdf/renderer';
-import type { Snapshot, Session, DomainType } from '@atlas/types';
-import {
-  pdfColors,
-  fontSizes,
-  commonStyles,
-} from './theme';
+import type { Snapshot, Session, DomainType, SnapshotV3, RoadmapAction } from '@atlas/types';
 
-interface SnapshotDocumentProps {
-  snapshot: Snapshot;
-  session: Session;
-}
+// ─── Constants ───────────────────────────────────────────────────────────────
 
 const DOMAIN_LABELS: Record<DomainType, string> = {
   market: 'Market',
@@ -26,6 +18,8 @@ const DOMAIN_LABELS: Record<DomainType, string> = {
   financials: 'Financials',
 };
 
+const DOMAIN_ORDER: DomainType[] = ['market', 'product', 'gtm', 'operations', 'financials'];
+
 const POSITIONING_LABELS: Record<string, string> = {
   expansion_ready: 'Expansion Ready',
   well_positioned: 'Well Positioned',
@@ -34,459 +28,679 @@ const POSITIONING_LABELS: Record<string, string> = {
   early_exploration: 'Too Early',
 };
 
-const styles = StyleSheet.create({
-  // Positioning badge
-  positioningBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-    alignSelf: 'flex-start',
-    marginBottom: 12,
+const POSITIONING_STYLE: Record<string, { bg: string; text: string; border: string }> = {
+  expansion_ready:          { bg: '#DCFCE7', text: '#166534', border: '#16A34A' },
+  well_positioned:          { bg: '#DDEDEA', text: '#0F7B6C', border: '#0F7B6C' },
+  conditionally_positioned: { bg: '#FBF3DB', text: '#9A6700', border: '#E9B949' },
+  foundation_building:      { bg: '#FAEBDD', text: '#D9730D', border: '#D9730D' },
+  early_exploration:        { bg: '#F7F6F3', text: '#9B9A97', border: '#E8E6E1' },
+};
+
+const CONF = {
+  high:   { text: '#0F7B6C', bg: '#DDEDEA', label: 'HIGH' },
+  medium: { text: '#9A6700', bg: '#FBF3DB', label: 'MEDIUM' },
+  low:    { text: '#C9372C', bg: '#FFE2DD', label: 'LOW' },
+};
+
+// ─── Styles ──────────────────────────────────────────────────────────────────
+
+const s = StyleSheet.create({
+  page: {
+    paddingTop: 0,
+    paddingBottom: 56,
+    paddingHorizontal: 0,
+    fontFamily: 'Helvetica',
+    fontSize: 10,
+    color: '#334155',
+    backgroundColor: '#ffffff',
   },
-  positioningText: {
-    fontSize: fontSizes.sm,
-    fontWeight: 'bold',
+
+  // Dark header band
+  headerBand: {
+    backgroundColor: '#37352F',
+    paddingTop: 32,
+    paddingBottom: 28,
+    paddingHorizontal: 44,
+    marginBottom: 28,
   },
-  // Executive summary
-  execSummary: {
-    backgroundColor: '#F9F8F5',
-    borderLeftWidth: 3,
-    borderLeftColor: pdfColors.primary,
-    padding: 12,
-    marginBottom: 20,
-    borderRadius: 4,
-  },
-  // Coverage grid
-  coverageGrid: {
+  headerBrandRow: {
     flexDirection: 'row',
-    gap: 6,
-    marginBottom: 16,
-  },
-  coverageItem: {
-    flex: 1,
-    padding: 8,
-    backgroundColor: pdfColors.slate50,
-    borderRadius: 4,
     alignItems: 'center',
+    marginBottom: 14,
   },
-  coverageLabel: {
-    fontSize: fontSizes.xs,
-    color: pdfColors.slate500,
-    marginBottom: 2,
-    textTransform: 'uppercase',
-  },
-  coverageValue: {
-    fontSize: fontSizes.xl,
-    fontWeight: 'bold',
-    color: pdfColors.slate900,
-  },
-  coverageSub: {
-    fontSize: fontSizes.xs,
-    color: pdfColors.slate500,
-  },
-  // Domain badge
-  domainBadge: {
-    paddingHorizontal: 5,
-    paddingVertical: 2,
-    borderRadius: 3,
-    backgroundColor: pdfColors.slate100,
-  },
-  domainBadgeText: {
-    fontSize: fontSizes.xs,
-    color: pdfColors.slate500,
-  },
-  // Strength card
-  strengthCard: {
-    backgroundColor: '#F0FDF4',
-    borderLeftWidth: 3,
-    borderLeftColor: pdfColors.green600,
-    padding: 10,
-    marginBottom: 8,
-    borderRadius: 4,
-  },
-  // Risk card
-  riskCard: {
-    backgroundColor: '#FFFBEB',
-    borderLeftWidth: 3,
-    borderLeftColor: pdfColors.amber600,
-    padding: 10,
-    marginBottom: 8,
-    borderRadius: 4,
-  },
-  // Critical action card
-  criticalCard: {
-    borderWidth: 1,
-    borderColor: pdfColors.slate300,
-    borderRadius: 4,
-    padding: 10,
-    marginBottom: 8,
-  },
-  priorityBadge: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: pdfColors.primary,
+  headerLogoBox: {
+    width: 28,
+    height: 28,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderRadius: 6,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 8,
   },
-  priorityText: {
-    color: pdfColors.white,
-    fontSize: fontSizes.xs,
-    fontWeight: 'bold',
+  headerLogoLetter: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontFamily: 'Helvetica-Bold',
   },
-  // Validation card
-  validationCard: {
-    backgroundColor: pdfColors.slate50,
+  headerBrand: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontFamily: 'Helvetica-Bold',
+  },
+  headerTitle: {
+    color: '#ffffff',
+    fontSize: 20,
+    fontFamily: 'Helvetica-Bold',
+    marginBottom: 6,
+  },
+  headerMeta: {
+    color: 'rgba(255,255,255,0.5)',
+    fontSize: 9,
+  },
+
+  // Content area
+  content: {
+    paddingHorizontal: 44,
+  },
+
+  // Section
+  section: {
+    marginBottom: 24,
+  },
+  sectionLabel: {
+    fontSize: 8,
+    fontFamily: 'Helvetica-Bold',
+    color: '#94a3b8',
+    textTransform: 'uppercase',
+    letterSpacing: 1.2,
+    marginBottom: 10,
+    paddingBottom: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e8e6e1',
+  },
+
+  // Positioning badge
+  positioningBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 20,
+    borderWidth: 1,
+    marginBottom: 14,
+  },
+  positioningText: {
+    fontSize: 10,
+    fontFamily: 'Helvetica-Bold',
+  },
+
+  // Executive summary
+  summaryCard: {
+    backgroundColor: '#F9F8F5',
     borderLeftWidth: 3,
-    borderLeftColor: pdfColors.slate500,
-    padding: 10,
-    marginBottom: 8,
-    borderRadius: 4,
+    borderLeftColor: '#37352F',
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderRadius: 3,
   },
-  // Roadmap phase
-  phaseHeader: {
-    backgroundColor: pdfColors.slate100,
-    padding: 8,
+  summaryText: {
+    fontSize: 10,
+    color: '#0f172a',
+    lineHeight: 1.65,
+  },
+
+  // Coverage table
+  coverageRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 9,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f0ec',
+  },
+  coverageDomain: {
+    width: 82,
+    fontSize: 10,
+    fontFamily: 'Helvetica-Bold',
+    color: '#0f172a',
+  },
+  coverageDots: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  dot: {
+    width: 7,
+    height: 7,
     borderRadius: 4,
-    marginBottom: 8,
+    marginRight: 3,
+  },
+  coverageCount: {
+    width: 62,
+    fontSize: 9,
+    color: '#64748b',
+    textAlign: 'right',
+  },
+  confBadge: {
+    width: 52,
+    paddingVertical: 2,
+    paddingHorizontal: 4,
+    borderRadius: 3,
+    alignItems: 'center',
+    marginLeft: 8,
+  },
+  confBadgeText: {
+    fontSize: 7,
+    fontFamily: 'Helvetica-Bold',
+  },
+  progressWrap: {
+    height: 5,
+    backgroundColor: '#e8e6e1',
+    borderRadius: 3,
+    marginTop: 12,
+    marginBottom: 5,
+  },
+  progressFill: {
+    height: 5,
+    borderRadius: 3,
+  },
+  progressLabel: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+
+  // Generic cards
+  cardBase: {
+    paddingVertical: 11,
+    paddingHorizontal: 13,
+    marginBottom: 9,
+    borderRadius: 4,
+    borderLeftWidth: 3,
+  },
+  cardTitle: {
+    fontSize: 10,
+    fontFamily: 'Helvetica-Bold',
+    color: '#0f172a',
+    marginBottom: 5,
+  },
+  cardBody: {
+    fontSize: 9,
+    color: '#334155',
+    lineHeight: 1.55,
+    marginBottom: 7,
+  },
+  cardHighlight: {
+    fontSize: 9,
+    fontFamily: 'Helvetica-Bold',
+    marginBottom: 6,
+  },
+  cardMeta: {
+    flexDirection: 'row',
+  },
+  chip: {
+    backgroundColor: '#f1f5f9',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 3,
+    marginRight: 5,
+  },
+  chipText: {
+    fontSize: 7,
+    color: '#64748b',
+  },
+
+  // Critical action priority circle
+  priorityRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  priorityCircle: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#37352F',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+    marginTop: 1,
+  },
+  priorityNum: {
+    color: '#ffffff',
+    fontSize: 8,
+    fontFamily: 'Helvetica-Bold',
+  },
+  priorityContent: {
+    flex: 1,
+  },
+
+  // Roadmap phases (stacked vertically)
+  roadmapPhase: {
+    marginBottom: 18,
+  },
+  phaseHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#37352F',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 4,
+    marginBottom: 10,
+  },
+  phaseTitle: {
+    color: '#ffffff',
+    fontSize: 10,
+    fontFamily: 'Helvetica-Bold',
+    marginRight: 8,
+  },
+  phaseSub: {
+    color: 'rgba(255,255,255,0.55)',
+    fontSize: 8,
   },
   roadmapItem: {
     flexDirection: 'row',
-    marginBottom: 8,
-    paddingLeft: 4,
+    alignItems: 'flex-start',
+    paddingHorizontal: 6,
+    marginBottom: 9,
   },
-  bullet: {
-    width: 14,
-    fontSize: fontSizes.base,
-    color: pdfColors.primary,
+  roadmapBullet: {
+    color: '#37352F',
+    fontSize: 11,
+    fontFamily: 'Helvetica-Bold',
+    marginRight: 8,
+    lineHeight: 1.2,
   },
-  itemContent: {
+  roadmapBody: {
     flex: 1,
   },
-  metaRow: {
+  roadmapAction: {
+    fontSize: 10,
+    fontFamily: 'Helvetica-Bold',
+    color: '#0f172a',
+    marginBottom: 3,
+  },
+  roadmapRationale: {
+    fontSize: 9,
+    color: '#64748b',
+    lineHeight: 1.45,
+  },
+
+  // In-progress box
+  inProgressBox: {
+    backgroundColor: '#FEF3C7',
+    borderWidth: 1,
+    borderColor: '#FDE68A',
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderRadius: 4,
+    marginBottom: 18,
+  },
+
+  // Footer
+  footer: {
+    position: 'absolute',
+    bottom: 20,
+    left: 44,
+    right: 44,
     flexDirection: 'row',
-    gap: 6,
-    marginTop: 4,
-    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    borderTopWidth: 1,
+    borderTopColor: '#e8e6e1',
+    paddingTop: 8,
   },
-  // Two column
-  twoCol: {
-    flexDirection: 'row',
-    gap: 14,
+  footerText: {
+    fontSize: 7,
+    color: '#94a3b8',
   },
-  col: {
-    flex: 1,
-  },
-  // Empty state
-  emptyNote: {
-    fontSize: fontSizes.sm,
-    color: pdfColors.slate500,
+
+  emptyText: {
+    fontSize: 9,
+    color: '#94a3b8',
     fontStyle: 'italic',
     paddingVertical: 4,
   },
 });
 
-function DomainBadge({ domain }: { domain: DomainType }) {
+// ─── Small helper components ─────────────────────────────────────────────────
+
+function SectionLabel({ children }: { children: string }) {
+  return <Text style={s.sectionLabel}>{children}</Text>;
+}
+
+function Chip({ label }: { label: string }) {
   return (
-    <View style={styles.domainBadge}>
-      <Text style={styles.domainBadgeText}>{DOMAIN_LABELS[domain]}</Text>
+    <View style={s.chip}>
+      <Text style={s.chipText}>{label}</Text>
     </View>
   );
 }
 
-function SectionTitle({ title, description }: { title: string; description?: string }) {
+function PageFooter({ left, right }: { left: string; right: string }) {
   return (
-    <View style={{ marginBottom: 10 }}>
-      <Text style={commonStyles.sectionTitle}>{title}</Text>
-      {description && (
-        <Text style={[commonStyles.textSm, { marginTop: 2 }]}>{description}</Text>
-      )}
+    <View style={s.footer}>
+      <Text style={s.footerText}>{left}</Text>
+      <Text style={s.footerText}>{right}</Text>
     </View>
   );
 }
 
-export function SnapshotDocument({ snapshot, session }: SnapshotDocumentProps) {
-  const v3 = snapshot.v3;
+function RoadmapPhase({
+  title,
+  subtitle,
+  items,
+}: {
+  title: string;
+  subtitle: string;
+  items: RoadmapAction[];
+}) {
+  if (!items || items.length === 0) return null;
+  return (
+    <View style={s.roadmapPhase}>
+      <View style={s.phaseHeader}>
+        <Text style={s.phaseTitle}>{title}</Text>
+        <Text style={s.phaseSub}>{subtitle}</Text>
+      </View>
+      {items.map((item, i) => (
+        <View key={i} style={s.roadmapItem}>
+          <Text style={s.roadmapBullet}>›</Text>
+          <View style={s.roadmapBody}>
+            <Text style={s.roadmapAction}>{item.action}</Text>
+            <Text style={s.roadmapRationale}>{item.rationale}</Text>
+          </View>
+        </View>
+      ))}
+    </View>
+  );
+}
+
+// ─── Main document ───────────────────────────────────────────────────────────
+
+export function SnapshotDocument({ snapshot, session }: { snapshot: Snapshot; session: Session }) {
+  const v3 = snapshot.v3 as SnapshotV3 | undefined;
+  const isAssessable = v3?.assessment_status === 'assessable';
   const generatedDate = new Date().toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
+    year: 'numeric', month: 'long', day: 'numeric',
   });
 
-  // Derive positioning display
   const positioning = v3?.expansion_positioning;
-  const positioningLabel = positioning ? POSITIONING_LABELS[positioning] : null;
-  const isAssessable = v3?.assessment_status === 'assessable';
+  const posLabel = positioning ? POSITIONING_LABELS[positioning] : null;
+  const posStyle = positioning ? POSITIONING_STYLE[positioning] : null;
 
-  // Coverage per domain (from v3.domains if available, else from legacy coverage_summary)
-  const domains: DomainType[] = ['market', 'product', 'gtm', 'operations', 'financials'];
+  const pct = v3?.coverage_percentage ?? 0;
+  const barColor = pct >= 70 ? '#0F7B6C' : pct >= 40 ? '#D9730D' : '#C9372C';
+
+  const hasRoadmap =
+    (v3?.roadmap_phase1?.length ?? 0) > 0 ||
+    (v3?.roadmap_phase2?.length ?? 0) > 0 ||
+    (v3?.roadmap_phase3?.length ?? 0) > 0;
 
   return (
     <Document>
-      {/* ─── PAGE 1: Header + Overview ─── */}
-      <Page size="A4" style={commonStyles.page}>
-        {/* Header */}
-        <View style={commonStyles.header}>
-          <View style={commonStyles.logo}>
-            <Text style={commonStyles.logoText}>A</Text>
+
+      {/* ══════════════════════════════════════════════
+          PAGE 1 — Overview
+      ══════════════════════════════════════════════ */}
+      <Page size="A4" style={s.page}>
+
+        {/* Header band */}
+        <View style={s.headerBand}>
+          <View style={s.headerBrandRow}>
+            <View style={s.headerLogoBox}>
+              <Text style={s.headerLogoLetter}>A</Text>
+            </View>
+            <Text style={s.headerBrand}>Atlas</Text>
           </View>
-          <Text style={commonStyles.title}>U.S. Expansion Readiness Report</Text>
-          <Text style={commonStyles.subtitle}>
-            Assessment for {session.email}
-          </Text>
-          <Text style={[commonStyles.textSm, { marginTop: 6 }]}>
-            Generated on {generatedDate}
-          </Text>
+          <Text style={s.headerTitle}>U.S. Expansion Readiness Report</Text>
+          <Text style={s.headerMeta}>{session.email}  ·  {generatedDate}</Text>
         </View>
 
-        {/* Positioning badge + executive summary (V5 assessable only) */}
-        {isAssessable && positioningLabel && (
-          <View style={[styles.positioningBadge, { backgroundColor: '#EDE9FE' }]}>
-            <Text style={[styles.positioningText, { color: '#5B21B6' }]}>
-              {positioningLabel}
-            </Text>
-          </View>
-        )}
+        <View style={s.content}>
 
-        {isAssessable && v3?.executive_summary && (
-          <View style={styles.execSummary}>
-            <Text style={[commonStyles.text, { lineHeight: 1.6 }]}>
-              {v3.executive_summary}
-            </Text>
-          </View>
-        )}
+          {/* Positioning badge */}
+          {posLabel && posStyle && (
+            <View style={[s.positioningBadge, { backgroundColor: posStyle.bg, borderColor: posStyle.border }]}>
+              <Text style={[s.positioningText, { color: posStyle.text }]}>{posLabel}</Text>
+            </View>
+          )}
 
-        {/* Coverage overview */}
-        <View style={commonStyles.section}>
-          <SectionTitle
-            title="Coverage Overview"
-            description="Topics assessed across the five key domains"
-          />
-          <View style={styles.coverageGrid}>
-            {domains.map((domain) => {
+          {/* Executive summary */}
+          {v3?.executive_summary && (
+            <View style={[s.section, { marginTop: posLabel ? 10 : 0 }]}>
+              <View style={s.summaryCard}>
+                <Text style={s.summaryText}>{v3.executive_summary}</Text>
+              </View>
+            </View>
+          )}
+
+          {/* In-progress notice */}
+          {v3 && !isAssessable && (
+            <View style={s.inProgressBox}>
+              <Text style={{ fontSize: 10, fontFamily: 'Helvetica-Bold', color: '#92400E', marginBottom: 4 }}>
+                Assessment In Progress
+              </Text>
+              <Text style={{ fontSize: 9, color: '#78350F', lineHeight: 1.5 }}>
+                {v3.topics_covered} of {v3.topics_total} topics covered. Complete at least 15 topics across all domains to unlock the full readiness report.
+              </Text>
+            </View>
+          )}
+
+          {/* Coverage */}
+          <View style={s.section}>
+            <SectionLabel>Coverage by Domain</SectionLabel>
+            {DOMAIN_ORDER.map((domain) => {
               const dr = v3?.domains?.[domain];
-              const covered = dr ? dr.topics_covered : 0;
-              const total = dr ? dr.topics_total : 5;
-              const legacyCoverage = snapshot.coverage_summary?.[domain];
-              const legacyTotal = legacyCoverage
-                ? legacyCoverage.high_confidence + legacyCoverage.medium_confidence + legacyCoverage.low_confidence
-                : 0;
-              const displayCovered = dr ? covered : legacyTotal;
+              const covered = dr?.topics_covered ?? 0;
+              const total = dr?.topics_total ?? 5;
+              const conf = dr?.confidence_level ?? 'low';
+              const c = CONF[conf];
               return (
-                <View key={domain} style={styles.coverageItem}>
-                  <Text style={styles.coverageLabel}>{DOMAIN_LABELS[domain]}</Text>
-                  <Text style={styles.coverageValue}>{displayCovered}</Text>
-                  <Text style={styles.coverageSub}>{dr ? `/ ${total} topics` : 'inputs'}</Text>
+                <View key={domain} style={s.coverageRow}>
+                  <Text style={s.coverageDomain}>{DOMAIN_LABELS[domain]}</Text>
+                  <View style={s.coverageDots}>
+                    {Array.from({ length: total }, (_, i) => (
+                      <View
+                        key={i}
+                        style={[s.dot, { backgroundColor: i < covered ? c.text : '#ddd8d0' }]}
+                      />
+                    ))}
+                  </View>
+                  <Text style={s.coverageCount}>{covered}/{total}</Text>
+                  <View style={[s.confBadge, { backgroundColor: c.bg }]}>
+                    <Text style={[s.confBadgeText, { color: c.text }]}>{c.label}</Text>
+                  </View>
                 </View>
               );
             })}
+            {v3 && (
+              <>
+                <View style={s.progressWrap}>
+                  <View style={[s.progressFill, { width: `${pct}%`, backgroundColor: barColor }]} />
+                </View>
+                <View style={s.progressLabel}>
+                  <Text style={{ fontSize: 8, color: '#64748b' }}>Report Confidence</Text>
+                  <Text style={{ fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#0f172a' }}>
+                    {pct}%  ·  {v3.topics_covered}/{v3.topics_total} topics
+                  </Text>
+                </View>
+              </>
+            )}
           </View>
 
-          {v3 && (
-            <Text style={commonStyles.textSm}>
-              Overall coverage: {v3.topics_covered}/{v3.topics_total} topics ({v3.coverage_percentage}%)
-              {' · '}
-              Status: {v3.assessment_status === 'assessable' ? 'Full Assessment' : 'In Progress'}
-            </Text>
+          {/* Early signals (incomplete assessment only) */}
+          {!isAssessable && v3?.early_signals && v3.early_signals.length > 0 && (
+            <View style={s.section}>
+              <SectionLabel>Early Signals</SectionLabel>
+              {v3.early_signals.map((sig, i) => (
+                <View key={i} style={[s.cardBase, { backgroundColor: '#FFFBF0', borderLeftColor: '#D9730D' }]}>
+                  <Text style={s.cardTitle}>{sig.title}</Text>
+                  <Text style={s.cardBody}>{sig.description}</Text>
+                  <Text style={[s.cardHighlight, { color: '#D9730D' }]}>Implication: {sig.implication}</Text>
+                </View>
+              ))}
+            </View>
           )}
+
         </View>
 
-        {/* Incomplete assessment note */}
-        {v3 && !isAssessable && (
-          <View style={{ backgroundColor: '#FEF3C7', padding: 12, borderRadius: 6, marginBottom: 16 }}>
-            <Text style={[commonStyles.text, { fontWeight: 'bold', marginBottom: 4 }]}>
-              Assessment In Progress
-            </Text>
-            <Text style={commonStyles.textSm}>
-              {v3.topics_covered} of {v3.topics_total} topics covered. Complete at least 15 topics across all domains to unlock the full readiness report.
-            </Text>
-          </View>
-        )}
-
-        {/* Early signals for incomplete assessments */}
-        {!isAssessable && v3?.early_signals && v3.early_signals.length > 0 && (
-          <View style={commonStyles.section}>
-            <SectionTitle title="Early Signals" description="Cross-domain patterns identified so far" />
-            {v3.early_signals.map((signal, i) => (
-              <View key={i} style={[styles.riskCard, { marginBottom: 8 }]}>
-                <Text style={[commonStyles.text, { fontWeight: 'bold', marginBottom: 4 }]}>
-                  {signal.title}
-                </Text>
-                <Text style={commonStyles.textSm}>{signal.description}</Text>
-                <Text style={[commonStyles.textSm, { color: pdfColors.amber600, marginTop: 4 }]}>
-                  Implication: {signal.implication}
-                </Text>
-              </View>
-            ))}
-          </View>
-        )}
-
-        {/* Footer */}
-        <View style={commonStyles.footer}>
-          <Text>Atlas Readiness Guide · This report reflects your self-reported information.</Text>
-          <Text>It is not a score or recommendation to expand.</Text>
-        </View>
+        <PageFooter
+          left="Atlas Readiness Guide · STX Labs"
+          right="Self-reported data only — not a recommendation to expand"
+        />
       </Page>
 
-      {/* ─── PAGE 2: Strengths + Risks (assessable only) ─── */}
+      {/* ══════════════════════════════════════════════
+          PAGE 2 — Strengths & Risks
+      ══════════════════════════════════════════════ */}
       {isAssessable && (
-        <Page size="A4" style={commonStyles.page}>
-          {/* Strengths */}
-          <View style={commonStyles.section}>
-            <SectionTitle
-              title="Strengths"
-              description="High-confidence validated advantages for U.S. expansion"
-            />
-            {(!v3?.strengths || v3.strengths.length === 0) ? (
-              <Text style={styles.emptyNote}>No clear strengths identified yet.</Text>
-            ) : (
-              v3.strengths.map((s, i) => (
-                <View key={i} style={styles.strengthCard}>
-                  <Text style={[commonStyles.text, { fontWeight: 'bold', marginBottom: 4 }]}>
-                    {s.title}
-                  </Text>
-                  <Text style={commonStyles.textSm}>{s.description}</Text>
-                  <View style={styles.metaRow}>
-                    <DomainBadge domain={s.source_domain} />
-                    <Text style={commonStyles.textSm}>{s.source_topic}</Text>
-                  </View>
-                </View>
-              ))
-            )}
+        <Page size="A4" style={s.page}>
+          <View style={s.headerBand}>
+            <Text style={[s.headerTitle, { fontSize: 16, marginBottom: 0 }]}>Strengths &amp; Risks</Text>
           </View>
 
-          {/* Risks */}
-          <View style={commonStyles.section}>
-            <SectionTitle
-              title="Risks"
-              description="Signals that will compound if ignored"
-            />
-            {(!v3?.risks || v3.risks.length === 0) ? (
-              <Text style={styles.emptyNote}>No significant risks identified.</Text>
-            ) : (
-              v3.risks.map((r, i) => (
-                <View key={i} style={styles.riskCard}>
-                  <Text style={[commonStyles.text, { fontWeight: 'bold', marginBottom: 4 }]}>
-                    {r.title}
-                  </Text>
-                  <Text style={commonStyles.textSm}>{r.description}</Text>
-                  <View style={styles.metaRow}>
-                    <DomainBadge domain={r.source_domain} />
-                    <Text style={commonStyles.textSm}>{r.source_topic}</Text>
+          <View style={s.content}>
+
+            {/* Strengths */}
+            <View style={s.section}>
+              <SectionLabel>Validated Strengths</SectionLabel>
+              {(!v3?.strengths || v3.strengths.length === 0) ? (
+                <Text style={s.emptyText}>No clear strengths identified yet.</Text>
+              ) : (
+                v3.strengths.map((item, i) => (
+                  <View key={i} style={[s.cardBase, { backgroundColor: '#F0FDF8', borderLeftColor: '#0F7B6C' }]}>
+                    <Text style={s.cardTitle}>{item.title}</Text>
+                    <Text style={s.cardBody}>{item.description}</Text>
+                    <View style={s.cardMeta}>
+                      <Chip label={DOMAIN_LABELS[item.source_domain]} />
+                      <Chip label={item.source_topic} />
+                    </View>
                   </View>
-                </View>
-              ))
-            )}
+                ))
+              )}
+            </View>
+
+            {/* Risks */}
+            <View style={s.section}>
+              <SectionLabel>Risks to Address</SectionLabel>
+              {(!v3?.risks || v3.risks.length === 0) ? (
+                <Text style={s.emptyText}>No significant risks identified.</Text>
+              ) : (
+                v3.risks.map((item, i) => (
+                  <View key={i} style={[s.cardBase, { backgroundColor: '#FFFBF0', borderLeftColor: '#D9730D' }]}>
+                    <Text style={s.cardTitle}>{item.title}</Text>
+                    <Text style={s.cardBody}>{item.description}</Text>
+                    <View style={s.cardMeta}>
+                      <Chip label={DOMAIN_LABELS[item.source_domain]} />
+                      <Chip label={item.source_topic} />
+                    </View>
+                  </View>
+                ))
+              )}
+            </View>
+
           </View>
 
-          <View style={commonStyles.footer}>
-            <Text>Atlas Readiness Guide · This report reflects your self-reported information.</Text>
-            <Text>It is not a score or recommendation to expand.</Text>
-          </View>
+          <PageFooter
+            left="Atlas Readiness Guide · STX Labs"
+            right="Self-reported data only — not a recommendation to expand"
+          />
         </Page>
       )}
 
-      {/* ─── PAGE 3: Critical Actions + Validation + Roadmap (assessable only) ─── */}
+      {/* ══════════════════════════════════════════════
+          PAGE 3 — Critical Actions & Validation
+      ══════════════════════════════════════════════ */}
       {isAssessable && (
-        <Page size="A4" style={commonStyles.page}>
-          {/* Critical Actions */}
-          {v3?.critical_actions && v3.critical_actions.length > 0 && (
-            <View style={commonStyles.section}>
-              <SectionTitle
-                title="Critical Actions"
-                description="Hard blockers that must be resolved before committing capital"
-              />
-              {v3.critical_actions.map((ca, i) => (
-                <View key={i} style={styles.criticalCard}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
-                    <View style={styles.priorityBadge}>
-                      <Text style={styles.priorityText}>{ca.priority}</Text>
-                    </View>
-                    <Text style={[commonStyles.text, { fontWeight: 'bold', flex: 1 }]}>{ca.title}</Text>
-                    <DomainBadge domain={ca.source_domain} />
-                  </View>
-                  <Text style={commonStyles.textSm}>{ca.description}</Text>
-                  <Text style={[commonStyles.textSm, { color: pdfColors.primary, marginTop: 6, fontWeight: 'bold' }]}>
-                    Next step: {ca.action}
-                  </Text>
-                </View>
-              ))}
-            </View>
-          )}
+        <Page size="A4" style={s.page}>
+          <View style={s.headerBand}>
+            <Text style={[s.headerTitle, { fontSize: 16, marginBottom: 0 }]}>Critical Actions &amp; Validation</Text>
+          </View>
 
-          {/* Needs Validation */}
-          {v3?.needs_validation && v3.needs_validation.length > 0 && (
-            <View style={commonStyles.section}>
-              <SectionTitle
-                title="Needs Validation"
-                description="Assumptions to test before treating as fact"
-              />
-              {v3.needs_validation.map((nv, i) => (
-                <View key={i} style={styles.validationCard}>
-                  <Text style={[commonStyles.text, { fontWeight: 'bold', marginBottom: 4 }]}>
-                    {nv.title}
-                  </Text>
-                  <Text style={commonStyles.textSm}>{nv.description}</Text>
-                  <Text style={[commonStyles.textSm, { color: pdfColors.slate700, marginTop: 4, fontWeight: 'bold' }]}>
-                    Validate: {nv.validation_step}
-                  </Text>
-                </View>
-              ))}
-            </View>
-          )}
+          <View style={s.content}>
 
-          {/* Roadmap */}
-          {((v3?.roadmap_phase1 && v3.roadmap_phase1.length > 0) || (v3?.roadmap_phase2 && v3.roadmap_phase2.length > 0)) && (
-            <View style={commonStyles.section}>
-              <SectionTitle title="90-Day Roadmap" />
-              <View style={styles.twoCol}>
-                {/* Phase 1 */}
-                <View style={styles.col}>
-                  <View style={styles.phaseHeader}>
-                    <Text style={[commonStyles.text, { fontWeight: 'bold' }]}>Days 1–30</Text>
-                    <Text style={commonStyles.textSm}>Resolve critical blockers</Text>
-                  </View>
-                  {(v3?.roadmap_phase1 || []).map((item, i) => (
-                    <View key={i} style={styles.roadmapItem}>
-                      <Text style={styles.bullet}>›</Text>
-                      <View style={styles.itemContent}>
-                        <Text style={commonStyles.textSm}>{item.action}</Text>
-                        <Text style={[commonStyles.textSm, { color: pdfColors.slate500, marginTop: 2 }]}>
-                          {item.rationale}
-                        </Text>
+            {/* Critical Actions */}
+            {v3?.critical_actions && v3.critical_actions.length > 0 && (
+              <View style={s.section}>
+                <SectionLabel>Critical Actions — Hard blockers to resolve first</SectionLabel>
+                {v3.critical_actions.map((ca, i) => (
+                  <View key={i} style={[s.cardBase, { backgroundColor: '#FFF5F5', borderLeftColor: '#C9372C' }]}>
+                    <View style={s.priorityRow}>
+                      <View style={s.priorityCircle}>
+                        <Text style={s.priorityNum}>{ca.priority}</Text>
+                      </View>
+                      <View style={s.priorityContent}>
+                        <Text style={s.cardTitle}>{ca.title}</Text>
+                        <Text style={s.cardBody}>{ca.description}</Text>
+                        <Text style={[s.cardHighlight, { color: '#C9372C' }]}>Next step: {ca.action}</Text>
+                        <View style={s.cardMeta}>
+                          <Chip label={DOMAIN_LABELS[ca.source_domain]} />
+                          <Chip label={ca.source_topic} />
+                        </View>
                       </View>
                     </View>
-                  ))}
-                </View>
-                {/* Phase 2 */}
-                <View style={styles.col}>
-                  <View style={styles.phaseHeader}>
-                    <Text style={[commonStyles.text, { fontWeight: 'bold' }]}>Days 31–60</Text>
-                    <Text style={commonStyles.textSm}>Test key assumptions</Text>
                   </View>
-                  {(v3?.roadmap_phase2 || []).map((item, i) => (
-                    <View key={i} style={styles.roadmapItem}>
-                      <Text style={styles.bullet}>›</Text>
-                      <View style={styles.itemContent}>
-                        <Text style={commonStyles.textSm}>{item.action}</Text>
-                        <Text style={[commonStyles.textSm, { color: pdfColors.slate500, marginTop: 2 }]}>
-                          {item.rationale}
-                        </Text>
-                      </View>
-                    </View>
-                  ))}
-                </View>
+                ))}
               </View>
-            </View>
-          )}
+            )}
 
-          <View style={commonStyles.footer}>
-            <Text>Atlas Readiness Guide · This report reflects your self-reported information.</Text>
-            <Text>It is not a score or recommendation to expand.</Text>
+            {/* Needs Validation */}
+            {v3?.needs_validation && v3.needs_validation.length > 0 && (
+              <View style={s.section}>
+                <SectionLabel>Needs Validation — Assumptions to test before treating as fact</SectionLabel>
+                {v3.needs_validation.map((nv, i) => (
+                  <View key={i} style={[s.cardBase, { backgroundColor: '#FEFCE8', borderLeftColor: '#9A6700' }]}>
+                    <Text style={s.cardTitle}>{nv.title}</Text>
+                    <Text style={s.cardBody}>{nv.description}</Text>
+                    <Text style={[s.cardHighlight, { color: '#9A6700' }]}>Validate: {nv.validation_step}</Text>
+                    <View style={s.cardMeta}>
+                      <Chip label={DOMAIN_LABELS[nv.source_domain]} />
+                      <Chip label={nv.source_topic} />
+                    </View>
+                  </View>
+                ))}
+              </View>
+            )}
+
           </View>
+
+          <PageFooter
+            left="Atlas Readiness Guide · STX Labs"
+            right="Self-reported data only — not a recommendation to expand"
+          />
         </Page>
       )}
+
+      {/* ══════════════════════════════════════════════
+          PAGE 4 — 90-Day Roadmap (stacked, not columns)
+      ══════════════════════════════════════════════ */}
+      {isAssessable && hasRoadmap && (
+        <Page size="A4" style={s.page}>
+          <View style={s.headerBand}>
+            <Text style={[s.headerTitle, { fontSize: 16, marginBottom: 0 }]}>90-Day Roadmap</Text>
+          </View>
+
+          <View style={s.content}>
+            <SectionLabel>Phased action plan — resolve blockers, test assumptions, scale what works</SectionLabel>
+
+            <RoadmapPhase
+              title="Phase 1: Days 1–30"
+              subtitle="Resolve critical blockers"
+              items={v3?.roadmap_phase1 ?? []}
+            />
+            <RoadmapPhase
+              title="Phase 2: Days 31–60"
+              subtitle="Test key assumptions"
+              items={v3?.roadmap_phase2 ?? []}
+            />
+            <RoadmapPhase
+              title="Phase 3: Days 61–90"
+              subtitle="Scale what's working · Build U.S. operations foundation"
+              items={v3?.roadmap_phase3 ?? []}
+            />
+          </View>
+
+          <PageFooter
+            left="Atlas Readiness Guide · STX Labs"
+            right="Self-reported data only — not a recommendation to expand"
+          />
+        </Page>
+      )}
+
     </Document>
   );
 }

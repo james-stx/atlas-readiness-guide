@@ -215,7 +215,8 @@ packages/config/src
 ## Recent Commits
 
 ```
-600315d fix(email): Fix blank logo and PDF attachment
+4e2d81a fix(pdf): Redesign PDF layout and add 90-day Phase 3
+002f5d8 fix(email): Fix blank logo and PDF attachment
 8109ae6 fix(email): Match app content — labels, coverage format, compass logo, PDF attachment
 a4b2940 fix: correct domain from stxlabs.io to stxlabs.co in email config and template
 d1954cb fix: null-safe email template + diagnostic logging for send route
@@ -224,6 +225,5 @@ f582a48 feat: Auth, guest mode, data capture & PDF email (F0–F5)
 e8c30b4 docs: auto-update MVP documentation [skip ci]
 af7cf32 feat: Redesign expansion positioning labels to readiness-oriented language
 c1b514d docs: auto-update MVP documentation [skip ci]
-117edd3 fix: Restore snapshot on session recovery so report persists across refreshes
 ```
 <!-- /AUTO:RECENT_CHANGES -->

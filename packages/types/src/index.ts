@@ -266,6 +266,7 @@ export interface SnapshotV3 {
   needs_validation?: NeedsValidationItem[];
   roadmap_phase1?: RoadmapAction[];
   roadmap_phase2?: RoadmapAction[];
+  roadmap_phase3?: RoadmapAction[];
 
   // Legacy actions (kept for backwards compatibility)
   critical_actions: CriticalAction[];

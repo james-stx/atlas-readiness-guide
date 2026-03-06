@@ -125,6 +125,14 @@ const assessableSnapshotSchema = z.object({
       sourceTopic: z.string(),
     })
   ).default([]),
+  roadmapPhase3: z.array(
+    z.object({
+      action: z.string(),
+      rationale: z.string(),
+      sourceDomain: domainEnum,
+      sourceTopic: z.string(),
+    })
+  ).default([]),
 });
 
 const requestSchema = z.object({
@@ -447,6 +455,12 @@ export async function POST(request: NextRequest) {
         source_topic: r.sourceTopic,
       })),
       roadmap_phase2: (assessableData?.roadmapPhase2 || []).map(r => ({
+        action: r.action,
+        rationale: r.rationale,
+        source_domain: r.sourceDomain as DomainType,
+        source_topic: r.sourceTopic,
+      })),
+      roadmap_phase3: (assessableData?.roadmapPhase3 || []).map(r => ({
         action: r.action,
         rationale: r.rationale,
         source_domain: r.sourceDomain as DomainType,

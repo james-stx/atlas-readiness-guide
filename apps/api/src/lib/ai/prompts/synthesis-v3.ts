@@ -228,6 +228,13 @@ Each item:
 - rationale: What this unblocks or why it matters
 - sourceDomain, sourceTopic
 
+### roadmapPhase3 (array, 3-4 items)
+Specific actions for Days 61-90: focused on scaling what's working and building the foundation for U.S. operations.
+Each item:
+- action: Specific, concrete task (start with a verb)
+- rationale: What this enables or why it matters now
+- sourceDomain, sourceTopic
+
 ## Output Rules
 - Conservative assessments — don't inflate readiness
 - Not covered topics = "not_covered", vague responses = LOW confidence
@@ -296,6 +303,7 @@ export function buildSynthesisV3UserPrompt(inputs: Input[]): string {
     prompt += `5. needsValidation: Assumptions to test (title, sourceDomain, sourceTopic, description, validationStep)\n`;
     prompt += `6. roadmapPhase1: Days 1-30 actions for critical blockers (action, rationale, sourceDomain, sourceTopic)\n`;
     prompt += `7. roadmapPhase2: Days 31-60 actions for testing assumptions (action, rationale, sourceDomain, sourceTopic)\n`;
+    prompt += `8. roadmapPhase3: Days 61-90 actions for scaling what works (action, rationale, sourceDomain, sourceTopic)\n`;
   }
 
   return prompt;
