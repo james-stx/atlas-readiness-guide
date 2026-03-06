@@ -766,6 +766,8 @@ This separation allows users to browse content freely without accidentally trigg
   - PDF generation with React-PDF
   - Email sending with React templates
 
+**Email Template Rendering**: The snapshot email template uses base64-encoded SVG images for cross-client compatibility. The logo renders as an image in Apple Mail and Outlook on Mac, with graceful degradation to a dark square fallback in Gmail (which strips SVG content).
+
 **Session Management:**
 - Assessment context can be lost during navigation via anchor tags
 - Session recovery mechanism implemented in both workspace and snapshot pages
@@ -1574,10 +1576,4 @@ Retrieves existing snapshot for a session.
 }
 ```
 
-**Note:** The API extracts V3 data, key_stats, readiness_level, and verdict_summary from the raw_output field to provide an enriched response format that matches the generate route.
-
----
-
-**GET /api/export/pdf/[sessionId]**
-
-Generates and downloads a PDF report for a given session.
+**Note:** The API extracts V3 data, key_
