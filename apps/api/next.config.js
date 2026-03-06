@@ -4,6 +4,10 @@ const path = require('path');
 const nextConfig = {
   reactStrictMode: true,
   transpilePackages: ['@atlas/types', '@atlas/config'],
+  // Prevent webpack from bundling packages with native deps or complex internals
+  experimental: {
+    serverComponentsExternalPackages: ['@react-pdf/renderer'],
+  },
   // API-only app - no static pages needed
   output: 'standalone',
   // Skip ESLint during builds (run separately in CI)

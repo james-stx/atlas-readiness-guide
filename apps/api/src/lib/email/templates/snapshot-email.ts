@@ -57,8 +57,9 @@ const READINESS_COLORS: Record<ReadinessLevel, { bg: string; text: string; borde
   not_ready:           { bg: '#FFE2DD', text: '#C9372C', border: '#FFBDAD' },
 };
 
-// Inline compass SVG (matches Lucide compass icon used in the app)
-const COMPASS_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>`;
+// Compass SVG as base64 data URI for <img> (works in Apple Mail, Outlook on Mac).
+// Gmail strips SVGs, so the dark-square <td> still renders — only the icon goes missing there.
+const COMPASS_IMG_SRC = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiLz48cG9seWdvbiBwb2ludHM9IjE2LjI0IDcuNzYgMTQuMTIgMTQuMTIgNy43NiAxNi4yNCA5Ljg4IDkuODggMTYuMjQgNy43NiIvPjwvc3ZnPg==';
 
 const ALL_DOMAINS: DomainType[] = ['market', 'product', 'gtm', 'operations', 'financials'];
 
@@ -140,9 +141,17 @@ export function renderSnapshotEmail({ snapshot, email }: SnapshotEmailProps): st
 
       <!-- ── Header ── -->
       <div style="background-color: #37352F; color: #ffffff; padding: 32px; text-align: center;">
-        <div style="width: 52px; height: 52px; background-color: rgba(255,255,255,0.12); border-radius: 12px; display: inline-block; line-height: 52px; margin-bottom: 14px; vertical-align: middle;">
-          <div style="padding-top: 12px;">${COMPASS_SVG}</div>
-        </div>
+        <!-- Logo: dark rounded square + compass icon (img degrades gracefully in Gmail) -->
+        <table cellpadding="0" cellspacing="0" style="margin: 0 auto 16px;">
+          <tr>
+            <td style="background-color: rgba(255,255,255,0.12); width: 44px; height: 44px; border-radius: 10px; text-align: center; vertical-align: middle;" align="center" valign="middle">
+              <img src="${COMPASS_IMG_SRC}" width="24" height="24" alt="Atlas" style="display: block; margin: 10px;" />
+            </td>
+            <td style="padding-left: 10px; vertical-align: middle;" valign="middle">
+              <span style="color: #ffffff; font-size: 18px; font-weight: 700; letter-spacing: -0.2px;">Atlas</span>
+            </td>
+          </tr>
+        </table>
         <h1 style="font-size: 22px; font-weight: 700; margin: 0 0 6px 0; letter-spacing: -0.3px;">Your Readiness Report</h1>
         <p style="font-size: 12px; color: rgba(255,255,255,0.5); margin: 0 0 14px 0; letter-spacing: 0.5px; text-transform: uppercase;">Powered by STX Labs</p>
         <p style="font-size: 12px; color: rgba(255,255,255,0.5); margin: 0;">Generated for ${escapeHtml(email)} &middot; ${generatedDate}</p>

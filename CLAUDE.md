@@ -215,7 +215,8 @@ packages/config/src
 ## Recent Commits
 
 ```
-a31cf2d fix(email): Match app content — labels, coverage format, compass logo, PDF attachment
+600315d fix(email): Fix blank logo and PDF attachment
+8109ae6 fix(email): Match app content — labels, coverage format, compass logo, PDF attachment
 a4b2940 fix: correct domain from stxlabs.io to stxlabs.co in email config and template
 d1954cb fix: null-safe email template + diagnostic logging for send route
 d6320ab fix: commit pnpm lockfile with @supabase/supabase-js for apps/web
@@ -224,6 +225,5 @@ e8c30b4 docs: auto-update MVP documentation [skip ci]
 af7cf32 feat: Redesign expansion positioning labels to readiness-oriented language
 c1b514d docs: auto-update MVP documentation [skip ci]
 117edd3 fix: Restore snapshot on session recovery so report persists across refreshes
-3f8d28e docs: auto-update MVP documentation [skip ci]
 ```
 <!-- /AUTO:RECENT_CHANGES -->
