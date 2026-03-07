@@ -110,6 +110,7 @@ apps/web/tsconfig.tsbuildinfo
 apps/web/vercel.json
 CLAUDE.md
 docs
+docs/ARCHITECTURE.md
 docs/CONTENT-PANEL-V3-SPEC.md
 docs/DESIGN-Auth-Guest-Flow-Wireframes.md
 docs/DESIGN-OVERHAUL-BRIEF.md
@@ -136,7 +137,6 @@ package.json
 packages
 packages/config
 packages/config/node_modules
-packages/config/package.json
 ```
 <!-- /AUTO:STRUCTURE -->
 
@@ -215,7 +215,8 @@ packages/config/package.json
 ## Recent Commits
 
 ```
-ed885c3 feat(agents): Add Model Currency Agent — daily auto-update of AI model references
+d2b98ac docs: add system architecture diagram for MVP
+713a4b2 feat(agents): Add Model Currency Agent — daily auto-update of AI model references
 0fec0d7 fix(ci): Fix update-docs workflow — correct model ID, add timeout and continue-on-error
 9e16ef7 fix(pdf): Prevent cards splitting across pages; change header to app blue
 d2e49d8 docs: auto-update MVP documentation [skip ci]
@@ -224,6 +225,5 @@ b1676f0 docs: auto-update MVP documentation [skip ci]
 002f5d8 fix(email): Fix blank logo and PDF attachment
 8109ae6 fix(email): Match app content — labels, coverage format, compass logo, PDF attachment
 a4b2940 fix: correct domain from stxlabs.io to stxlabs.co in email config and template
-d1954cb fix: null-safe email template + diagnostic logging for send route
 ```
 <!-- /AUTO:RECENT_CHANGES -->
