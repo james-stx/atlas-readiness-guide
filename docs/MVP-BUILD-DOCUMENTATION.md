@@ -864,9 +864,9 @@ The synthesis model configuration has been optimized with increased token limits
 This dual-path approach ensures report reliability even when the AI model (Haiku) has processing issues.
 
 **AI Model Configuration:**
-- Conversation model upgraded to `claude-sonnet-4-6` (latest)
+- Conversation model: `claude-sonnet-4-6` (latest)
 - Classification: `claude-haiku-4-5-20251001`
-- Synthesis: `claude-haiku-4-5-20251001`
+- Synthesis: `claude-sonnet-4-5-20250929`
 
 The conversation model upgrade to Claude Sonnet 4.6 provides enhanced AI capabilities for user interactions and topic discussions.
 
@@ -895,7 +895,7 @@ The conversation agent uses Vercel AI SDK's `streamText()` with tool support:
 
 **Automatic Domain Transitions**: The system now includes explicit instructions for the AI to automatically transition between assessment domains after covering 3-4 key topics, improving conversation flow and completion rates.
 
-The AI service layer utilizes Anthropic's Claude 4.6 models for different purposes:
+The AI service layer utilizes Anthropic's Claude models for different purposes:
 - **Sonnet 4.6**: Primary model for conversations and content synthesis (higher capability)
 - **Haiku 4.5**: Lightweight model for fast classification tasks (optimized for speed)
 
@@ -904,7 +904,7 @@ The AI service layer utilizes Anthropic's Claude 4.6 models for different purpos
 - **Technology**: PostgreSQL via Supabase
 - **Stores**: Sessions, messages, inputs, snapshots
 
-#### AI (Anthropic Claude 4.6)
+#### AI (Anthropic Claude)
 - **Purpose**: Conversational intelligence
 - **Models**: Claude 4.6 Sonnet and Haiku 4.5
 - **Uses**: Conversation flow, input extraction, confidence classification, snapshot synthesis
@@ -1041,8 +1041,12 @@ atlas-readiness-guide/
 │   └── config/                 # Shared configuration
 │       └── src/index.ts
 │
-├── scripts/update-docs.ts      # Auto-documentation update script
-├── .github/workflows/update-docs.yml # GitHub Action workflow
+├── scripts/
+│   ├── update-docs.ts          # Auto-documentation update script
+│   └── update-models.ts        # Model currency agent script
+├── .github/workflows/
+│   ├── update-docs.yml         # GitHub Action workflow for docs
+│   └── update-models.yml       # GitHub Action workflow for model updates
 ├── package.json                # Root package.json
 ├── pnpm-workspace.yaml         # Workspace configuration
 ├── turbo.json                  # Turborepo configuration
@@ -1135,7 +1139,9 @@ apps/web/src/components/snapshot/
 | `apps/web/src/app/chat/page.tsx` | Chat interface page |
 | `packages/types/src/index.ts` | All TypeScript type definitions |
 | `scripts/update-docs.ts` | Auto-documentation update script that analyzes git changes and generates documentation updates using Claude API |
+| `scripts/update-models.ts` | Model currency agent script that fetches latest Anthropic models and updates codebase references |
 | `.github/workflows/update-docs.yml` | GitHub Action workflow for automated documentation updates |
+| `.github/workflows/update-models.yml` | GitHub Action workflow for automated model currency updates |
 
 ---
 
@@ -1369,6 +1375,16 @@ All models use Claude 4.5/4.6 architecture, providing improved performance and c
 
 **Cost**: Pay per token (usage-based)
 
+### Anthropic Models API
+
+The repository integrates with the Anthropic `/v1/models` endpoint to keep AI model references current. The **Model Currency Agent** (a daily GitHub Action) automatically discovers and updates model IDs across the codebase without manual intervention.
+
+**Endpoint:** `GET https://api.anthropic.com/v1/models`
+
+**Authentication:** Requires `ANTHROPIC_API_KEY` secret configured in GitHub Actions.
+
+**Update Frequency:** Daily at 09:00 UTC (configurable via cron in `.github/workflows/update-models.yml`; also supports manual `workflow_dispatch` trigger).
+
 ### Resend (Email)
 
 **What it is**: Modern email API for transactional emails.
@@ -1520,35 +1536,4 @@ The `recordInput` tool now includes server-side validation:
 
 **Request Timeout Behavior**
 - All chat requests automatically timeout after 90 seconds
-- Timeout errors return user-friendly error messages
-- AbortSignal is passed through the request chain for proper cancellation
-- Failed/cancelled requests trigger cleanup of streaming UI state
-
----
-
-#### Generate Snapshot
-```
-POST /api/snapshot/generate
-```
-Generates readiness snapshot from all inputs.
-
-The `/api/snapshot/generate` endpoint now includes `roadmapPhase3` in both the AI synthesis prompt and response schema. This phase focuses on "Scale what's working" for days 61-90 of the expansion roadmap.
-
-**Model Configuration Updates:**
-- Synthesis operations now use 4096 max tokens (increased from 1024) for more comprehensive analysis
-- Snapshot generation includes robust error handling for partial completions
-- Optional response arrays (strengths, assumptions, gaps, nextSteps) default to empty arrays if not generated
-
-**Request Body**:
-```json
-{
-  "sessionId": "uuid"
-}
-```
-
-**Response**: Generated snapshot data.
-
-## AI Prompt Updates for V4
-
-### Incomplete Assessment Prompts
-When coverage is below 60%, the AI
+- Timeout errors return user-friendly error
