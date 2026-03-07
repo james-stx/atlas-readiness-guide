@@ -64,6 +64,7 @@ All agents, hooks, and automations are documented in **`AGENTS.md`** at the proj
 .github
 .github/workflows
 .github/workflows/update-docs.yml
+.github/workflows/update-models.yml
 .gitignore
 .prettierrc
 .turbo
@@ -136,7 +137,6 @@ packages
 packages/config
 packages/config/node_modules
 packages/config/package.json
-packages/config/src
 ```
 <!-- /AUTO:STRUCTURE -->
 
@@ -215,7 +215,8 @@ packages/config/src
 ## Recent Commits
 
 ```
-ae1229e fix(ci): Fix update-docs workflow — correct model ID, add timeout and continue-on-error
+ed885c3 feat(agents): Add Model Currency Agent — daily auto-update of AI model references
+0fec0d7 fix(ci): Fix update-docs workflow — correct model ID, add timeout and continue-on-error
 9e16ef7 fix(pdf): Prevent cards splitting across pages; change header to app blue
 d2e49d8 docs: auto-update MVP documentation [skip ci]
 4656a92 fix(pdf): Redesign PDF layout and add 90-day Phase 3
@@ -224,6 +225,5 @@ b1676f0 docs: auto-update MVP documentation [skip ci]
 8109ae6 fix(email): Match app content — labels, coverage format, compass logo, PDF attachment
 a4b2940 fix: correct domain from stxlabs.io to stxlabs.co in email config and template
 d1954cb fix: null-safe email template + diagnostic logging for send route
-d6320ab fix: commit pnpm lockfile with @supabase/supabase-js for apps/web
 ```
 <!-- /AUTO:RECENT_CHANGES -->

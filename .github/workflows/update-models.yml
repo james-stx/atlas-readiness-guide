@@ -1,0 +1,61 @@
+name: Model Currency Agent
+
+on:
+  schedule:
+    - cron: '0 9 * * *'   # Daily at 09:00 UTC
+  workflow_dispatch:        # Allow manual trigger from GitHub UI
+
+permissions:
+  contents: write           # Required to commit model updates back to main
+
+jobs:
+  update-models:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install root dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check and update AI model references
+        id: update
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: npx tsx scripts/update-models.ts
+
+      - name: Detect changes
+        id: detect
+        run: |
+          if git diff --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "All models are up to date — nothing to commit."
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "Model updates detected:"
+            git diff --stat
+          fi
+
+      - name: Commit and push model updates
+        if: steps.detect.outputs.has_changes == 'true'
+        run: |
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add -A
+          git commit -m "chore(models): Auto-update AI models to latest available [skip ci]"
+          git push
