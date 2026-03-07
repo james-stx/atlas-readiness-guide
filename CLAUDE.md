@@ -215,7 +215,9 @@ packages/config/src
 ## Recent Commits
 
 ```
-9b12cd1 fix(pdf): Prevent cards splitting across pages; change header to app blue
+ae1229e fix(ci): Fix update-docs workflow — correct model ID, add timeout and continue-on-error
+9e16ef7 fix(pdf): Prevent cards splitting across pages; change header to app blue
+d2e49d8 docs: auto-update MVP documentation [skip ci]
 4656a92 fix(pdf): Redesign PDF layout and add 90-day Phase 3
 b1676f0 docs: auto-update MVP documentation [skip ci]
 002f5d8 fix(email): Fix blank logo and PDF attachment
@@ -223,7 +225,5 @@ b1676f0 docs: auto-update MVP documentation [skip ci]
 a4b2940 fix: correct domain from stxlabs.io to stxlabs.co in email config and template
 d1954cb fix: null-safe email template + diagnostic logging for send route
 d6320ab fix: commit pnpm lockfile with @supabase/supabase-js for apps/web
-f582a48 feat: Auth, guest mode, data capture & PDF email (F0–F5)
-e8c30b4 docs: auto-update MVP documentation [skip ci]
 ```
 <!-- /AUTO:RECENT_CHANGES -->

@@ -141,7 +141,7 @@ If updates are needed, provide them in this JSON format:
 Only suggest updates for significant changes that users of the documentation would need to know about.`;
 
   const analysisResponse = await client.messages.create({
-    model: 'claude-sonnet-4-20250514',
+    model: 'claude-haiku-4-5-20251001',
     max_tokens: 4096,
     messages: [{ role: 'user', content: analysisPrompt }],
   });
@@ -196,7 +196,7 @@ Important:
 Return ONLY the updated documentation content, no explanations.`;
 
   const updateResponse = await client.messages.create({
-    model: 'claude-sonnet-4-20250514',
+    model: 'claude-haiku-4-5-20251001',
     max_tokens: 16000,
     messages: [{ role: 'user', content: updatePrompt }],
   });
