@@ -38,12 +38,14 @@ export function WelcomeModal({
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Check if user has completed onboarding before
+    // Check once on mount only — isReturningUser at load time determines the variant shown.
+    // Do NOT re-run when messages arrive mid-session (that would re-show the modal).
     const hasCompletedOnboarding = localStorage.getItem(STORAGE_KEY);
     if (!hasCompletedOnboarding || isReturningUser) {
       setIsVisible(true);
     }
-  }, [isReturningUser]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleGuided = () => {
     localStorage.setItem(STORAGE_KEY, 'true');

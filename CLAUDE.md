@@ -216,7 +216,9 @@ packages/config
 ## Recent Commits
 
 ```
-4dadb87 feat: domain completion insight cards + chapter reframing
+cf89c72 fix: prevent WelcomeModal re-appearing after first message is sent
+24e251f feat: domain completion insight cards + chapter reframing
+0288494 docs: auto-update MVP documentation [skip ci]
 aea21a0 fix: remove countdown timer from TopBar, keep % progress only
 ea4e3e8 fix: vertically align send button in chat input
 2843947 docs: add system architecture diagram for MVP
@@ -224,7 +226,5 @@ ea4e3e8 fix: vertically align send button in chat input
 713a4b2 feat(agents): Add Model Currency Agent — daily auto-update of AI model references
 0fec0d7 fix(ci): Fix update-docs workflow — correct model ID, add timeout and continue-on-error
 9e16ef7 fix(pdf): Prevent cards splitting across pages; change header to app blue
-d2e49d8 docs: auto-update MVP documentation [skip ci]
-4656a92 fix(pdf): Redesign PDF layout and add 90-day Phase 3
 ```
 <!-- /AUTO:RECENT_CHANGES -->
