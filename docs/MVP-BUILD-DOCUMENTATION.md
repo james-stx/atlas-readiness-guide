@@ -484,6 +484,8 @@ The expansion positioning labels have been redesigned to use readiness-oriented 
 
 The TopBar has been simplified to remove the 'My Assessment' / 'Readiness Assessment' subtitle, presenting a cleaner interface focused on the Atlas branding and progress indicators. The inline 'View your Readiness Report' CTA has also been removed from domain content areas, reducing UI clutter and making the report access more intentional through other navigation paths.
 
+**Progress Indicator**: The TopBar displays a progress bar with percentage completion (0-100%). The percentage is shown in tabular-nums format next to a visual progress bar.
+
 ## V3 Readiness Report Design System
 
 The readiness report implements a comprehensive visual design system:
@@ -1532,8 +1534,4 @@ The `recordInput` tool now includes server-side validation:
 - **Error handling**: If an invalid `questionId` is provided, the tool returns an error response containing the list of valid IDs for the current domain
 - **Self-correction**: This enables the AI agent to automatically retry with a correct `questionId` when validation fails
 
-**Session Status Validation**: The chat endpoint now allows messages for sessions with status 'active' or 'completed'. Only sessions with status 'abandoned' will return a validation error 'This session is no longer active'.
-
-**Request Timeout Behavior**
-- All chat requests automatically timeout after 90 seconds
-- Timeout errors return user-friendly error
+**Session Status Validation**: The chat endpoint now allows messages for sessions with status 'active' or 'completed'. Only sessions with status 'abandoned' will return a validation error 
