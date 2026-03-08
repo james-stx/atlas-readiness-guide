@@ -12,6 +12,7 @@ interface SidebarDomainItemProps {
   isSelected: boolean;
   isExpanded: boolean;
   count: { current: number; total: number };
+  hasNewInsight?: boolean;
   onSelect: () => void;
   onToggleExpand: () => void;
 }
@@ -22,6 +23,7 @@ export function SidebarDomainItem({
   isSelected,
   isExpanded,
   count,
+  hasNewInsight,
   onSelect,
   onToggleExpand,
 }: SidebarDomainItemProps) {
@@ -71,8 +73,13 @@ export function SidebarDomainItem({
       </button>
 
       {/* Domain name */}
-      <span className="flex-1 text-[14px] leading-[1.3] text-[#37352F] truncate">
-        {label}
+      <span className="flex-1 flex items-center gap-1.5 min-w-0">
+        <span className="text-[14px] leading-[1.3] text-[#37352F] truncate">
+          {label}
+        </span>
+        {hasNewInsight && (
+          <span className="w-1.5 h-1.5 shrink-0 rounded-full bg-[#2383E2] animate-pulse-subtle" />
+        )}
       </span>
 
       {/* Progress count */}

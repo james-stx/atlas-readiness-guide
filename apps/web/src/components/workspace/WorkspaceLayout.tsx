@@ -1,6 +1,5 @@
 'use client';
 
-import { cn } from '@/lib/utils';
 import { useWorkspace } from '@/lib/context/workspace-context';
 import { useAssessment } from '@/lib/context/assessment-context';
 import { TopBar } from './TopBar';
@@ -10,17 +9,9 @@ import { ChatPanel } from './chat/ChatPanel';
 import { MobileTabBar } from './mobile/MobileTabBar';
 import { NetworkBanner } from '@/components/ui/network-banner';
 import { WelcomeModal } from './WelcomeModal';
+import { DomainInsightProvider } from '@/lib/context/domain-insight-context';
 import { DOMAINS, DOMAIN_TOPICS } from '@/lib/progress';
 import { useEffect, useState, useMemo } from 'react';
-import type { DomainType } from '@atlas/types';
-import { useDomainCompletionInsight } from '@/hooks/useDomainCompletionInsight';
-import { DomainInsightModal } from './DomainInsightModal';
-
-const DOMAIN_ORDER: DomainType[] = ['market', 'product', 'gtm', 'operations', 'financials'];
-const DOMAIN_LABELS: Record<DomainType, string> = {
-  market: 'Market', product: 'Product', gtm: 'Go-to-Market',
-  operations: 'Operations', financials: 'Financials',
-};
 
 export function WorkspaceLayout() {
   const {
@@ -29,27 +20,9 @@ export function WorkspaceLayout() {
     mobileTab,
     openChat,
     progressState,
-    selectedDomain,
     selectDomain,
-    switchToReport,
   } = useWorkspace();
   const { messages, session } = useAssessment();
-
-  const { insightDomain, insight, isLoading: insightLoading, dismissInsight } = useDomainCompletionInsight();
-
-  const handleInsightContinue = () => {
-    if (!insightDomain) return;
-    dismissInsight();
-    const idx = DOMAIN_ORDER.indexOf(insightDomain);
-    const nextDomain = DOMAIN_ORDER[idx + 1];
-    if (nextDomain) {
-      selectDomain(nextDomain);
-      openChat(nextDomain);
-    } else {
-      // Last domain — switch to report view
-      switchToReport();
-    }
-  };
 
   const [isMobile, setIsMobile] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
@@ -99,7 +72,6 @@ export function WorkspaceLayout() {
 
   // Show welcome modal on mount
   useEffect(() => {
-    // Small delay to prevent flash
     const timer = setTimeout(() => {
       setShowWelcome(true);
     }, 300);
@@ -112,12 +84,10 @@ export function WorkspaceLayout() {
   };
 
   const handleChooseExplore = () => {
-    // Chat stays closed (default)
     setShowWelcome(false);
   };
 
   const handleContinue = () => {
-    // Navigate to the in-progress domain and open chat
     const inProgressDomain = DOMAINS.find(
       (d) => progressState.domainProgress[d.key].status === 'in_progress'
     );
@@ -131,21 +101,62 @@ export function WorkspaceLayout() {
   // ─── Mobile layout ───
   if (isMobile) {
     return (
+      <DomainInsightProvider>
+        <div className="flex h-dvh flex-col bg-white">
+          <TopBar />
+          <NetworkBanner />
+          <div className="flex-1 overflow-hidden">
+            {mobileTab === 'domains' && (
+              <div className="h-full overflow-y-auto">
+                <Sidebar />
+              </div>
+            )}
+            {mobileTab === 'content' && <ContentPanel />}
+            {mobileTab === 'chat' && <ChatPanel />}
+          </div>
+          <MobileTabBar />
+
+          {showWelcome && (
+            <WelcomeModal
+              onChooseGuided={handleChooseGuided}
+              onChooseExplore={handleChooseExplore}
+              onContinue={handleContinue}
+              isReturningUser={isReturningUser}
+              progress={progress}
+              domainSummaries={domainSummaries}
+              lastDomain={lastDomain}
+            />
+          )}
+        </div>
+      </DomainInsightProvider>
+    );
+  }
+
+  // ─── Desktop/Tablet layout ───
+  return (
+    <DomainInsightProvider>
       <div className="flex h-dvh flex-col bg-white">
         <TopBar />
         <NetworkBanner />
-        <div className="flex-1 overflow-hidden">
-          {mobileTab === 'domains' && (
-            <div className="h-full overflow-y-auto">
+
+        <div className="flex flex-1 overflow-hidden">
+          {!isSidebarCollapsed && (
+            <div className="hidden md:block">
               <Sidebar />
             </div>
           )}
-          {mobileTab === 'content' && <ContentPanel />}
-          {mobileTab === 'chat' && <ChatPanel />}
-        </div>
-        <MobileTabBar />
 
-        {/* Welcome Modal */}
+          <div className="flex-1">
+            <ContentPanel />
+          </div>
+
+          {isChatOpen && (
+            <div className="animate-slide-in-right">
+              <ChatPanel />
+            </div>
+          )}
+        </div>
+
         {showWelcome && (
           <WelcomeModal
             onChooseGuided={handleChooseGuided}
@@ -157,72 +168,7 @@ export function WorkspaceLayout() {
             lastDomain={lastDomain}
           />
         )}
-
-        {/* Domain Insight Modal */}
-        {insightDomain && (
-          <DomainInsightModal
-            domain={insightDomain}
-            insight={insight}
-            isLoading={insightLoading}
-            onContinue={handleInsightContinue}
-            onDismiss={dismissInsight}
-          />
-        )}
       </div>
-    );
-  }
-
-  // ─── Desktop/Tablet layout ───
-  // Sidebar + Content always visible. Chat slides in from right.
-  return (
-    <div className="flex h-dvh flex-col bg-white">
-      <TopBar />
-      <NetworkBanner />
-
-      <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar — always visible on desktop */}
-        {!isSidebarCollapsed && (
-          <div className="hidden md:block">
-            <Sidebar />
-          </div>
-        )}
-
-        {/* Content panel — always visible */}
-        <div className="flex-1">
-          <ContentPanel />
-        </div>
-
-        {/* Chat panel — slides in when open */}
-        {isChatOpen && (
-          <div className="animate-slide-in-right">
-            <ChatPanel />
-          </div>
-        )}
-      </div>
-
-      {/* Welcome Modal */}
-      {showWelcome && (
-        <WelcomeModal
-          onChooseGuided={handleChooseGuided}
-          onChooseExplore={handleChooseExplore}
-          onContinue={handleContinue}
-          isReturningUser={isReturningUser}
-          progress={progress}
-          domainSummaries={domainSummaries}
-          lastDomain={lastDomain}
-        />
-      )}
-
-      {/* Domain Insight Modal */}
-      {insightDomain && (
-        <DomainInsightModal
-          domain={insightDomain}
-          insight={insight}
-          isLoading={insightLoading}
-          onContinue={handleInsightContinue}
-          onDismiss={dismissInsight}
-        />
-      )}
-    </div>
+    </DomainInsightProvider>
   );
 }

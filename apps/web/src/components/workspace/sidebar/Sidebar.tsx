@@ -2,6 +2,7 @@
 
 import { useWorkspace } from '@/lib/context/workspace-context';
 import { useAssessment } from '@/lib/context/assessment-context';
+import { useDomainInsight } from '@/lib/context/domain-insight-context';
 import { DOMAINS } from '@/lib/progress';
 import { SidebarDomainItem } from './SidebarDomainItem';
 import { SidebarTopicItem } from './SidebarTopicItem';
@@ -27,6 +28,7 @@ export function Sidebar() {
   } = useWorkspace();
 
   const { snapshot } = useAssessment();
+  const { isNew: hasNewInsight } = useDomainInsight();
 
   // Calculate overall progress
   const totalTopics = 25;
@@ -105,6 +107,7 @@ export function Sidebar() {
                   isSelected={isSelected}
                   isExpanded={isExpanded}
                   count={count}
+                  hasNewInsight={hasNewInsight(domain.key)}
                   onSelect={() => {
                     selectDomain(domain.key);
                     switchToAssessment();
