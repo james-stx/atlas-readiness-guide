@@ -4,7 +4,6 @@ import {
   Compass,
   PanelRightClose,
   MessageSquare,
-  Clock,
   Upload,
   Check,
   ChevronDown,
@@ -51,17 +50,6 @@ export function TopBar() {
     return () => document.removeEventListener('mousedown', handler);
   }, [avatarMenuOpen]);
 
-  const remainingTime = useMemo(() => {
-    const completedTopics = Math.round((progress / 100) * 25);
-    const remainingTopics = 25 - completedTopics;
-    const minutes = remainingTopics * 4;
-    if (minutes <= 0) return null;
-    if (minutes < 60) return `~${minutes} min`;
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return mins > 0 ? `~${hours}h ${mins}m` : `~${hours}h`;
-  }, [progress]);
-
   // Derive avatar initials from email
   const avatarInitials = useMemo(() => {
     if (!session?.email) return '?';
@@ -96,15 +84,6 @@ export function TopBar() {
             />
           </div>
           <span className="text-[12px] tabular-nums text-[#9B9A97]">{progress}%</span>
-          {remainingTime && (
-            <>
-              <span className="text-[#D4D1CB]">·</span>
-              <span className="flex items-center gap-1 text-[12px] text-[#9B9A97]">
-                <Clock className="h-3 w-3" />
-                {remainingTime}
-              </span>
-            </>
-          )}
         </div>
       </div>
 

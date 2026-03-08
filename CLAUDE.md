@@ -215,7 +215,8 @@ packages/config/node_modules
 ## Recent Commits
 
 ```
-795edca fix: vertically align send button in chat input
+88034fa fix: remove countdown timer from TopBar, keep % progress only
+ea4e3e8 fix: vertically align send button in chat input
 2843947 docs: add system architecture diagram for MVP
 2abb3a0 docs: auto-update MVP documentation [skip ci]
 713a4b2 feat(agents): Add Model Currency Agent — daily auto-update of AI model references
@@ -224,6 +225,5 @@ packages/config/node_modules
 d2e49d8 docs: auto-update MVP documentation [skip ci]
 4656a92 fix(pdf): Redesign PDF layout and add 90-day Phase 3
 b1676f0 docs: auto-update MVP documentation [skip ci]
-002f5d8 fix(email): Fix blank logo and PDF attachment
 ```
 <!-- /AUTO:RECENT_CHANGES -->
