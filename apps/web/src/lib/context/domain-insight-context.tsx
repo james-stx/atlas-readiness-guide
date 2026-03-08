@@ -65,16 +65,29 @@ export function DomainInsightProvider({ children }: { children: ReactNode }) {
   const sessionRef = useRef(session);
   sessionRef.current = session;
 
-  // Load from localStorage when session becomes available
+  // Load from localStorage when session becomes available, then auto-fetch for any
+  // completed domain that has no stored entry (handles page reloads and redeployments)
   useEffect(() => {
     if (!session) return;
+
+    let loadedEntries: Partial<Record<DomainType, InsightEntry>> = {};
     try {
       const raw = localStorage.getItem(`atlas-chapter-insights-${session.id}`);
-      if (raw) {
-        setEntries(JSON.parse(raw));
-      }
+      if (raw) loadedEntries = JSON.parse(raw);
     } catch {
       // ignore storage errors
+    }
+    setEntries(loadedEntries);
+
+    // Auto-fetch insight for completed domains with no stored entry
+    const domainProgress = progressState.domainProgress;
+    for (const domain of DOMAIN_ORDER) {
+      const dp = domainProgress[domain];
+      const current = dp?.coveredTopics?.length ?? 0;
+      if (current >= TOPICS_PER_DOMAIN && !loadedEntries[domain]) {
+        doFetch(domain, current);
+        break; // one at a time on initial load
+      }
     }
   }, [session?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 

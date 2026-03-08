@@ -167,7 +167,16 @@ export function ContentDomainHeader({
               )}
             </div>
 
-            {suggestedTopic ? (
+            {/* Right action — priority: generate summary > continue to next topic > all covered */}
+            {count.current === count.total && !entry ? (
+              <button
+                onClick={() => refreshInsight(domain)}
+                className="flex items-center gap-1.5 text-[13px] font-medium text-[#2383E2] hover:text-[#1A6DC0] transition-colors"
+              >
+                <Sparkles className="h-3.5 w-3.5" />
+                Generate summary
+              </button>
+            ) : suggestedTopic ? (
               <button
                 onClick={() => onTopicSelect(suggestedTopic.id)}
                 className="flex items-center gap-1.5 text-[13px] font-medium text-[#2383E2] hover:text-[#1A6DC0] transition-colors"

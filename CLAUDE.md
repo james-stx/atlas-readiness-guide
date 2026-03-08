@@ -216,7 +216,8 @@ packages/config
 ## Recent Commits
 
 ```
-083d8a3 feat: replace domain insight modal with inline chapter summary banner
+129dde1 fix: auto-fetch chapter summary on mount + manual fallback button
+f6f4b53 feat: replace domain insight modal with inline chapter summary banner
 fc332f2 fix: prevent WelcomeModal re-appearing after first message is sent
 24e251f feat: domain completion insight cards + chapter reframing
 0288494 docs: auto-update MVP documentation [skip ci]
@@ -225,6 +226,5 @@ ea4e3e8 fix: vertically align send button in chat input
 2843947 docs: add system architecture diagram for MVP
 2abb3a0 docs: auto-update MVP documentation [skip ci]
 713a4b2 feat(agents): Add Model Currency Agent — daily auto-update of AI model references
-0fec0d7 fix(ci): Fix update-docs workflow — correct model ID, add timeout and continue-on-error
 ```
 <!-- /AUTO:RECENT_CHANGES -->
