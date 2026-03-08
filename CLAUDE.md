@@ -215,7 +215,9 @@ packages/config/node_modules
 ## Recent Commits
 
 ```
-d2b98ac docs: add system architecture diagram for MVP
+795edca fix: vertically align send button in chat input
+2843947 docs: add system architecture diagram for MVP
+2abb3a0 docs: auto-update MVP documentation [skip ci]
 713a4b2 feat(agents): Add Model Currency Agent — daily auto-update of AI model references
 0fec0d7 fix(ci): Fix update-docs workflow — correct model ID, add timeout and continue-on-error
 9e16ef7 fix(pdf): Prevent cards splitting across pages; change header to app blue
@@ -223,7 +225,5 @@ d2e49d8 docs: auto-update MVP documentation [skip ci]
 4656a92 fix(pdf): Redesign PDF layout and add 90-day Phase 3
 b1676f0 docs: auto-update MVP documentation [skip ci]
 002f5d8 fix(email): Fix blank logo and PDF attachment
-8109ae6 fix(email): Match app content — labels, coverage format, compass logo, PDF attachment
-a4b2940 fix: correct domain from stxlabs.io to stxlabs.co in email config and template
 ```
 <!-- /AUTO:RECENT_CHANGES -->

@@ -200,7 +200,7 @@ export function ChatPanel() {
       <div className="sticky bottom-0 border-t border-warm-200 bg-white px-4 py-3">
         {/* Quick responses could go here */}
 
-        <div className="relative">
+        <div className="flex items-end gap-2">
           <textarea
             ref={textareaRef}
             value={inputValue}
@@ -210,7 +210,7 @@ export function ChatPanel() {
             disabled={isLoading}
             rows={1}
             className={cn(
-              'w-full resize-none rounded-lg bg-warm-50 px-3 py-2.5 pr-10',
+              'flex-1 resize-none rounded-lg bg-warm-50 px-3 py-2.5',
               'text-ws-body text-warm-900 placeholder:text-warm-400',
               'focus:outline-none focus:ring-2 focus:ring-accent/30 focus:bg-white',
               'disabled:opacity-50 disabled:cursor-not-allowed',
@@ -223,7 +223,7 @@ export function ChatPanel() {
             onClick={handleSend}
             disabled={isLoading || !inputValue.trim()}
             className={cn(
-              'absolute right-2 bottom-2 flex h-7 w-7 items-center justify-center rounded-full',
+              'shrink-0 flex h-7 w-7 mb-1.5 items-center justify-center rounded-full',
               'bg-accent text-white transition-all duration-fast',
               'hover:bg-accent-700',
               'disabled:opacity-40 disabled:cursor-not-allowed'
