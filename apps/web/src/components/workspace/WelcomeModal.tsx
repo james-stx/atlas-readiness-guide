@@ -110,7 +110,7 @@ export function WelcomeModal({
           <p className="text-[14px] text-[#5C5A56] leading-relaxed">
             {isReturningUser
               ? `You're ${progress}% through your assessment. Let's continue where you left off.`
-              : "We'll help you assess your U.S. expansion readiness across 5 key areas."}
+              : "Complete 5 chapters and unlock a readiness insight for each area of your expansion."}
           </p>
         </div>
 
@@ -209,7 +209,7 @@ export function WelcomeModal({
           <div className="flex justify-center gap-4">
             <div className="flex items-center gap-1.5 text-[12px] text-[#787774]">
               <Clock className="h-3.5 w-3.5" />
-              <span>{isReturningUser ? `~${remainingMinutes} min left` : '20-30 min'}</span>
+              <span>{isReturningUser ? `~${remainingMinutes} min left` : '5 chapters · ~20 min each'}</span>
             </div>
             <div className="flex items-center gap-1.5 text-[12px] text-[#787774]">
               <Cloud className="h-3.5 w-3.5" />

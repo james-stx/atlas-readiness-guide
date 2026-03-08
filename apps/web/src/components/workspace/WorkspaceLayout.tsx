@@ -13,6 +13,14 @@ import { WelcomeModal } from './WelcomeModal';
 import { DOMAINS, DOMAIN_TOPICS } from '@/lib/progress';
 import { useEffect, useState, useMemo } from 'react';
 import type { DomainType } from '@atlas/types';
+import { useDomainCompletionInsight } from '@/hooks/useDomainCompletionInsight';
+import { DomainInsightModal } from './DomainInsightModal';
+
+const DOMAIN_ORDER: DomainType[] = ['market', 'product', 'gtm', 'operations', 'financials'];
+const DOMAIN_LABELS: Record<DomainType, string> = {
+  market: 'Market', product: 'Product', gtm: 'Go-to-Market',
+  operations: 'Operations', financials: 'Financials',
+};
 
 export function WorkspaceLayout() {
   const {
@@ -23,8 +31,25 @@ export function WorkspaceLayout() {
     progressState,
     selectedDomain,
     selectDomain,
+    switchToReport,
   } = useWorkspace();
   const { messages, session } = useAssessment();
+
+  const { insightDomain, insight, isLoading: insightLoading, dismissInsight } = useDomainCompletionInsight();
+
+  const handleInsightContinue = () => {
+    if (!insightDomain) return;
+    dismissInsight();
+    const idx = DOMAIN_ORDER.indexOf(insightDomain);
+    const nextDomain = DOMAIN_ORDER[idx + 1];
+    if (nextDomain) {
+      selectDomain(nextDomain);
+      openChat(nextDomain);
+    } else {
+      // Last domain — switch to report view
+      switchToReport();
+    }
+  };
 
   const [isMobile, setIsMobile] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
@@ -132,6 +157,17 @@ export function WorkspaceLayout() {
             lastDomain={lastDomain}
           />
         )}
+
+        {/* Domain Insight Modal */}
+        {insightDomain && (
+          <DomainInsightModal
+            domain={insightDomain}
+            insight={insight}
+            isLoading={insightLoading}
+            onContinue={handleInsightContinue}
+            onDismiss={dismissInsight}
+          />
+        )}
       </div>
     );
   }
@@ -174,6 +210,17 @@ export function WorkspaceLayout() {
           progress={progress}
           domainSummaries={domainSummaries}
           lastDomain={lastDomain}
+        />
+      )}
+
+      {/* Domain Insight Modal */}
+      {insightDomain && (
+        <DomainInsightModal
+          domain={insightDomain}
+          insight={insight}
+          isLoading={insightLoading}
+          onContinue={handleInsightContinue}
+          onDismiss={dismissInsight}
         />
       )}
     </div>

@@ -103,6 +103,7 @@ apps/web/postcss.config.js
 apps/web/src
 apps/web/src/app
 apps/web/src/components
+apps/web/src/hooks
 apps/web/src/lib
 apps/web/tailwind.config.ts
 apps/web/tsconfig.json
@@ -136,7 +137,6 @@ node_modules
 package.json
 packages
 packages/config
-packages/config/node_modules
 ```
 <!-- /AUTO:STRUCTURE -->
 
@@ -160,7 +160,7 @@ packages/config/node_modules
 
 ## Component Inventory (Web)
 
-- **components/workspace/** (4): SaveProgressPopup,TopBar,WelcomeModal,WorkspaceLayout
+- **components/workspace/** (5): DomainInsightModal,SaveProgressPopup,TopBar,WelcomeModal,WorkspaceLayout
 - **components/workspace/sidebar/** (4): Sidebar,SidebarDomainItem,SidebarFooter,SidebarTopicItem
 - **components/workspace/content/** (8): CategoryCard,ContentDomainHeader,ContentPanel,EmptyState,InlineSnapshotCTA,InsightCard,NotStartedCard,TopicCard
 - **components/workspace/chat/** (4): ChatHeader,ChatPanel,InputCapturedIndicator,TopicTransitionBanner
@@ -176,6 +176,7 @@ packages/config/node_modules
 
 - /api/chat/init — apps/api/src/app/api/chat/init/route.ts
 - /api/chat — apps/api/src/app/api/chat/route.ts
+- /api/domain/insight — apps/api/src/app/api/domain/insight/route.ts
 - /api/domain/summary — apps/api/src/app/api/domain/summary/route.ts
 - /api/export/pdf/[sessionId] — apps/api/src/app/api/export/pdf/[sessionId]/route.ts
 - /api/export/send/[sessionId] — apps/api/src/app/api/export/send/[sessionId]/route.ts
@@ -215,7 +216,8 @@ packages/config/node_modules
 ## Recent Commits
 
 ```
-88034fa fix: remove countdown timer from TopBar, keep % progress only
+4dadb87 feat: domain completion insight cards + chapter reframing
+aea21a0 fix: remove countdown timer from TopBar, keep % progress only
 ea4e3e8 fix: vertically align send button in chat input
 2843947 docs: add system architecture diagram for MVP
 2abb3a0 docs: auto-update MVP documentation [skip ci]
@@ -224,6 +226,5 @@ ea4e3e8 fix: vertically align send button in chat input
 9e16ef7 fix(pdf): Prevent cards splitting across pages; change header to app blue
 d2e49d8 docs: auto-update MVP documentation [skip ci]
 4656a92 fix(pdf): Redesign PDF layout and add 90-day Phase 3
-b1676f0 docs: auto-update MVP documentation [skip ci]
 ```
 <!-- /AUTO:RECENT_CHANGES -->
