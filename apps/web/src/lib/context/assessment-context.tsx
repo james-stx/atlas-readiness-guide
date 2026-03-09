@@ -130,7 +130,7 @@ interface AssessmentContextValue extends AssessmentState {
 
   // Chat actions
   initChat: () => Promise<void>;
-  sendMessage: (content: string) => Promise<void>;
+  sendMessage: (content: string, topicHint?: string) => Promise<void>;
   addMessage: (message: ChatMessage) => void;
 
   // Input actions
@@ -338,7 +338,7 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
 
   // Send a message
   const sendMessageAction = useCallback(
-    async (content: string) => {
+    async (content: string, topicHint?: string) => {
       if (!state.session) {
         throw new Error('No active session');
       }
@@ -346,6 +346,13 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
       dispatch({ type: 'SET_LOADING', payload: true });
       dispatch({ type: 'SET_ERROR', payload: null });
       dispatch({ type: 'CLEAR_STREAMING_MESSAGE' });
+
+      // Set capturingTopicId immediately when we know which topic we're discussing.
+      // This gives "In Progress" visibility for the full duration of the request,
+      // not just the brief window when the SSE input event arrives.
+      if (topicHint) {
+        setCapturingTopicId(topicHint);
+      }
 
       // Add user message immediately
       const userMessage: ChatMessage = {

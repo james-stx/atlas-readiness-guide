@@ -63,8 +63,9 @@ export function ChatPanel() {
       // Get topic label for the prompt
       const topicLabel = getTopicLabel(topicToDiscuss);
 
-      // Automatically send a message to start discussing this topic
-      sendMessage(`Let's talk about: ${topicLabel}`).catch(() => {});
+      // Pass topicToDiscuss as a hint so capturingTopicId is set immediately on submit,
+      // giving "In Progress" visibility on the topic card for the full request duration.
+      sendMessage(`Let's talk about: ${topicLabel}`, topicToDiscuss).catch(() => {});
 
       // Clear the flag so it doesn't trigger again
       clearTopicToDiscuss();
