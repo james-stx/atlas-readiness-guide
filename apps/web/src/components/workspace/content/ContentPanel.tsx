@@ -7,7 +7,7 @@ import { EmptyState } from './EmptyState';
 import { ContentDomainHeader } from './ContentDomainHeader';
 import { TopicCard } from './TopicCard';
 import { ReportPanel } from '../report/ReportPanel';
-import { useEffect, useRef, useCallback, useMemo } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useSkippedTopics } from '@/lib/hooks/use-skipped-topics';
 import type { Input } from '@atlas/types';
 
@@ -47,6 +47,26 @@ export function ContentPanel() {
   const domainInputs = inputs.filter((i) => i.domain === selectedDomain);
   const count = getDomainInputCount(selectedDomain);
   const dp = progressState.domainProgress[selectedDomain];
+
+  // First uncaptured, non-skipped topic in the visible domain — computed fresh
+  // from live state so there's no stale-closure risk.
+  const firstUncapturedTopicId = topics.find(
+    (t) => !domainInputs.find((i) => i.question_id === t.id) && !isSkipped(t.id)
+  )?.id;
+
+  // Which topic should show "In progress":
+  //   1. capturingTopicId — set by the tool_start SSE event (most precise)
+  //   2. selectedCategory — set when user clicked "Talk to Atlas" on a specific card,
+  //      but only if that topic hasn't been captured yet
+  //   3. firstUncapturedTopicId — fallback heuristic while loading
+  const selectedCategoryUncaptured =
+    selectedCategory && !domainInputs.find((i) => i.question_id === selectedCategory)
+      ? selectedCategory
+      : null;
+
+  const activeTopicForProgress =
+    capturingTopicId || selectedCategoryUncaptured || (isLoading ? firstUncapturedTopicId : null);
+
   // Open chat and start discussing a topic - explicit user action via "Talk to Atlas" button
   const handleDiscussTopic = useCallback((topicId: string) => {
     discussTopic(selectedDomain, topicId);
@@ -111,17 +131,16 @@ export function ContentPanel() {
         <div className="space-y-3">
           {topics.map((topic) => {
             const input = domainInputs.find((i) => i.question_id === topic.id);
-            // Show in-progress for the active topic throughout the full request.
-            // Pre-capture: use selectedCategory (topic the user is discussing).
-            // Post-tool_start: capturingTopicId narrows it to the exact topic.
-            // No !input guard — TopicCard's own "input ? complete" logic handles
-            // the flip to Complete once the input arrives, even in the same render.
-            const activeTopic = capturingTopicId || selectedCategory;
+            // Show in-progress while a request is in flight for this topic.
+            // activeTopicForProgress is computed above using a 3-level priority:
+            //   capturingTopicId (tool_start) > selectedCategory > firstUncapturedTopicId
+            // !input guard: once the input arrives, TopicCard flips to "complete" anyway,
+            // but guard here avoids a flash of "in_progress" on an already-complete topic.
             const showInProgress =
               isLoading &&
               !isSkipped(topic.id) &&
-              !!activeTopic &&
-              activeTopic === topic.id;
+              !input &&
+              activeTopicForProgress === topic.id;
             return (
               <div
                 key={topic.id}
