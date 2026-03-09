@@ -216,7 +216,8 @@ docs/READINESS-REPORT-V5-DESIGN-REVIEW.md
 ## Recent Commits
 
 ```
-fef91fa fix: set capturingTopicId immediately on every send via heuristic
+ee41006 fix: drive In Progress badge from capturingTopicId alone, not isLoading
+a157eb5 fix: set capturingTopicId immediately on every send via heuristic
 f745599 fix: remove domain-sync effect that was clearing selectedCategory
 1d13503 fix: use selectedCategory directly for in-progress — no SSE events needed
 1492516 fix: set capturingTopicId from topicHint immediately on submit
@@ -225,6 +226,5 @@ d19f30f fix: set capturingTopicId from input event as reliable fallback
 cce537f fix: persist capturing indicator through wave 2; show in-progress on re-discussions
 58ab7f7 fix: keep ContentPanel mounted on mobile to show in-progress topic cards
 f7c6ce6 fix: navigate to session domain on load + show CapturingIndicator without streamingMessage
-6da6d23 fix: compute in-progress topic directly in ContentPanel to avoid stale-closure bugs
 ```
 <!-- /AUTO:RECENT_CHANGES -->

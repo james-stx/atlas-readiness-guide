@@ -21,7 +21,7 @@ export function ContentPanel() {
     progressState,
     activeView,
   } = useWorkspace();
-  const { inputs, addInput, session, isLoading, capturingTopicId } = useAssessment();
+  const { inputs, addInput, session, capturingTopicId } = useAssessment();
   const { isSkipped, skipTopic, unskipTopic } = useSkippedTopics();
   const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
@@ -47,13 +47,6 @@ export function ContentPanel() {
   const domainInputs = inputs.filter((i) => i.domain === selectedDomain);
   const count = getDomainInputCount(selectedDomain);
   const dp = progressState.domainProgress[selectedDomain];
-
-  // Heuristic fallback: first uncaptured topic in the domain the user is viewing.
-  // Used only when there's no explicit selectedCategory (generic typed messages).
-  const domainInputIds = new Set(inputs.filter((i) => i.domain === selectedDomain).map((i) => i.question_id));
-  const firstUncapturedTopicId = (DOMAIN_TOPICS[selectedDomain] || []).find(
-    (t) => !domainInputIds.has(t.id) && !isSkipped(t.id)
-  )?.id;
 
   // Open chat and start discussing a topic - explicit user action via "Talk to Atlas" button
   const handleDiscussTopic = useCallback((topicId: string) => {
@@ -119,18 +112,9 @@ export function ContentPanel() {
         <div className="space-y-3">
           {topics.map((topic) => {
             const input = domainInputs.find((i) => i.question_id === topic.id);
-            // Show in-progress while a request is in flight for this topic.
-            // Priority order (all require isLoading=true):
-            //   1. selectedCategory — set the instant user clicks "Talk to Atlas"; no SSE
-            //      events needed; works for re-discussions (already-captured topics too).
-            //   2. capturingTopicId — SSE-confirmed from tool_start or input events.
-            //   3. firstUncapturedTopicId — heuristic fallback for generic typed messages.
-            const showInProgress =
-              isLoading &&
-              !isSkipped(topic.id) &&
-              (topic.id === selectedCategory ||
-                topic.id === capturingTopicId ||
-                (!input && topic.id === firstUncapturedTopicId));
+            // capturingTopicId is set immediately on send (before HTTP) and cleared
+            // in finally — reliable even when isLoading batches away in React 18.
+            const showInProgress = !isSkipped(topic.id) && topic.id === capturingTopicId;
             return (
               <div
                 key={topic.id}
