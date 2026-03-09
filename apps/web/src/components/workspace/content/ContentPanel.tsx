@@ -21,7 +21,7 @@ export function ContentPanel() {
     progressState,
     activeView,
   } = useWorkspace();
-  const { inputs, addInput, session } = useAssessment();
+  const { inputs, addInput, session, isCapturingInput } = useAssessment();
   const { isSkipped, skipTopic, unskipTopic } = useSkippedTopics();
   const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
@@ -124,6 +124,7 @@ export function ContentPanel() {
                   input={input}
                   isSkipped={isSkipped(topic.id)}
                   isHighlighted={selectedCategory === topic.id}
+                  isCapturingInput={isCapturingInput && !input && !isSkipped(topic.id)}
                   onWriteResponse={(response) => handleWriteResponse(topic.id, response)}
                   onTalkToAtlas={() => handleDiscussTopic(topic.id)}
                   onSkip={() => skipTopic(topic.id)}

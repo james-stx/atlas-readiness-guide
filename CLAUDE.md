@@ -216,7 +216,8 @@ packages/config
 ## Recent Commits
 
 ```
-582506b fix: persist capturing indicator until wave 2 text arrives; fix paragraph break in saved message
+e1ea4b5 feat: show in-progress spinner on uncompleted topic cards while Atlas captures input
+936b6fc fix: persist capturing indicator until wave 2 text arrives; fix paragraph break in saved message
 c3d909f feat: show capturing indicator + paragraph break between response waves
 6c96899 fix: stop shimmer permanently after first view; enforce second person in all AI outputs
 4812d87 fix: more visible progress bar shimmer, reliable pause on expand, ban em dashes
@@ -225,6 +226,5 @@ d0354ba fix: stay on completed chapter + blue shimmer + UX polish
 6231108 fix: snap content panel to chapter on insight arrival + blue banner styling
 b0a52f2 fix: auto-fetch chapter summary on mount + manual fallback button
 f6f4b53 feat: replace domain insight modal with inline chapter summary banner
-fc332f2 fix: prevent WelcomeModal re-appearing after first message is sent
 ```
 <!-- /AUTO:RECENT_CHANGES -->

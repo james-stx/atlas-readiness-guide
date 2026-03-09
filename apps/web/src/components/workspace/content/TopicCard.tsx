@@ -33,6 +33,7 @@ interface TopicCardProps {
   input?: Input; // If present, topic has been completed
   isSkipped?: boolean;
   isHighlighted?: boolean;
+  isCapturingInput?: boolean;
   onWriteResponse: (response: string) => void;
   onEditResponse?: (response: string) => void;
   onTalkToAtlas: () => void;
@@ -125,6 +126,7 @@ export function TopicCard({
   input,
   isSkipped = false,
   isHighlighted = false,
+  isCapturingInput = false,
   onWriteResponse,
   onEditResponse,
   onTalkToAtlas,
@@ -143,6 +145,8 @@ export function TopicCard({
     ? 'skipped'
     : input
     ? 'complete'
+    : isCapturingInput
+    ? 'in_progress'
     : 'not_started';
 
   const statusCfg = statusConfig[status];
