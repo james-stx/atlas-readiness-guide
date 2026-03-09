@@ -216,7 +216,8 @@ packages/config
 ## Recent Commits
 
 ```
-bda3269 fix: more visible progress bar shimmer, reliable pause on expand, ban em dashes
+5fe5d84 fix: stop shimmer permanently after first view; enforce second person in all AI outputs
+4812d87 fix: more visible progress bar shimmer, reliable pause on expand, ban em dashes
 d0354ba fix: stay on completed chapter + blue shimmer + UX polish
 54fe40d feat: chapter progress bar + sticky domain header
 6231108 fix: snap content panel to chapter on insight arrival + blue banner styling
@@ -225,6 +226,5 @@ f6f4b53 feat: replace domain insight modal with inline chapter summary banner
 fc332f2 fix: prevent WelcomeModal re-appearing after first message is sent
 24e251f feat: domain completion insight cards + chapter reframing
 0288494 docs: auto-update MVP documentation [skip ci]
-aea21a0 fix: remove countdown timer from TopBar, keep % progress only
 ```
 <!-- /AUTO:RECENT_CHANGES -->

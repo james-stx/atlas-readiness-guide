@@ -366,8 +366,8 @@ function InsightBanner({
         )}
       </div>
 
-      {/* Progress bar — pauses shimmer when expanded */}
-      <ChapterProgressBar current={count.current} total={count.total} paused={expanded} />
+      {/* Progress bar — shimmer only while chapter hasn't been read yet */}
+      <ChapterProgressBar current={count.current} total={count.total} paused={expanded || !hasNewInsight} />
 
       {/* Expanded content */}
       {expanded && (

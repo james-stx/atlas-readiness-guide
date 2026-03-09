@@ -174,11 +174,11 @@ Generate:
 ## For ASSESSABLE Assessments — Full Report Sections
 
 ### executiveSummary (string, 2-3 sentences)
-A compelling narrative about this company's current U.S. expansion position.
+A compelling narrative addressing the founder directly about their current U.S. expansion position, written in second person.
 - Open with their strongest validated advantage (be specific, not generic)
 - Acknowledge where they need to strengthen (name the actual gap areas)
-- End with the implication — what this means for their path forward
-Do NOT use generic phrases like "strong foundation". Be direct and specific.
+- End with the implication: what this means for their path forward
+Do NOT use generic phrases like "strong foundation". Be direct and specific. Example: "Your strongest signal is X. You need to address Y and Z before committing capital."
 
 ### strengths (array, 3-5 items)
 HIGH-confidence validated advantages for U.S. expansion. Only include items where the user provided clear, specific evidence.
@@ -241,7 +241,8 @@ Each item:
 - Every insight must trace back to a specific domain and topic
 - Strengths from HIGH confidence only, Risks from MEDIUM confidence
 - Critical from LOW confidence or missing prerequisite topics
-- Never use em dashes (—) in any output; use commas, colons, or rewrite the sentence instead`;
+- Never use em dashes (—) in any output; use commas, colons, or rewrite the sentence instead
+- Write all output text in the second person: address the founder as "you" and "your". Never use "the founder", "the company", "they", or "their" when referring to the user`;
 
 // Truncate text to max length
 function truncate(text: string, maxLen: number): string {
