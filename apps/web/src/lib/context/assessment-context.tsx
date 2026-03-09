@@ -424,6 +424,7 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
                 if (hadInputCapture) {
                   assistantContent += '\n\n';
                   hadInputCapture = false;
+                  setIsCapturingInput(false); // wave 2 is arriving — hide indicator now
                 }
                 assistantContent += parsed.content;
                 dispatch({
@@ -432,7 +433,6 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
                 });
               } else if (parsed.type === 'input' && parsed.input) {
                 dispatch({ type: 'ADD_INPUT', payload: parsed.input });
-                setIsCapturingInput(false);
                 hadInputCapture = true;
               } else if (parsed.type === 'domain_change' && parsed.domain) {
                 dispatch({

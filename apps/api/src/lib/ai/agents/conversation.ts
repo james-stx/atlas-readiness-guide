@@ -261,6 +261,9 @@ CRITICAL INSTRUCTIONS:
         fullText += part.textDelta;
         yield { type: 'text', content: part.textDelta };
       } else if (part.type === 'tool-call') {
+        if (fullText.trim()) {
+          fullText += '\n\n'; // paragraph break between wave 1 and wave 2 in saved message
+        }
         yield { type: 'tool_start', toolName: part.toolName };
       } else if (part.type === 'tool-result') {
         console.log('[Atlas] Tool result:', part.toolName, part.result?.success);
