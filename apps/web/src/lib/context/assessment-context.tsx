@@ -6,6 +6,7 @@ import {
   useReducer,
   useCallback,
   useEffect,
+  useState,
   type ReactNode,
 } from 'react';
 import type {
@@ -144,6 +145,7 @@ interface AssessmentContextValue extends AssessmentState {
 
   // Utility
   hasStoredSession: boolean;
+  isCapturingInput: boolean;
 }
 
 const AssessmentContext = createContext<AssessmentContextValue | null>(null);
@@ -154,6 +156,7 @@ const AssessmentContext = createContext<AssessmentContextValue | null>(null);
 
 export function AssessmentProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(assessmentReducer, initialState);
+  const [isCapturingInput, setIsCapturingInput] = useState(false);
 
   // Check for stored session on mount
   const hasStoredSession =
@@ -379,6 +382,7 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
 
         const decoder = new TextDecoder();
         let assistantContent = '';
+        let hadInputCapture = false;
         let buffer = '';
         let receivedComplete = false;
         let eventCount = 0;
@@ -414,7 +418,13 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
               eventCount++;
               console.log('[Atlas] Event:', parsed.type);
 
-              if (parsed.type === 'text') {
+              if (parsed.type === 'tool_start') {
+                setIsCapturingInput(true);
+              } else if (parsed.type === 'text') {
+                if (hadInputCapture) {
+                  assistantContent += '\n\n';
+                  hadInputCapture = false;
+                }
                 assistantContent += parsed.content;
                 dispatch({
                   type: 'SET_STREAMING_MESSAGE',
@@ -422,6 +432,8 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
                 });
               } else if (parsed.type === 'input' && parsed.input) {
                 dispatch({ type: 'ADD_INPUT', payload: parsed.input });
+                setIsCapturingInput(false);
+                hadInputCapture = true;
               } else if (parsed.type === 'domain_change' && parsed.domain) {
                 dispatch({
                   type: 'UPDATE_DOMAIN',
@@ -499,6 +511,7 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
         throw error;
       } finally {
         clearTimeout(timeoutId);
+        setIsCapturingInput(false);
         dispatch({ type: 'SET_LOADING', payload: false });
         dispatch({ type: 'CLEAR_STREAMING_MESSAGE' });
       }
@@ -573,6 +586,7 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
     updateDomain,
     updateStatus,
     hasStoredSession,
+    isCapturingInput,
   };
 
   return (

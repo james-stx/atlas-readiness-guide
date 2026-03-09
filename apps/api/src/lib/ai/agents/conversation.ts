@@ -168,8 +168,9 @@ export async function* streamConversation(
   userMessage: string,
   currentDomain: DomainType
 ): AsyncGenerator<{
-  type: 'text' | 'input' | 'domain_change' | 'complete' | 'error';
+  type: 'text' | 'tool_start' | 'input' | 'domain_change' | 'complete' | 'error';
   content?: string;
+  toolName?: string;
   data?: unknown;
   input?: unknown;
   domain?: string;
@@ -259,6 +260,8 @@ CRITICAL INSTRUCTIONS:
       if (part.type === 'text-delta') {
         fullText += part.textDelta;
         yield { type: 'text', content: part.textDelta };
+      } else if (part.type === 'tool-call') {
+        yield { type: 'tool_start', toolName: part.toolName };
       } else if (part.type === 'tool-result') {
         console.log('[Atlas] Tool result:', part.toolName, part.result?.success);
         if (part.toolName === 'recordInput' && part.result?.success && part.result.input?.id) {

@@ -22,6 +22,7 @@ export function ChatPanel() {
     inputs,
     streamingMessage,
     isLoading,
+    isCapturingInput,
     sendMessage,
     initChat,
     session,
@@ -178,9 +179,12 @@ export function ChatPanel() {
                 metadata: {},
                 created_at: '',
               }}
-              isStreaming
+              isStreaming={!isCapturingInput}
             />
           )}
+
+          {/* Capturing indicator — shown during tool execution gap */}
+          {isCapturingInput && streamingMessage && <CapturingIndicator />}
 
           {/* Typing indicator */}
           {isLoading && !streamingMessage && <TypingDots />}
@@ -305,6 +309,28 @@ function TypingDots() {
             />
           ))}
         </div>
+      </div>
+    </div>
+  );
+}
+
+function CapturingIndicator() {
+  return (
+    <div className="flex gap-2.5 justify-start">
+      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent">
+        <Compass className="h-3 w-3 text-white" />
+      </div>
+      <div className="rounded-xl rounded-tl-sm bg-warm-50 px-4 py-2.5 flex items-center gap-2">
+        <div className="flex gap-1">
+          {[0, 1, 2].map((i) => (
+            <span
+              key={i}
+              className="h-1.5 w-1.5 rounded-full bg-accent/60 animate-typing-dot"
+              style={{ animationDelay: `${i * 0.2}s` }}
+            />
+          ))}
+        </div>
+        <span className="text-ws-caption text-warm-500">Saving your answer to workspace…</span>
       </div>
     </div>
   );

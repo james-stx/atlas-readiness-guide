@@ -216,7 +216,8 @@ packages/config
 ## Recent Commits
 
 ```
-5fe5d84 fix: stop shimmer permanently after first view; enforce second person in all AI outputs
+8ac4f85 feat: show capturing indicator + paragraph break between response waves
+6c96899 fix: stop shimmer permanently after first view; enforce second person in all AI outputs
 4812d87 fix: more visible progress bar shimmer, reliable pause on expand, ban em dashes
 d0354ba fix: stay on completed chapter + blue shimmer + UX polish
 54fe40d feat: chapter progress bar + sticky domain header
@@ -225,6 +226,5 @@ b0a52f2 fix: auto-fetch chapter summary on mount + manual fallback button
 f6f4b53 feat: replace domain insight modal with inline chapter summary banner
 fc332f2 fix: prevent WelcomeModal re-appearing after first message is sent
 24e251f feat: domain completion insight cards + chapter reframing
-0288494 docs: auto-update MVP documentation [skip ci]
 ```
 <!-- /AUTO:RECENT_CHANGES -->
