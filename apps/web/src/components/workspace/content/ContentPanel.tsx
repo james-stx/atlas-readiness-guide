@@ -71,17 +71,7 @@ export function ContentPanel() {
     (t) => !sessionInputs.find((i) => i.question_id === t.id) && !isSkipped(t.id)
   )?.id;
 
-  // Which topic should show "In progress":
-  //   1. capturingTopicId — set by the tool_start SSE event (most precise)
-  //   2. selectedCategory — set when user clicked "Talk to Atlas", if uncaptured
-  //   3. firstUncapturedTopicId — fallback heuristic while loading
-  const selectedCategoryUncaptured =
-    selectedCategory && !sessionInputs.find((i) => i.question_id === selectedCategory)
-      ? selectedCategory
-      : null;
-
-  const activeTopicForProgress =
-    capturingTopicId || selectedCategoryUncaptured || (isLoading ? firstUncapturedTopicId : null);
+  // No intermediate — showInProgress is computed per-topic below.
 
   // Open chat and start discussing a topic - explicit user action via "Talk to Atlas" button
   const handleDiscussTopic = useCallback((topicId: string) => {
@@ -148,17 +138,17 @@ export function ContentPanel() {
           {topics.map((topic) => {
             const input = domainInputs.find((i) => i.question_id === topic.id);
             // Show in-progress while a request is in flight for this topic.
-            // Two cases:
-            //   1. capturingTopicId matches — authoritative signal from tool_start.
-            //      No !input guard: topic may already be complete (re-discussion), and
-            //      TopicCard now prioritises isCapturingInput over input in status.
-            //   2. Heuristic (no capturingTopicId yet) — only fire for uncaptured topics.
+            // Priority order (all require isLoading=true):
+            //   1. selectedCategory — set the instant user clicks "Talk to Atlas"; no SSE
+            //      events needed; works for re-discussions (already-captured topics too).
+            //   2. capturingTopicId — SSE-confirmed from tool_start or input events.
+            //   3. firstUncapturedTopicId — heuristic fallback for generic typed messages.
             const showInProgress =
               isLoading &&
               !isSkipped(topic.id) &&
-              (capturingTopicId === topic.id
-                ? true
-                : !input && activeTopicForProgress === topic.id);
+              (topic.id === selectedCategory ||
+                topic.id === capturingTopicId ||
+                (!input && topic.id === firstUncapturedTopicId));
             return (
               <div
                 key={topic.id}
