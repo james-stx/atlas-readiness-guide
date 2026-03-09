@@ -7,6 +7,7 @@ import {
   useCallback,
   useEffect,
   useState,
+  useRef,
   type ReactNode,
 } from 'react';
 import type {
@@ -25,6 +26,7 @@ import {
   getSessionFromStorage,
   clearSessionFromStorage,
 } from '../storage';
+import { DOMAIN_TOPICS } from '../progress';
 
 // ============================================
 // Initial State
@@ -159,6 +161,10 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(assessmentReducer, initialState);
   const [isCapturingInput, setIsCapturingInput] = useState(false);
   const [capturingTopicId, setCapturingTopicId] = useState<string | null>(null);
+
+  // Ref so sendMessageAction can read fresh inputs without stale closure
+  const inputsRef = useRef(state.inputs);
+  inputsRef.current = state.inputs;
 
   // Check for stored session on mount
   const hasStoredSession =
@@ -347,11 +353,24 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
       dispatch({ type: 'SET_ERROR', payload: null });
       dispatch({ type: 'CLEAR_STREAMING_MESSAGE' });
 
-      // Set capturingTopicId immediately when we know which topic we're discussing.
-      // This gives "In Progress" visibility for the full duration of the request,
-      // not just the brief window when the SSE input event arrives.
+      // Set capturingTopicId immediately — before the HTTP request — so "In Progress"
+      // shows on the topic card from the moment the user hits send.
+      // Priority: explicit topicHint (Talk to Atlas) → heuristic (first uncaptured topic).
       if (topicHint) {
         setCapturingTopicId(topicHint);
+      } else {
+        const sessionDomain = (state.session?.current_domain ?? 'market') as DomainType;
+        const capturedIds = new Set(
+          inputsRef.current
+            .filter((i) => i.domain === sessionDomain)
+            .map((i) => i.question_id)
+        );
+        const uncaptured = (DOMAIN_TOPICS[sessionDomain] || []).find(
+          (t) => !capturedIds.has(t.id)
+        );
+        if (uncaptured) {
+          setCapturingTopicId(uncaptured.id);
+        }
       }
 
       // Add user message immediately
