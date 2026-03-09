@@ -216,18 +216,19 @@ function ChapterProgressBar({
   const pct = Math.min((current / total) * 100, 100);
 
   return (
-    <div className="h-1.5 bg-[#E8E6E1]">
+    <div className="h-2 bg-[#E8E6E1]">
       <div
         className={cn(
           'h-full transition-all duration-700 ease-out',
-          isComplete && !paused ? 'animate-shimmer' : 'bg-[#2383E2]'
+          isComplete ? 'animate-shimmer' : 'bg-[#2383E2]'
         )}
         style={
-          isComplete && !paused
+          isComplete
             ? {
                 width: '100%',
-                background: 'linear-gradient(90deg, #1A6DC0 0%, #2383E2 50%, #1A6DC0 100%)',
+                background: 'linear-gradient(90deg, #1A6DC0 0%, #2383E2 30%, #93C5FD 50%, #2383E2 70%, #1A6DC0 100%)',
                 backgroundSize: '200% 100%',
+                animationPlayState: paused ? 'paused' : 'running',
               }
             : { width: `${pct}%` }
         }

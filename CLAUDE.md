@@ -216,7 +216,8 @@ packages/config
 ## Recent Commits
 
 ```
-a979150 fix: stay on completed chapter + blue shimmer + UX polish
+bda3269 fix: more visible progress bar shimmer, reliable pause on expand, ban em dashes
+d0354ba fix: stay on completed chapter + blue shimmer + UX polish
 54fe40d feat: chapter progress bar + sticky domain header
 6231108 fix: snap content panel to chapter on insight arrival + blue banner styling
 b0a52f2 fix: auto-fetch chapter summary on mount + manual fallback button
@@ -225,6 +226,5 @@ fc332f2 fix: prevent WelcomeModal re-appearing after first message is sent
 24e251f feat: domain completion insight cards + chapter reframing
 0288494 docs: auto-update MVP documentation [skip ci]
 aea21a0 fix: remove countdown timer from TopBar, keep % progress only
-ea4e3e8 fix: vertically align send button in chat input
 ```
 <!-- /AUTO:RECENT_CHANGES -->

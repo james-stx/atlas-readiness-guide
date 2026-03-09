@@ -40,7 +40,8 @@ Rules:
 - Use founder's actual words when quoting
 - Critical gaps = blockers that must be resolved first
 - Week 1 = foundation/unblocking, Week 2 = validation, Weeks 3-4 = execution prep
-- No scores or percentages — focus on "know vs assume vs don't know"`;
+- No scores or percentages; focus on "know vs assume vs don't know"
+- Never use em dashes (—) in any output; use commas, colons, or rewrite the sentence instead`;
 
 // Truncate text to max length
 function truncate(text: string, maxLen: number): string {

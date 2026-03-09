@@ -236,11 +236,12 @@ Each item:
 - sourceDomain, sourceTopic
 
 ## Output Rules
-- Conservative assessments — don't inflate readiness
+- Conservative assessments; don't inflate readiness
 - Not covered topics = "not_covered", vague responses = LOW confidence
 - Every insight must trace back to a specific domain and topic
 - Strengths from HIGH confidence only, Risks from MEDIUM confidence
-- Critical from LOW confidence or missing prerequisite topics`;
+- Critical from LOW confidence or missing prerequisite topics
+- Never use em dashes (—) in any output; use commas, colons, or rewrite the sentence instead`;
 
 // Truncate text to max length
 function truncate(text: string, maxLen: number): string {

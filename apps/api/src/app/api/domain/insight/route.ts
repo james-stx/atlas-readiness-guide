@@ -61,12 +61,13 @@ Readiness level criteria:
 - "early": Vague answers, low confidence, significant unknowns, or mostly assumptions
 
 Rules:
-- Be specific to their ACTUAL answers — never give generic startup advice
+- Be specific to their ACTUAL answers; never give generic startup advice
 - headline: one punchy, specific sentence (max 12 words) that captures the standout finding
 - narrative: 2–3 sentences synthesising what their answers collectively reveal about this dimension of readiness
 - strengths: exactly 2 specific strengths drawn directly from their answers (not generic)
 - gaps: 1–2 specific gaps, unknowns, or assumptions that need addressing (not generic)
 - nextStep: one concrete, actionable recommendation given what they've shared
+- Never use em dashes (—) in any output; use commas, colons, or rewrite the sentence instead
 
 Return valid JSON only. No markdown, no code blocks, no explanation.`;
 
