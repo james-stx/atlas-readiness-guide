@@ -94,16 +94,20 @@ export function ContentPanel() {
       role="main"
       aria-label="Assessment content"
     >
-      <div className="mx-auto max-w-[720px] px-8 py-8">
-        {/* Domain header with insight card */}
-        <ContentDomainHeader
-          domain={selectedDomain}
-          count={count}
-          domainProgress={dp}
-          onTopicSelect={handleTopicSelect}
-        />
+      {/* Sticky domain header */}
+      <div className="sticky top-0 z-10 bg-white shadow-sm">
+        <div className="mx-auto max-w-[720px] px-8 pt-6 pb-4">
+          <ContentDomainHeader
+            domain={selectedDomain}
+            count={count}
+            domainProgress={dp}
+            onTopicSelect={handleTopicSelect}
+          />
+        </div>
+      </div>
 
-        {/* All Topics - Unified cards */}
+      {/* Scrollable topic cards */}
+      <div className="mx-auto max-w-[720px] px-8 pt-4 pb-8">
         <div className="space-y-3">
           {topics.map((topic) => {
             const input = domainInputs.find((i) => i.question_id === topic.id);
@@ -129,7 +133,6 @@ export function ContentPanel() {
             );
           })}
         </div>
-
       </div>
     </div>
   );

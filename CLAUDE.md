@@ -216,7 +216,8 @@ packages/config
 ## Recent Commits
 
 ```
-d6c9761 fix: snap content panel to chapter on insight arrival + blue banner styling
+6dbbb0f feat: chapter progress bar + sticky domain header
+6231108 fix: snap content panel to chapter on insight arrival + blue banner styling
 b0a52f2 fix: auto-fetch chapter summary on mount + manual fallback button
 f6f4b53 feat: replace domain insight modal with inline chapter summary banner
 fc332f2 fix: prevent WelcomeModal re-appearing after first message is sent
@@ -225,6 +226,5 @@ fc332f2 fix: prevent WelcomeModal re-appearing after first message is sent
 aea21a0 fix: remove countdown timer from TopBar, keep % progress only
 ea4e3e8 fix: vertically align send button in chat input
 2843947 docs: add system architecture diagram for MVP
-2abb3a0 docs: auto-update MVP documentation [skip ci]
 ```
 <!-- /AUTO:RECENT_CHANGES -->

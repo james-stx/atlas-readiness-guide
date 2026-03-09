@@ -101,9 +101,9 @@ export function ContentDomainHeader({
   };
 
   return (
-    <div className="mb-6">
+    <div>
       {/* Title row */}
-      <div className="flex items-center justify-between gap-4 mb-4">
+      <div className="flex items-center justify-between gap-4 mb-3">
         <h2 className="text-[22px] font-semibold text-[#37352F]">
           {label} Insights
         </h2>
@@ -114,10 +114,11 @@ export function ContentDomainHeader({
 
       {/* Domain Summary Card — three states */}
       {generatingDomain === domain ? (
-        <LoadingCard />
+        <LoadingCard count={count} />
       ) : entry && insight ? (
         <InsightBanner
           insight={insight}
+          count={count}
           expanded={expanded}
           isHighlighting={isHighlighting}
           hasNewInsight={hasNewInsight}
@@ -130,95 +131,130 @@ export function ContentDomainHeader({
           isLastDomain={isLastDomain}
         />
       ) : (
-        /* Original assessment card */
-        <div className="rounded-lg border border-[#E8E6E1] bg-[#FAF9F7] p-4">
-          {/* Assessment sentence */}
-          <div className="flex items-start gap-3 mb-3">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#E8E6E1]">
-              <Sparkles className="h-4 w-4 text-[#5C5A56]" />
+        /* Base assessment card */
+        <div className="rounded-lg border border-[#E8E6E1] bg-[#FAF9F7] overflow-hidden">
+          <div className="p-4">
+            {/* Assessment sentence */}
+            <div className="flex items-start gap-3 mb-3">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#E8E6E1]">
+                <Sparkles className="h-4 w-4 text-[#5C5A56]" />
+              </div>
+              <p className="text-[14px] leading-relaxed text-[#37352F] pt-1">
+                {assessment}
+              </p>
             </div>
-            <p className="text-[14px] leading-relaxed text-[#37352F] pt-1">
-              {assessment}
-            </p>
-          </div>
 
-          {/* Suggested next action */}
-          <div className="flex items-center justify-between pt-3 border-t border-[#E8E6E1]">
-            <div className="flex items-center gap-2">
-              {count.current > 0 && (
-                <span className="text-[12px] text-[#9B9A97]">
-                  {domainProgress.highConfidence > 0 && (
-                    <span className="text-[#0F7B6C]">{domainProgress.highConfidence} high</span>
-                  )}
-                  {domainProgress.mediumConfidence > 0 && (
-                    <span className="text-[#9A6700]">
-                      {domainProgress.highConfidence > 0 && ' · '}
-                      {domainProgress.mediumConfidence} medium
-                    </span>
-                  )}
-                  {domainProgress.lowConfidence > 0 && (
-                    <span className="text-[#E03E3E]">
-                      {(domainProgress.highConfidence > 0 || domainProgress.mediumConfidence > 0) && ' · '}
-                      {domainProgress.lowConfidence} low
-                    </span>
-                  )}
-                  <span className="text-[#9B9A97]"> confidence</span>
+            {/* Action row */}
+            <div className="flex items-center justify-between pt-3 border-t border-[#E8E6E1]">
+              <div className="flex items-center gap-2">
+                {count.current > 0 && (
+                  <span className="text-[12px] text-[#9B9A97]">
+                    {domainProgress.highConfidence > 0 && (
+                      <span className="text-[#0F7B6C]">{domainProgress.highConfidence} high</span>
+                    )}
+                    {domainProgress.mediumConfidence > 0 && (
+                      <span className="text-[#9A6700]">
+                        {domainProgress.highConfidence > 0 && ' · '}
+                        {domainProgress.mediumConfidence} medium
+                      </span>
+                    )}
+                    {domainProgress.lowConfidence > 0 && (
+                      <span className="text-[#E03E3E]">
+                        {(domainProgress.highConfidence > 0 || domainProgress.mediumConfidence > 0) && ' · '}
+                        {domainProgress.lowConfidence} low
+                      </span>
+                    )}
+                    <span className="text-[#9B9A97]"> confidence</span>
+                  </span>
+                )}
+              </div>
+
+              {count.current === count.total && !entry ? (
+                <button
+                  onClick={() => refreshInsight(domain)}
+                  className="flex items-center gap-1.5 text-[13px] font-medium text-[#2383E2] hover:text-[#1A6DC0] transition-colors"
+                >
+                  <Sparkles className="h-3.5 w-3.5" />
+                  Generate summary
+                </button>
+              ) : suggestedTopic ? (
+                <button
+                  onClick={() => onTopicSelect(suggestedTopic.id)}
+                  className="flex items-center gap-1.5 text-[13px] font-medium text-[#2383E2] hover:text-[#1A6DC0] transition-colors"
+                >
+                  Continue: {suggestedTopic.label}
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </button>
+              ) : count.current === count.total ? (
+                <span className="text-[13px] font-medium text-[#0F7B6C]">
+                  All topics covered
                 </span>
-              )}
+              ) : null}
             </div>
-
-            {/* Right action — priority: generate summary > continue to next topic > all covered */}
-            {count.current === count.total && !entry ? (
-              <button
-                onClick={() => refreshInsight(domain)}
-                className="flex items-center gap-1.5 text-[13px] font-medium text-[#2383E2] hover:text-[#1A6DC0] transition-colors"
-              >
-                <Sparkles className="h-3.5 w-3.5" />
-                Generate summary
-              </button>
-            ) : suggestedTopic ? (
-              <button
-                onClick={() => onTopicSelect(suggestedTopic.id)}
-                className="flex items-center gap-1.5 text-[13px] font-medium text-[#2383E2] hover:text-[#1A6DC0] transition-colors"
-              >
-                Continue: {suggestedTopic.label}
-                <ArrowRight className="h-3.5 w-3.5" />
-              </button>
-            ) : count.current === count.total ? (
-              <span className="text-[13px] font-medium text-[#0F7B6C]">
-                All topics covered
-              </span>
-            ) : null}
           </div>
+
+          {/* Progress bar — flush at bottom */}
+          <ChapterProgressBar current={count.current} total={count.total} />
         </div>
       )}
     </div>
   );
 }
 
+// ─── Progress bar ─────────────────────────────────────────────────────────────
+
+function ChapterProgressBar({ current, total }: { current: number; total: number }) {
+  const isComplete = current >= total;
+  const pct = Math.min((current / total) * 100, 100);
+
+  return (
+    <div className="h-1.5 bg-[#E8E6E1]">
+      <div
+        className={cn(
+          'h-full transition-all duration-700 ease-out',
+          isComplete ? 'animate-shimmer' : 'bg-[#2383E2]'
+        )}
+        style={
+          isComplete
+            ? {
+                width: '100%',
+                background: 'linear-gradient(90deg, #059669 0%, #34D399 50%, #059669 100%)',
+                backgroundSize: '200% 100%',
+              }
+            : { width: `${pct}%` }
+        }
+      />
+    </div>
+  );
+}
+
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function LoadingCard() {
+function LoadingCard({ count }: { count: { current: number; total: number } }) {
   return (
-    <div className="rounded-lg border border-[#BFDBFE] bg-[#F0F7FF] p-4 animate-card-highlight">
-      <div className="flex items-center gap-3 mb-3">
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#BFDBFE]">
-          <Loader2 className="h-4 w-4 text-[#2383E2] animate-spin" />
+    <div className="rounded-lg border border-[#BFDBFE] bg-[#F0F7FF] overflow-hidden animate-card-highlight">
+      <div className="p-4">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#BFDBFE]">
+            <Loader2 className="h-4 w-4 text-[#2383E2] animate-spin" />
+          </div>
+          <p className="text-[14px] text-[#2383E2] font-medium">
+            Generating chapter summary…
+          </p>
         </div>
-        <p className="text-[14px] text-[#2383E2] font-medium">
-          Generating chapter summary…
-        </p>
+        <div className="space-y-2 pl-11">
+          <div className="h-3 rounded bg-[#BFDBFE]/60 w-3/4 animate-pulse" />
+          <div className="h-3 rounded bg-[#BFDBFE]/60 w-1/2 animate-pulse" />
+        </div>
       </div>
-      <div className="space-y-2 pl-11">
-        <div className="h-3 rounded bg-[#BFDBFE]/60 w-3/4 animate-pulse" />
-        <div className="h-3 rounded bg-[#BFDBFE]/60 w-1/2 animate-pulse" />
-      </div>
+      <ChapterProgressBar current={count.current} total={count.total} />
     </div>
   );
 }
 
 interface InsightBannerProps {
   insight: DomainInsight;
+  count: { current: number; total: number };
   expanded: boolean;
   isHighlighting: boolean;
   hasNewInsight: boolean;
@@ -233,6 +269,7 @@ interface InsightBannerProps {
 
 function InsightBanner({
   insight,
+  count,
   expanded,
   isHighlighting,
   hasNewInsight,
@@ -249,7 +286,7 @@ function InsightBanner({
   return (
     <div
       className={cn(
-        'rounded-lg border transition-colors duration-300',
+        'rounded-lg border overflow-hidden transition-colors duration-300',
         isHighlighting && 'animate-card-highlight',
         isStale
           ? 'border-[#FDE68A] bg-[#FFFBEB]/50'
@@ -258,7 +295,6 @@ function InsightBanner({
     >
       {/* Compact row */}
       <div className="flex items-center gap-3 p-4">
-        {/* Icon */}
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#BFDBFE]">
           <Sparkles className="h-4 w-4 text-[#2383E2]" />
         </div>
@@ -320,9 +356,12 @@ function InsightBanner({
         )}
       </div>
 
+      {/* Progress bar — sits between compact row and expanded content */}
+      <ChapterProgressBar current={count.current} total={count.total} />
+
       {/* Expanded content */}
       {expanded && (
-        <div className="px-4 pb-4 border-t border-[#BFDBFE] animate-expand-down overflow-hidden">
+        <div className="px-4 pb-4 animate-expand-down">
           {/* Headline + narrative */}
           <div className="pt-4 mb-4">
             <p className="text-[17px] font-semibold text-[#37352F] leading-snug mb-2">
