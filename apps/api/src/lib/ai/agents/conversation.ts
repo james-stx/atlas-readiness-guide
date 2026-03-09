@@ -171,6 +171,7 @@ export async function* streamConversation(
   type: 'text' | 'tool_start' | 'input' | 'domain_change' | 'complete' | 'error';
   content?: string;
   toolName?: string;
+  questionId?: string;
   data?: unknown;
   input?: unknown;
   domain?: string;
@@ -264,7 +265,10 @@ CRITICAL INSTRUCTIONS:
         if (fullText.trim()) {
           fullText += '\n\n'; // paragraph break between wave 1 and wave 2 in saved message
         }
-        yield { type: 'tool_start', toolName: part.toolName };
+        const questionId = part.toolName === 'recordInput'
+          ? (part.args as Record<string, unknown>)?.questionId as string | undefined
+          : undefined;
+        yield { type: 'tool_start', toolName: part.toolName, questionId };
       } else if (part.type === 'tool-result') {
         console.log('[Atlas] Tool result:', part.toolName, part.result?.success);
         if (part.toolName === 'recordInput' && part.result?.success && part.result.input?.id) {

@@ -146,6 +146,7 @@ interface AssessmentContextValue extends AssessmentState {
   // Utility
   hasStoredSession: boolean;
   isCapturingInput: boolean;
+  capturingTopicId: string | null;
 }
 
 const AssessmentContext = createContext<AssessmentContextValue | null>(null);
@@ -157,6 +158,7 @@ const AssessmentContext = createContext<AssessmentContextValue | null>(null);
 export function AssessmentProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(assessmentReducer, initialState);
   const [isCapturingInput, setIsCapturingInput] = useState(false);
+  const [capturingTopicId, setCapturingTopicId] = useState<string | null>(null);
 
   // Check for stored session on mount
   const hasStoredSession =
@@ -420,6 +422,7 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
 
               if (parsed.type === 'tool_start') {
                 setIsCapturingInput(true);
+                if (parsed.questionId) setCapturingTopicId(parsed.questionId);
               } else if (parsed.type === 'text') {
                 if (hadInputCapture) {
                   assistantContent += '\n\n';
@@ -443,6 +446,7 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
                 assistantContent = assistantContent || '[Domain transition]';
               } else if (parsed.type === 'complete') {
                 receivedComplete = true;
+                setCapturingTopicId(null);
                 // Add final assistant message
                 const message = parsed.data?.message || parsed.message;
                 if (message) {
@@ -512,6 +516,7 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
       } finally {
         clearTimeout(timeoutId);
         setIsCapturingInput(false);
+        setCapturingTopicId(null);
         dispatch({ type: 'SET_LOADING', payload: false });
         dispatch({ type: 'CLEAR_STREAMING_MESSAGE' });
       }
@@ -587,6 +592,7 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
     updateStatus,
     hasStoredSession,
     isCapturingInput,
+    capturingTopicId,
   };
 
   return (

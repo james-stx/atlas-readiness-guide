@@ -21,7 +21,7 @@ export function ContentPanel() {
     progressState,
     activeView,
   } = useWorkspace();
-  const { inputs, addInput, session, isCapturingInput } = useAssessment();
+  const { inputs, addInput, session, isLoading, capturingTopicId } = useAssessment();
   const { isSkipped, skipTopic, unskipTopic } = useSkippedTopics();
   const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
@@ -111,6 +111,20 @@ export function ContentPanel() {
         <div className="space-y-3">
           {topics.map((topic) => {
             const input = domainInputs.find((i) => i.question_id === topic.id);
+            // Show in-progress only on the specific topic being captured.
+            // Once capturingTopicId is known, match exactly.
+            // Before tool fires (capturingTopicId null), use the first uncompleted
+            // topic in this domain as a best-guess proxy.
+            const firstUncapturedId = topics.find(
+              (t) => !domainInputs.find((i) => i.question_id === t.id) && !isSkipped(t.id)
+            )?.id;
+            const showInProgress =
+              isLoading &&
+              !input &&
+              !isSkipped(topic.id) &&
+              (capturingTopicId
+                ? capturingTopicId === topic.id
+                : firstUncapturedId === topic.id);
             return (
               <div
                 key={topic.id}
@@ -124,7 +138,7 @@ export function ContentPanel() {
                   input={input}
                   isSkipped={isSkipped(topic.id)}
                   isHighlighted={selectedCategory === topic.id}
-                  isCapturingInput={isCapturingInput && !input && !isSkipped(topic.id)}
+                  isCapturingInput={showInProgress}
                   onWriteResponse={(response) => handleWriteResponse(topic.id, response)}
                   onTalkToAtlas={() => handleDiscussTopic(topic.id)}
                   onSkip={() => skipTopic(topic.id)}

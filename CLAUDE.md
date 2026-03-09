@@ -216,7 +216,8 @@ packages/config
 ## Recent Commits
 
 ```
-e1ea4b5 feat: show in-progress spinner on uncompleted topic cards while Atlas captures input
+b91382a fix: show in-progress on correct single topic for full duration of AI response
+253079a feat: show in-progress spinner on uncompleted topic cards while Atlas captures input
 936b6fc fix: persist capturing indicator until wave 2 text arrives; fix paragraph break in saved message
 c3d909f feat: show capturing indicator + paragraph break between response waves
 6c96899 fix: stop shimmer permanently after first view; enforce second person in all AI outputs
@@ -225,6 +226,5 @@ d0354ba fix: stay on completed chapter + blue shimmer + UX polish
 54fe40d feat: chapter progress bar + sticky domain header
 6231108 fix: snap content panel to chapter on insight arrival + blue banner styling
 b0a52f2 fix: auto-fetch chapter summary on mount + manual fallback button
-f6f4b53 feat: replace domain insight modal with inline chapter summary banner
 ```
 <!-- /AUTO:RECENT_CHANGES -->
