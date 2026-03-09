@@ -454,7 +454,10 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
               } else if (parsed.type === 'complete') {
                 receivedComplete = true;
                 setIsCapturingInput(false);
-                setCapturingTopicId(null);
+                // Do NOT clear capturingTopicId here. The finally block clears it
+                // together with SET_LOADING=false in a single batch, ensuring
+                // ContentPanel keeps showing "In progress" until loading is truly done.
+                // Clearing it here would race with the input handler that just set it.
                 // Add final assistant message
                 const message = parsed.data?.message || parsed.message;
                 if (message) {
