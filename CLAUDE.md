@@ -216,7 +216,8 @@ docs/READINESS-REPORT-V5-DESIGN-REVIEW.md
 ## Recent Commits
 
 ```
-0b5a0ad fix: use selectedCategory directly for in-progress — no SSE events needed
+0b44ffc fix: remove domain-sync effect that was clearing selectedCategory
+1d13503 fix: use selectedCategory directly for in-progress — no SSE events needed
 1492516 fix: set capturingTopicId from topicHint immediately on submit
 baec771 fix: don't clear capturingTopicId in complete handler
 d19f30f fix: set capturingTopicId from input event as reliable fallback
@@ -225,6 +226,5 @@ cce537f fix: persist capturing indicator through wave 2; show in-progress on re-
 f7c6ce6 fix: navigate to session domain on load + show CapturingIndicator without streamingMessage
 6da6d23 fix: compute in-progress topic directly in ContentPanel to avoid stale-closure bugs
 b979905 fix: use refs for fresh inputs/domain in sendMessageAction to avoid stale closure
-59985c8 fix: set capturingTopicId immediately on send so in-progress shows from submit
 ```
 <!-- /AUTO:RECENT_CHANGES -->
