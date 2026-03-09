@@ -25,6 +25,7 @@ import {
   getSessionFromStorage,
   clearSessionFromStorage,
 } from '../storage';
+import { DOMAIN_TOPICS } from '../progress';
 
 // ============================================
 // Initial State
@@ -346,6 +347,16 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
       dispatch({ type: 'SET_LOADING', payload: true });
       dispatch({ type: 'SET_ERROR', payload: null });
       dispatch({ type: 'CLEAR_STREAMING_MESSAGE' });
+
+      // Immediately mark the first uncaptured topic as the likely capture target
+      // so the content panel can show in-progress before any SSE arrives.
+      const currentDomain = state.session.current_domain;
+      const domainTopics = DOMAIN_TOPICS[currentDomain] || [];
+      const capturedIds = new Set(
+        state.inputs.filter(i => i.domain === currentDomain).map(i => i.question_id)
+      );
+      const firstUncapturedId = domainTopics.find(t => !capturedIds.has(t.id))?.id;
+      if (firstUncapturedId) setCapturingTopicId(firstUncapturedId);
 
       // Add user message immediately
       const userMessage: ChatMessage = {

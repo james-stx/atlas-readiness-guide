@@ -216,7 +216,8 @@ docs/READINESS-REPORT-V5-DESIGN-REVIEW.md
 ## Recent Commits
 
 ```
-c5d803b fix: show in-progress on correct topic for full request duration
+2cda7d5 fix: set capturingTopicId immediately on send so in-progress shows from submit
+42ec4ac fix: show in-progress on correct topic for full request duration
 5b173a9 fix: show in-progress on correct single topic for full duration of AI response
 253079a feat: show in-progress spinner on uncompleted topic cards while Atlas captures input
 936b6fc fix: persist capturing indicator until wave 2 text arrives; fix paragraph break in saved message
@@ -225,6 +226,5 @@ c3d909f feat: show capturing indicator + paragraph break between response waves
 4812d87 fix: more visible progress bar shimmer, reliable pause on expand, ban em dashes
 d0354ba fix: stay on completed chapter + blue shimmer + UX polish
 54fe40d feat: chapter progress bar + sticky domain header
-6231108 fix: snap content panel to chapter on insight arrival + blue banner styling
 ```
 <!-- /AUTO:RECENT_CHANGES -->
