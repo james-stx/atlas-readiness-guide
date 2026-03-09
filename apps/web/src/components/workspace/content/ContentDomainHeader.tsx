@@ -253,26 +253,14 @@ function InsightBanner({
         isHighlighting && 'animate-card-highlight',
         isStale
           ? 'border-[#FDE68A] bg-[#FFFBEB]/50'
-          : hasNewInsight
-          ? 'border-[#BFDBFE] bg-[#F0F7FF]'
-          : 'border-[#E8E6E1] bg-[#FAF9F7]'
+          : 'border-[#93C5FD] bg-[#DBEAFE]'
       )}
     >
       {/* Compact row */}
       <div className="flex items-center gap-3 p-4">
         {/* Icon */}
-        <div
-          className={cn(
-            'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
-            hasNewInsight && !isStale ? 'bg-[#BFDBFE]' : 'bg-[#E8E6E1]'
-          )}
-        >
-          <Sparkles
-            className={cn(
-              'h-4 w-4',
-              hasNewInsight && !isStale ? 'text-[#2383E2]' : 'text-[#5C5A56]'
-            )}
-          />
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#BFDBFE]">
+          <Sparkles className="h-4 w-4 text-[#2383E2]" />
         </div>
 
         {/* Label + readiness badge */}
@@ -334,7 +322,7 @@ function InsightBanner({
 
       {/* Expanded content */}
       {expanded && (
-        <div className="px-4 pb-4 border-t border-[#E8E6E1] animate-expand-down overflow-hidden">
+        <div className="px-4 pb-4 border-t border-[#BFDBFE] animate-expand-down overflow-hidden">
           {/* Headline + narrative */}
           <div className="pt-4 mb-4">
             <p className="text-[17px] font-semibold text-[#37352F] leading-snug mb-2">
@@ -387,7 +375,7 @@ function InsightBanner({
           </div>
 
           {/* Recommended next step */}
-          <div className="rounded-lg bg-[#F0F7FF] border border-[#BFDBFE] px-4 py-3 mb-4">
+          <div className="rounded-lg bg-white border border-[#BFDBFE] px-4 py-3 mb-4">
             <span className="text-[11px] font-semibold uppercase tracking-wide text-[#2383E2] block mb-1">
               Recommended next step
             </span>

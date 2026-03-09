@@ -52,7 +52,7 @@ const TOPICS_PER_DOMAIN = 5;
 // ─── Provider ────────────────────────────────────────────────────────────────
 
 export function DomainInsightProvider({ children }: { children: ReactNode }) {
-  const { progressState } = useWorkspace();
+  const { progressState, selectDomain } = useWorkspace();
   const { session } = useAssessment();
 
   const [entries, setEntries] = useState<Partial<Record<DomainType, InsightEntry>>>({});
@@ -205,6 +205,13 @@ export function DomainInsightProvider({ children }: { children: ReactNode }) {
   const dismissNew = useCallback(() => {
     setNewlyReadyDomain(null);
   }, []);
+
+  // When an insight arrives, navigate the content panel to that domain so the user
+  // sees the glow animation even if the chat already moved them to the next chapter
+  useEffect(() => {
+    if (!newlyReadyDomain) return;
+    selectDomain(newlyReadyDomain);
+  }, [newlyReadyDomain, selectDomain]);
 
   return (
     <DomainInsightContext.Provider

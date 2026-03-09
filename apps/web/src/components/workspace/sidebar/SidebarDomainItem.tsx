@@ -31,7 +31,13 @@ export function SidebarDomainItem({
     <div
       className={cn(
         'group flex items-center h-[32px] mx-1 px-2 rounded-[3px] cursor-pointer select-none',
-        isSelected ? 'bg-[#EBEBEA]' : 'hover:bg-[#EBEBEA]'
+        hasNewInsight
+          ? isSelected
+            ? 'bg-[#DBEAFE]'
+            : 'bg-[#EBF5FF] hover:bg-[#DBEAFE]'
+          : isSelected
+          ? 'bg-[#EBEBEA]'
+          : 'hover:bg-[#EBEBEA]'
       )}
       style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif' }}
       onClick={() => {
@@ -74,7 +80,7 @@ export function SidebarDomainItem({
 
       {/* Domain name */}
       <span className="flex-1 flex items-center gap-1.5 min-w-0">
-        <span className="text-[14px] leading-[1.3] text-[#37352F] truncate">
+        <span className={cn('text-[14px] leading-[1.3] truncate', hasNewInsight ? 'text-[#1A6DC0] font-medium' : 'text-[#37352F]')}>
           {label}
         </span>
         {hasNewInsight && (
