@@ -1,5 +1,6 @@
 'use client';
 
+import { cn } from '@/lib/utils';
 import { useWorkspace } from '@/lib/context/workspace-context';
 import { useAssessment } from '@/lib/context/assessment-context';
 import { TopBar } from './TopBar';
@@ -111,8 +112,16 @@ export function WorkspaceLayout() {
                 <Sidebar />
               </div>
             )}
-            {mobileTab === 'content' && <ContentPanel />}
-            {mobileTab === 'chat' && <ChatPanel />}
+            {/* Keep both panels mounted so state/effects persist across tab switches.
+                Use CSS hide/show instead of conditional rendering so that
+                ContentPanel's domain-sync effect and showInProgress logic
+                continue to run even while the user is in the chat tab. */}
+            <div className={cn(mobileTab !== 'content' && 'hidden')}>
+              <ContentPanel />
+            </div>
+            <div className={cn(mobileTab !== 'chat' && 'hidden')}>
+              <ChatPanel />
+            </div>
           </div>
           <MobileTabBar />
 

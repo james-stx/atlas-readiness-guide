@@ -216,7 +216,8 @@ docs/READINESS-REPORT-V5-DESIGN-REVIEW.md
 ## Recent Commits
 
 ```
-84a97b2 fix: navigate to session domain on load + show CapturingIndicator without streamingMessage
+e57fcad fix: keep ContentPanel mounted on mobile to show in-progress topic cards
+f7c6ce6 fix: navigate to session domain on load + show CapturingIndicator without streamingMessage
 6da6d23 fix: compute in-progress topic directly in ContentPanel to avoid stale-closure bugs
 b979905 fix: use refs for fresh inputs/domain in sendMessageAction to avoid stale closure
 59985c8 fix: set capturingTopicId immediately on send so in-progress shows from submit
@@ -225,6 +226,5 @@ b979905 fix: use refs for fresh inputs/domain in sendMessageAction to avoid stal
 253079a feat: show in-progress spinner on uncompleted topic cards while Atlas captures input
 936b6fc fix: persist capturing indicator until wave 2 text arrives; fix paragraph break in saved message
 c3d909f feat: show capturing indicator + paragraph break between response waves
-6c96899 fix: stop shimmer permanently after first view; enforce second person in all AI outputs
 ```
 <!-- /AUTO:RECENT_CHANGES -->
