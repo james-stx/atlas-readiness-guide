@@ -140,13 +140,15 @@ export function TopicCard({
 
   const topicConfig = getTopicConfig(topicId);
 
-  // Determine status
+  // Determine status.
+  // isCapturingInput takes priority over input so that re-discussing an already-
+  // complete topic shows "In progress" while Atlas is actively recording a new capture.
   const status: TopicStatus = isSkipped
     ? 'skipped'
-    : input
-    ? 'complete'
     : isCapturingInput
     ? 'in_progress'
+    : input
+    ? 'complete'
     : 'not_started';
 
   const statusCfg = statusConfig[status];

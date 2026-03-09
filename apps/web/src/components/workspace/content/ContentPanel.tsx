@@ -148,15 +148,17 @@ export function ContentPanel() {
           {topics.map((topic) => {
             const input = domainInputs.find((i) => i.question_id === topic.id);
             // Show in-progress while a request is in flight for this topic.
-            // activeTopicForProgress is computed above using a 3-level priority:
-            //   capturingTopicId (tool_start) > selectedCategory > firstUncapturedTopicId
-            // !input guard: once the input arrives, TopicCard flips to "complete" anyway,
-            // but guard here avoids a flash of "in_progress" on an already-complete topic.
+            // Two cases:
+            //   1. capturingTopicId matches — authoritative signal from tool_start.
+            //      No !input guard: topic may already be complete (re-discussion), and
+            //      TopicCard now prioritises isCapturingInput over input in status.
+            //   2. Heuristic (no capturingTopicId yet) — only fire for uncaptured topics.
             const showInProgress =
               isLoading &&
               !isSkipped(topic.id) &&
-              !input &&
-              activeTopicForProgress === topic.id;
+              (capturingTopicId === topic.id
+                ? true
+                : !input && activeTopicForProgress === topic.id);
             return (
               <div
                 key={topic.id}

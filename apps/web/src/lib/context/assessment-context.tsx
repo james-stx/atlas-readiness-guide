@@ -427,7 +427,8 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
                 if (hadInputCapture) {
                   assistantContent += '\n\n';
                   hadInputCapture = false;
-                  setIsCapturingInput(false); // wave 2 is arriving — hide indicator now
+                  // Keep isCapturingInput=true until complete fires so the
+                  // "Saving your answer" indicator stays visible through wave 2
                 }
                 assistantContent += parsed.content;
                 dispatch({
@@ -446,6 +447,7 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
                 assistantContent = assistantContent || '[Domain transition]';
               } else if (parsed.type === 'complete') {
                 receivedComplete = true;
+                setIsCapturingInput(false);
                 setCapturingTopicId(null);
                 // Add final assistant message
                 const message = parsed.data?.message || parsed.message;
