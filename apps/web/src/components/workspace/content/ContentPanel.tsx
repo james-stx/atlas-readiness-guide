@@ -17,6 +17,7 @@ export function ContentPanel() {
     selectedCategory,
     getDomainInputCount,
     selectCategory,
+    selectDomain,
     discussTopic,
     progressState,
     activeView,
@@ -35,6 +36,15 @@ export function ContentPanel() {
     }
   }, [selectedCategory]);
 
+  // When a request is in flight, ensure the content panel is showing the domain
+  // where capture is actually happening (session.current_domain). Without this,
+  // a domain mismatch means firstUncapturedTopicId never matches any visible topic.
+  useEffect(() => {
+    if (isLoading && session?.current_domain && selectedDomain !== session.current_domain) {
+      selectDomain(session.current_domain);
+    }
+  }, [isLoading, session?.current_domain, selectedDomain, selectDomain]);
+
   if (!selectedDomain) {
     return (
       <div className="flex-1 overflow-y-auto bg-white workspace-panel">
@@ -48,19 +58,25 @@ export function ContentPanel() {
   const count = getDomainInputCount(selectedDomain);
   const dp = progressState.domainProgress[selectedDomain];
 
-  // First uncaptured, non-skipped topic in the visible domain — computed fresh
-  // from live state so there's no stale-closure risk.
-  const firstUncapturedTopicId = topics.find(
-    (t) => !domainInputs.find((i) => i.question_id === t.id) && !isSkipped(t.id)
+  // Compute the in-progress topic using session.current_domain (where capture
+  // is happening) rather than selectedDomain (what the user is browsing).
+  // If domains match this is identical; if they differ we get the right result
+  // on the next render after the selectDomain() effect above fires.
+  const sessionDomain = session?.current_domain ?? selectedDomain;
+  const sessionInputs = inputs.filter((i) => i.domain === sessionDomain);
+  const sessionTopics = DOMAIN_TOPICS[sessionDomain] || [];
+
+  // First uncaptured, non-skipped topic in the session's active domain.
+  const firstUncapturedTopicId = sessionTopics.find(
+    (t) => !sessionInputs.find((i) => i.question_id === t.id) && !isSkipped(t.id)
   )?.id;
 
   // Which topic should show "In progress":
   //   1. capturingTopicId — set by the tool_start SSE event (most precise)
-  //   2. selectedCategory — set when user clicked "Talk to Atlas" on a specific card,
-  //      but only if that topic hasn't been captured yet
+  //   2. selectedCategory — set when user clicked "Talk to Atlas", if uncaptured
   //   3. firstUncapturedTopicId — fallback heuristic while loading
   const selectedCategoryUncaptured =
-    selectedCategory && !domainInputs.find((i) => i.question_id === selectedCategory)
+    selectedCategory && !sessionInputs.find((i) => i.question_id === selectedCategory)
       ? selectedCategory
       : null;
 

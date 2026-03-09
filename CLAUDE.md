@@ -216,7 +216,8 @@ docs/READINESS-REPORT-V5-DESIGN-REVIEW.md
 ## Recent Commits
 
 ```
-3da8753 fix: compute in-progress topic directly in ContentPanel to avoid stale-closure bugs
+84a97b2 fix: navigate to session domain on load + show CapturingIndicator without streamingMessage
+6da6d23 fix: compute in-progress topic directly in ContentPanel to avoid stale-closure bugs
 b979905 fix: use refs for fresh inputs/domain in sendMessageAction to avoid stale closure
 59985c8 fix: set capturingTopicId immediately on send so in-progress shows from submit
 42ec4ac fix: show in-progress on correct topic for full request duration
@@ -225,6 +226,5 @@ b979905 fix: use refs for fresh inputs/domain in sendMessageAction to avoid stal
 936b6fc fix: persist capturing indicator until wave 2 text arrives; fix paragraph break in saved message
 c3d909f feat: show capturing indicator + paragraph break between response waves
 6c96899 fix: stop shimmer permanently after first view; enforce second person in all AI outputs
-4812d87 fix: more visible progress bar shimmer, reliable pause on expand, ban em dashes
 ```
 <!-- /AUTO:RECENT_CHANGES -->

@@ -183,8 +183,10 @@ export function ChatPanel() {
             />
           )}
 
-          {/* Capturing indicator — shown during tool execution gap */}
-          {isCapturingInput && streamingMessage && <CapturingIndicator />}
+          {/* Capturing indicator — shown during tool execution gap.
+              No streamingMessage guard: the model sometimes calls the tool
+              before emitting any text, so we show the indicator regardless. */}
+          {isCapturingInput && <CapturingIndicator />}
 
           {/* Typing indicator */}
           {isLoading && !streamingMessage && <TypingDots />}
