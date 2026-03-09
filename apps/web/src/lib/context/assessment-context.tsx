@@ -7,6 +7,7 @@ import {
   useCallback,
   useEffect,
   useState,
+  useRef,
   type ReactNode,
 } from 'react';
 import type {
@@ -160,6 +161,13 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(assessmentReducer, initialState);
   const [isCapturingInput, setIsCapturingInput] = useState(false);
   const [capturingTopicId, setCapturingTopicId] = useState<string | null>(null);
+
+  // Always-fresh refs so sendMessageAction (memoized on state.session) can
+  // read current inputs/domain without a stale closure.
+  const freshInputsRef = useRef(state.inputs);
+  freshInputsRef.current = state.inputs;
+  const freshDomainRef = useRef(state.session?.current_domain);
+  freshDomainRef.current = state.session?.current_domain;
 
   // Check for stored session on mount
   const hasStoredSession =
@@ -350,10 +358,11 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
 
       // Immediately mark the first uncaptured topic as the likely capture target
       // so the content panel can show in-progress before any SSE arrives.
-      const currentDomain = state.session.current_domain;
+      // Use refs for fresh values — state.inputs is stale inside this memoized callback.
+      const currentDomain = freshDomainRef.current ?? state.session.current_domain;
       const domainTopics = DOMAIN_TOPICS[currentDomain] || [];
       const capturedIds = new Set(
-        state.inputs.filter(i => i.domain === currentDomain).map(i => i.question_id)
+        freshInputsRef.current.filter(i => i.domain === currentDomain).map(i => i.question_id)
       );
       const firstUncapturedId = domainTopics.find(t => !capturedIds.has(t.id))?.id;
       if (firstUncapturedId) setCapturingTopicId(firstUncapturedId);

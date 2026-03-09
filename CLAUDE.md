@@ -216,7 +216,8 @@ docs/READINESS-REPORT-V5-DESIGN-REVIEW.md
 ## Recent Commits
 
 ```
-2cda7d5 fix: set capturingTopicId immediately on send so in-progress shows from submit
+572225d fix: use refs for fresh inputs/domain in sendMessageAction to avoid stale closure
+59985c8 fix: set capturingTopicId immediately on send so in-progress shows from submit
 42ec4ac fix: show in-progress on correct topic for full request duration
 5b173a9 fix: show in-progress on correct single topic for full duration of AI response
 253079a feat: show in-progress spinner on uncompleted topic cards while Atlas captures input
@@ -225,6 +226,5 @@ c3d909f feat: show capturing indicator + paragraph break between response waves
 6c96899 fix: stop shimmer permanently after first view; enforce second person in all AI outputs
 4812d87 fix: more visible progress bar shimmer, reliable pause on expand, ban em dashes
 d0354ba fix: stay on completed chapter + blue shimmer + UX polish
-54fe40d feat: chapter progress bar + sticky domain header
 ```
 <!-- /AUTO:RECENT_CHANGES -->
