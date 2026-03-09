@@ -111,20 +111,17 @@ export function ContentPanel() {
         <div className="space-y-3">
           {topics.map((topic) => {
             const input = domainInputs.find((i) => i.question_id === topic.id);
-            // Show in-progress only on the specific topic being captured.
-            // Once capturingTopicId is known, match exactly.
-            // Before tool fires (capturingTopicId null), use the first uncompleted
-            // topic in this domain as a best-guess proxy.
-            const firstUncapturedId = topics.find(
-              (t) => !domainInputs.find((i) => i.question_id === t.id) && !isSkipped(t.id)
-            )?.id;
+            // Show in-progress for the active topic throughout the full request.
+            // Pre-capture: use selectedCategory (topic the user is discussing).
+            // Post-tool_start: capturingTopicId narrows it to the exact topic.
+            // No !input guard — TopicCard's own "input ? complete" logic handles
+            // the flip to Complete once the input arrives, even in the same render.
+            const activeTopic = capturingTopicId || selectedCategory;
             const showInProgress =
               isLoading &&
-              !input &&
               !isSkipped(topic.id) &&
-              (capturingTopicId
-                ? capturingTopicId === topic.id
-                : firstUncapturedId === topic.id);
+              !!activeTopic &&
+              activeTopic === topic.id;
             return (
               <div
                 key={topic.id}

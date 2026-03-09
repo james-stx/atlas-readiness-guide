@@ -74,8 +74,12 @@ apps/api
 apps/api/.env.example
 apps/api/.env.local
 apps/api/.eslintrc.json
+apps/api/.gitignore
 apps/api/.next
 apps/api/.turbo
+apps/api/.vercel
+apps/api/.vercel/project.json
+apps/api/.vercel/README.txt
 apps/api/migrations
 apps/api/migrations/001_add_guest_session_fields.sql
 apps/api/next-env.d.ts
@@ -93,8 +97,12 @@ apps/web
 apps/web/.env.example
 apps/web/.env.local
 apps/web/.eslintrc.json
+apps/web/.gitignore
 apps/web/.next
 apps/web/.turbo
+apps/web/.vercel
+apps/web/.vercel/project.json
+apps/web/.vercel/README.txt
 apps/web/next-env.d.ts
 apps/web/next.config.js
 apps/web/node_modules
@@ -129,14 +137,6 @@ docs/READINESS-REPORT-V2-WIREFRAMES.md
 docs/READINESS-REPORT-V3-REDESIGN.md
 docs/READINESS-REPORT-V4-COMPREHENSIVE-REDESIGN.md
 docs/READINESS-REPORT-V5-DESIGN-REVIEW.md
-docs/READINESS-REPORT-V5-PRD.md
-docs/ux
-docs/UX-UI-Design-Specifications.md
-docs/ux/comprehensive-ux-audit-v1.md
-node_modules
-package.json
-packages
-packages/config
 ```
 <!-- /AUTO:STRUCTURE -->
 
@@ -216,7 +216,8 @@ packages/config
 ## Recent Commits
 
 ```
-b91382a fix: show in-progress on correct single topic for full duration of AI response
+c5d803b fix: show in-progress on correct topic for full request duration
+5b173a9 fix: show in-progress on correct single topic for full duration of AI response
 253079a feat: show in-progress spinner on uncompleted topic cards while Atlas captures input
 936b6fc fix: persist capturing indicator until wave 2 text arrives; fix paragraph break in saved message
 c3d909f feat: show capturing indicator + paragraph break between response waves
@@ -225,6 +226,5 @@ c3d909f feat: show capturing indicator + paragraph break between response waves
 d0354ba fix: stay on completed chapter + blue shimmer + UX polish
 54fe40d feat: chapter progress bar + sticky domain header
 6231108 fix: snap content panel to chapter on insight arrival + blue banner styling
-b0a52f2 fix: auto-fetch chapter summary on mount + manual fallback button
 ```
 <!-- /AUTO:RECENT_CHANGES -->
