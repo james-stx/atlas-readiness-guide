@@ -203,7 +203,15 @@ export function ContentDomainHeader({
 
 // ─── Progress bar ─────────────────────────────────────────────────────────────
 
-function ChapterProgressBar({ current, total }: { current: number; total: number }) {
+function ChapterProgressBar({
+  current,
+  total,
+  paused = false,
+}: {
+  current: number;
+  total: number;
+  paused?: boolean;
+}) {
   const isComplete = current >= total;
   const pct = Math.min((current / total) * 100, 100);
 
@@ -212,13 +220,13 @@ function ChapterProgressBar({ current, total }: { current: number; total: number
       <div
         className={cn(
           'h-full transition-all duration-700 ease-out',
-          isComplete ? 'animate-shimmer' : 'bg-[#2383E2]'
+          isComplete && !paused ? 'animate-shimmer' : 'bg-[#2383E2]'
         )}
         style={
-          isComplete
+          isComplete && !paused
             ? {
                 width: '100%',
-                background: 'linear-gradient(90deg, #059669 0%, #34D399 50%, #059669 100%)',
+                background: 'linear-gradient(90deg, #1A6DC0 0%, #2383E2 50%, #1A6DC0 100%)',
                 backgroundSize: '200% 100%',
               }
             : { width: `${pct}%` }
@@ -304,6 +312,7 @@ function InsightBanner({
           <span className="text-[14px] font-medium text-[#37352F] truncate">
             Chapter Summary
           </span>
+          <span className="text-[11px] text-[#5C5A56] shrink-0">Confidence level</span>
           <span
             className="shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold border"
             style={{
@@ -356,8 +365,8 @@ function InsightBanner({
         )}
       </div>
 
-      {/* Progress bar — sits between compact row and expanded content */}
-      <ChapterProgressBar current={count.current} total={count.total} />
+      {/* Progress bar — pauses shimmer when expanded */}
+      <ChapterProgressBar current={count.current} total={count.total} paused={expanded} />
 
       {/* Expanded content */}
       {expanded && (

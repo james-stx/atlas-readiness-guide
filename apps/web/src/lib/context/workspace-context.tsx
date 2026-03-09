@@ -283,6 +283,10 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   // Track inputs to auto-navigate when new ones are captured
   const prevInputsLengthRef = useRef(inputs.length);
   const prevDomainRef = useRef(session?.current_domain);
+  // Stable ref to latest progress so the domain-change effect can read it
+  // without adding progressState as a reactive dependency
+  const progressStateRef = useRef(progressState);
+  progressStateRef.current = progressState;
 
   // Auto-navigate when a new input is captured
   useEffect(() => {
@@ -303,18 +307,29 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     prevInputsLengthRef.current = inputs.length;
   }, [inputs, state.expandedDomains]);
 
-  // Auto-navigate when domain changes (AI transitions to next domain)
+  // Auto-navigate when domain changes (AI transitions to next domain).
+  // Exception: if the domain we're leaving just completed all its topics, stay
+  // so the user can read their chapter summary before moving on.
   useEffect(() => {
     const currentDomain = session?.current_domain;
     if (currentDomain && currentDomain !== prevDomainRef.current) {
-      // Domain changed - navigate to it
+      const prevDomain = prevDomainRef.current as DomainType | undefined;
+      prevDomainRef.current = currentDomain;
+
+      if (prevDomain) {
+        const prevProgress = progressStateRef.current.domainProgress[prevDomain];
+        const topicsTotal = DOMAIN_TOPICS[prevDomain]?.length ?? 5;
+        if (prevProgress && prevProgress.coveredTopics.length >= topicsTotal) {
+          // Chapter just completed — let user read the summary, don't auto-navigate
+          return;
+        }
+      }
+
       dispatch({ type: 'SELECT_DOMAIN', payload: currentDomain });
-      // Expand the new domain
       if (!state.expandedDomains.includes(currentDomain)) {
         dispatch({ type: 'TOGGLE_DOMAIN_EXPAND', payload: currentDomain });
       }
     }
-    prevDomainRef.current = currentDomain;
   }, [session?.current_domain, state.expandedDomains]);
 
   // Actions
