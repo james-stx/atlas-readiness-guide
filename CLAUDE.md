@@ -216,7 +216,8 @@ docs/READINESS-REPORT-V5-DESIGN-REVIEW.md
 ## Recent Commits
 
 ```
-3093992 fix: persist capturing indicator through wave 2; show in-progress on re-discussions
+4ff588a fix: set capturingTopicId from input event as reliable fallback
+cce537f fix: persist capturing indicator through wave 2; show in-progress on re-discussions
 58ab7f7 fix: keep ContentPanel mounted on mobile to show in-progress topic cards
 f7c6ce6 fix: navigate to session domain on load + show CapturingIndicator without streamingMessage
 6da6d23 fix: compute in-progress topic directly in ContentPanel to avoid stale-closure bugs
@@ -225,6 +226,5 @@ b979905 fix: use refs for fresh inputs/domain in sendMessageAction to avoid stal
 42ec4ac fix: show in-progress on correct topic for full request duration
 5b173a9 fix: show in-progress on correct single topic for full duration of AI response
 253079a feat: show in-progress spinner on uncompleted topic cards while Atlas captures input
-936b6fc fix: persist capturing indicator until wave 2 text arrives; fix paragraph break in saved message
 ```
 <!-- /AUTO:RECENT_CHANGES -->

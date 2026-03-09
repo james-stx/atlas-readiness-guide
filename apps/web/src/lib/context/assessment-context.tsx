@@ -438,6 +438,12 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
               } else if (parsed.type === 'input' && parsed.input) {
                 dispatch({ type: 'ADD_INPUT', payload: parsed.input });
                 hadInputCapture = true;
+                // Always set capturingTopicId from the input's question_id — this is
+                // the most reliable signal (input always has question_id; tool_start
+                // may drop questionId if JSON.stringify omits undefined fields).
+                if (parsed.input.question_id) {
+                  setCapturingTopicId(parsed.input.question_id);
+                }
               } else if (parsed.type === 'domain_change' && parsed.domain) {
                 dispatch({
                   type: 'UPDATE_DOMAIN',
