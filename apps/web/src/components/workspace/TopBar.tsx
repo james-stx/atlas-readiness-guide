@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  Compass,
   PanelRightClose,
   MessageSquare,
   Upload,
@@ -9,6 +8,7 @@ import {
   ChevronDown,
   LogOut,
 } from 'lucide-react';
+import { AtlasLogo } from '@/components/AtlasLogo';
 import { useWorkspace } from '@/lib/context/workspace-context';
 import { useAssessment } from '@/lib/context/assessment-context';
 import { useRouter } from 'next/navigation';
@@ -68,9 +68,7 @@ export function TopBar() {
     <header className="relative flex h-12 items-center justify-between border-b border-[#E8E6E1] bg-white px-4 z-50">
       {/* Left: Logo */}
       <div className="flex items-center gap-2">
-        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#37352F]">
-          <Compass className="h-4 w-4 text-white" />
-        </div>
+        <AtlasLogo variant="dark" size={28} />
         <span className="text-[14px] font-semibold text-[#37352F]">Atlas</span>
       </div>
 

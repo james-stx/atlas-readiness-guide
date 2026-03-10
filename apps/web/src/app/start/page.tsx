@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { AtlasLogo } from '@/components/AtlasLogo';
 import { ArrowLeft, ArrowRight, Loader2, RotateCcw, Mail, CheckCircle2, UserX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -105,9 +106,7 @@ export default function StartPage() {
         <div className="w-full max-w-md">
           {/* Logo */}
           <div className="text-center mb-8">
-            <div className="w-12 h-12 bg-neutral-900 rounded-xl flex items-center justify-center mx-auto mb-6">
-              <span className="text-white font-semibold text-xl">A</span>
-            </div>
+            <AtlasLogo variant="dark" size={48} className="mx-auto mb-6" />
             <h1 className="text-2xl font-semibold text-neutral-900 tracking-tight">
               {view === 'sent' ? 'Check your inbox' : "Let's understand your readiness"}
             </h1>

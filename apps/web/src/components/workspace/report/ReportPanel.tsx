@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { useWorkspace } from '@/lib/context/workspace-context';
 import { useAssessment } from '@/lib/context/assessment-context';
 import { DOMAINS } from '@/lib/progress';
-import { Compass, Loader2, RefreshCw, ArrowLeft, AlertCircle } from 'lucide-react';
+import { Loader2, RefreshCw, ArrowLeft, AlertCircle } from 'lucide-react';
+import { AtlasLogo } from '@/components/AtlasLogo';
 import { getSnapshot } from '@/lib/api-client';
 
 import { ReportExecutiveSummary } from '@/components/snapshot/report-executive-summary';
@@ -138,9 +139,7 @@ export function ReportPanel() {
       <div className="overflow-y-auto bg-white workspace-panel">
         <div className="max-w-[720px] mx-auto px-8 py-8">
           <div className="text-center mb-8">
-            <div className="w-12 h-12 bg-[#F7F6F3] rounded-lg flex items-center justify-center mx-auto mb-4">
-              <Compass className="w-6 h-6 text-[#37352F]" />
-            </div>
+            <AtlasLogo variant="dark" size={48} className="mx-auto mb-4" />
             <h1 className="text-[22px] font-semibold text-[#37352F] mb-2">Readiness Report</h1>
             <p className="text-[14px] text-[#5C5A56]">Complete your assessment to generate your report</p>
           </div>
@@ -194,9 +193,7 @@ export function ReportPanel() {
       <div className="overflow-y-auto bg-white workspace-panel">
         <div className="max-w-[720px] mx-auto px-8 py-8">
           <div className="text-center mb-8">
-            <div className="w-12 h-12 bg-[#DDEDEA] rounded-lg flex items-center justify-center mx-auto mb-4">
-              <Compass className="w-6 h-6 text-[#0F7B6C]" />
-            </div>
+            <AtlasLogo variant="blue" size={48} className="mx-auto mb-4" />
             <h1 className="text-[22px] font-semibold text-[#37352F] mb-2">Readiness Report</h1>
             <p className="text-[14px] text-[#5C5A56]">Your assessment is ready for analysis</p>
           </div>
@@ -256,9 +253,7 @@ export function ReportPanel() {
         {/* ── Page header ── */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-[#37352F] rounded-lg flex items-center justify-center">
-              <Compass className="w-5 h-5 text-white" />
-            </div>
+            <AtlasLogo variant="dark" size={40} />
             <div>
               <h1 className="text-[18px] font-semibold text-[#37352F]">Readiness Report</h1>
               {reportDate && (

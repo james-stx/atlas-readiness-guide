@@ -108,6 +108,9 @@ apps/web/next.config.js
 apps/web/node_modules
 apps/web/package.json
 apps/web/postcss.config.js
+apps/web/public
+apps/web/public/logo-blue.png
+apps/web/public/logo-dark.png
 apps/web/src
 apps/web/src/app
 apps/web/src/components
@@ -134,9 +137,6 @@ docs/product/central-console-feedback-v1.md
 docs/READINESS-REPORT-UX-OVERHAUL.md
 docs/READINESS-REPORT-V2-SPEC.md
 docs/READINESS-REPORT-V2-WIREFRAMES.md
-docs/READINESS-REPORT-V3-REDESIGN.md
-docs/READINESS-REPORT-V4-COMPREHENSIVE-REDESIGN.md
-docs/READINESS-REPORT-V5-DESIGN-REVIEW.md
 ```
 <!-- /AUTO:STRUCTURE -->
 
@@ -216,7 +216,8 @@ docs/READINESS-REPORT-V5-DESIGN-REVIEW.md
 ## Recent Commits
 
 ```
-a541832 feat: update confidence badge icons — empty circle (low), half circle (medium), star (high)
+b209a24 feat: replace Compass icon with new Atlas logos throughout app
+3c71d32 feat: update confidence badge icons — empty circle (low), half circle (medium), star (high)
 8ed334e fix: drive In Progress badge from capturingTopicId alone, not isLoading
 a157eb5 fix: set capturingTopicId immediately on every send via heuristic
 f745599 fix: remove domain-sync effect that was clearing selectedCategory
@@ -225,6 +226,5 @@ f745599 fix: remove domain-sync effect that was clearing selectedCategory
 baec771 fix: don't clear capturingTopicId in complete handler
 d19f30f fix: set capturingTopicId from input event as reliable fallback
 cce537f fix: persist capturing indicator through wave 2; show in-progress on re-discussions
-58ab7f7 fix: keep ContentPanel mounted on mobile to show in-progress topic cards
 ```
 <!-- /AUTO:RECENT_CHANGES -->

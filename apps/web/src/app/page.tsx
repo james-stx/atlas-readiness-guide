@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { AtlasLogo } from '@/components/AtlasLogo';
 
 export default function HomePage() {
   return (
@@ -7,9 +8,7 @@ export default function HomePage() {
       <header className="sticky top-0 z-50 border-b border-neutral-100 bg-white/80 backdrop-blur-sm">
         <div className="max-w-wide mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-neutral-900 rounded-lg flex items-center justify-center">
-              <span className="text-white font-semibold text-sm">A</span>
-            </div>
+            <AtlasLogo variant="dark" size={32} />
             <span className="flex items-baseline gap-1.5">
               <span className="font-semibold text-neutral-900">Atlas</span>
               <span className="text-xs text-gradient font-medium">by STX Labs</span>

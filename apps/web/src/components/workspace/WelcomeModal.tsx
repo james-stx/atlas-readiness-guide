@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Compass, MessageSquare, LayoutGrid, Clock, Cloud, X, Check, Circle, Play, Loader2 } from 'lucide-react';
+import { MessageSquare, LayoutGrid, Clock, Cloud, X, Check, Circle, Play, Loader2 } from 'lucide-react';
+import { AtlasLogo } from '@/components/AtlasLogo';
 import { cn } from '@/lib/utils';
 import type { DomainType } from '@atlas/types';
 import type { DomainProgress } from '@/lib/progress';
@@ -100,9 +101,7 @@ export function WelcomeModal({
         {/* Header */}
         <div className="px-6 pt-8 pb-4 text-center border-b border-[#F1F0EC]">
           <div className="flex justify-center mb-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#37352F]">
-              <Compass className="h-6 w-6 text-white" />
-            </div>
+            <AtlasLogo variant="dark" size={48} />
           </div>
 
           <h2 id="welcome-title" className="text-xl font-semibold text-[#37352F] mb-2">

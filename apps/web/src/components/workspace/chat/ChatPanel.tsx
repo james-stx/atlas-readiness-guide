@@ -7,7 +7,8 @@ import { useAssessment } from '@/lib/context/assessment-context';
 import { ChatHeader } from './ChatHeader';
 import { InputCapturedIndicator } from './InputCapturedIndicator';
 import { TopicTransitionBanner } from './TopicTransitionBanner';
-import { Compass, Send, Loader2 } from 'lucide-react';
+import { Send, Loader2 } from 'lucide-react';
+import { AtlasLogo } from '@/components/AtlasLogo';
 import type { ChatMessage, Input } from '@atlas/types';
 import { DOMAINS, getTopicLabel } from '@/lib/progress';
 
@@ -272,9 +273,7 @@ function ChatBubble({
       )}
     >
       {isAssistant && (
-        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent">
-          <Compass className="h-3 w-3 text-white" />
-        </div>
+        <AtlasLogo variant="blue" size={24} className="rounded-xl" />
       )}
 
       <div
