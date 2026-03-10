@@ -10,6 +10,7 @@ import { ChatPanel } from './chat/ChatPanel';
 import { MobileTabBar } from './mobile/MobileTabBar';
 import { NetworkBanner } from '@/components/ui/network-banner';
 import { WelcomeModal } from './WelcomeModal';
+import { OnboardingTour } from './OnboardingTour';
 import { DomainInsightProvider } from '@/lib/context/domain-insight-context';
 import { DOMAINS, DOMAIN_TOPICS } from '@/lib/progress';
 import { useEffect, useState, useMemo } from 'react';
@@ -27,6 +28,7 @@ export function WorkspaceLayout() {
 
   const [isMobile, setIsMobile] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
+  const [showTour, setShowTour] = useState(false);
 
   // Check if returning user (has existing messages)
   const isReturningUser = messages.length > 1;
@@ -79,6 +81,14 @@ export function WorkspaceLayout() {
     return () => clearTimeout(timer);
   }, []);
 
+  const handleStartTour = () => {
+    // Ensure Market domain is selected so all tour targets are rendered
+    selectDomain('market');
+    setShowWelcome(false);
+    // Small delay so the domain selection renders before the tour measures elements
+    setTimeout(() => setShowTour(true), 400);
+  };
+
   const handleChooseGuided = () => {
     openChat();
     setShowWelcome(false);
@@ -129,6 +139,7 @@ export function WorkspaceLayout() {
             <WelcomeModal
               onChooseGuided={handleChooseGuided}
               onChooseExplore={handleChooseExplore}
+              onStartTour={handleStartTour}
               onContinue={handleContinue}
               isReturningUser={isReturningUser}
               progress={progress}
@@ -136,6 +147,7 @@ export function WorkspaceLayout() {
               lastDomain={lastDomain}
             />
           )}
+          {showTour && <OnboardingTour onComplete={() => setShowTour(false)} />}
         </div>
       </DomainInsightProvider>
     );
@@ -170,6 +182,7 @@ export function WorkspaceLayout() {
           <WelcomeModal
             onChooseGuided={handleChooseGuided}
             onChooseExplore={handleChooseExplore}
+            onStartTour={handleStartTour}
             onContinue={handleContinue}
             isReturningUser={isReturningUser}
             progress={progress}
@@ -177,6 +190,7 @@ export function WorkspaceLayout() {
             lastDomain={lastDomain}
           />
         )}
+        {showTour && <OnboardingTour onComplete={() => setShowTour(false)} />}
       </div>
     </DomainInsightProvider>
   );

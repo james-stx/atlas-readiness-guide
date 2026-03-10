@@ -96,7 +96,7 @@ export function ContentPanel() {
       aria-label="Assessment content"
     >
       {/* Sticky domain header */}
-      <div className="sticky top-0 z-10 bg-white shadow-sm">
+      <div className="sticky top-0 z-10 bg-white shadow-sm" data-tour-id="tour-domain-insight">
         <div className="mx-auto max-w-[720px] px-8 pt-6 pb-4">
           <ContentDomainHeader
             domain={selectedDomain}
@@ -108,7 +108,7 @@ export function ContentPanel() {
       </div>
 
       {/* Scrollable topic cards */}
-      <div className="mx-auto max-w-[720px] px-8 pt-4 pb-8">
+      <div className="mx-auto max-w-[720px] px-8 pt-4 pb-8" data-tour-id="tour-topic-cards">
         <div className="space-y-3">
           {topics.map((topic) => {
             const input = domainInputs.find((i) => i.question_id === topic.id);

@@ -90,6 +90,7 @@ export function Sidebar() {
           className="flex-1 overflow-y-auto"
           role="tree"
           aria-label="Assessment domains"
+          data-tour-id="tour-sidebar"
         >
           {DOMAINS.map((domain) => {
             const dp = progressState.domainProgress[domain.key];
@@ -140,7 +141,7 @@ export function Sidebar() {
       </div>
 
       {/* ─── READINESS REPORT SECTION ─── */}
-      <div className="border-t border-[#E8E6E1]">
+      <div className="border-t border-[#E8E6E1]" data-tour-id="tour-report">
         <button
           onClick={switchToReport}
           className={`w-full text-left px-3 py-3 flex items-center gap-3 transition-colors ${

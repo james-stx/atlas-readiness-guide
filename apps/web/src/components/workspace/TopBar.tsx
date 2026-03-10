@@ -163,6 +163,7 @@ export function TopBar() {
 
         {/* Chat toggle */}
         <button
+          data-tour-id="tour-ask-atlas"
           onClick={toggleChat}
           className={cn(
             'flex items-center gap-1.5 rounded-lg px-3 py-1.5 transition-colors',

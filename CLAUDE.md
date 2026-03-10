@@ -160,7 +160,7 @@ docs/READINESS-REPORT-V2-WIREFRAMES.md
 
 ## Component Inventory (Web)
 
-- **components/workspace/** (4): SaveProgressPopup,TopBar,WelcomeModal,WorkspaceLayout
+- **components/workspace/** (5): OnboardingTour,SaveProgressPopup,TopBar,WelcomeModal,WorkspaceLayout
 - **components/workspace/sidebar/** (4): Sidebar,SidebarDomainItem,SidebarFooter,SidebarTopicItem
 - **components/workspace/content/** (8): CategoryCard,ContentDomainHeader,ContentPanel,EmptyState,InlineSnapshotCTA,InsightCard,NotStartedCard,TopicCard
 - **components/workspace/chat/** (4): ChatHeader,ChatPanel,InputCapturedIndicator,TopicTransitionBanner
@@ -216,7 +216,8 @@ docs/READINESS-REPORT-V2-WIREFRAMES.md
 ## Recent Commits
 
 ```
-4822b08 fix: show 'Chat' instead of 'Chat — Chat' when no domain is selected
+a89b960 feat: add spotlight onboarding tour for first-time users
+27b91f4 fix: show 'Chat' instead of 'Chat — Chat' when no domain is selected
 dc95857 fix: enforce exact width/height on AtlasLogo to prevent flex-stretch distortion
 28bd7eb fix: replace remaining A-text logos with AtlasLogo on how-it-works and homepage footer
 0faf136 feat: replace Compass icon with new Atlas logos throughout app
@@ -225,6 +226,5 @@ dc95857 fix: enforce exact width/height on AtlasLogo to prevent flex-stretch dis
 a157eb5 fix: set capturingTopicId immediately on every send via heuristic
 f745599 fix: remove domain-sync effect that was clearing selectedCategory
 1d13503 fix: use selectedCategory directly for in-progress — no SSE events needed
-1492516 fix: set capturingTopicId from topicHint immediately on submit
 ```
 <!-- /AUTO:RECENT_CHANGES -->

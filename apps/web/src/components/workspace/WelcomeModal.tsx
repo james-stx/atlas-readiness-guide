@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { MessageSquare, LayoutGrid, Clock, Cloud, X, Check, Circle, Play, Loader2 } from 'lucide-react';
+import { Map, LayoutGrid, Clock, Cloud, X, Check, Circle, Play, Loader2 } from 'lucide-react';
 import { AtlasLogo } from '@/components/AtlasLogo';
 import { cn } from '@/lib/utils';
 import type { DomainType } from '@atlas/types';
@@ -18,6 +18,7 @@ interface DomainSummary {
 interface WelcomeModalProps {
   onChooseGuided: () => void;
   onChooseExplore: () => void;
+  onStartTour?: () => void;
   onContinue?: () => void;
   isReturningUser?: boolean;
   progress?: number;
@@ -30,6 +31,7 @@ const STORAGE_KEY = 'atlas-onboarding-complete';
 export function WelcomeModal({
   onChooseGuided,
   onChooseExplore,
+  onStartTour,
   onContinue,
   isReturningUser = false,
   progress = 0,
@@ -52,6 +54,12 @@ export function WelcomeModal({
     localStorage.setItem(STORAGE_KEY, 'true');
     setIsVisible(false);
     onChooseGuided();
+  };
+
+  const handleStartTour = () => {
+    localStorage.setItem(STORAGE_KEY, 'true');
+    setIsVisible(false);
+    if (onStartTour) onStartTour();
   };
 
   const handleExplore = () => {
@@ -252,20 +260,20 @@ export function WelcomeModal({
               </p>
 
               <div className="grid grid-cols-2 gap-3">
-                {/* Guide me option */}
+                {/* Take a tour */}
                 <button
-                  onClick={handleGuided}
+                  onClick={handleStartTour}
                   className={cn(
                     'flex flex-col items-center gap-3 p-4 rounded-lg border-2 transition-all',
                     'border-[#2383E2] bg-[#F7FBFF] hover:bg-[#EBF5FF]'
                   )}
                 >
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#2383E2]">
-                    <MessageSquare className="h-5 w-5 text-white" />
+                    <Map className="h-5 w-5 text-white" />
                   </div>
                   <div className="text-center">
                     <span className="block text-[14px] font-medium text-[#37352F]">
-                      Guide me
+                      Take a Tour
                     </span>
                     <span className="block text-[11px] text-[#5C5A56] mt-0.5">
                       Recommended
@@ -273,7 +281,7 @@ export function WelcomeModal({
                   </div>
                 </button>
 
-                {/* Explore option */}
+                {/* Skip tour */}
                 <button
                   onClick={handleExplore}
                   className={cn(
@@ -286,7 +294,7 @@ export function WelcomeModal({
                   </div>
                   <div className="text-center">
                     <span className="block text-[14px] font-medium text-[#37352F]">
-                      Let me explore
+                      Skip Tour
                     </span>
                     <span className="block text-[11px] text-[#9B9A97] mt-0.5">
                       Self-guided
