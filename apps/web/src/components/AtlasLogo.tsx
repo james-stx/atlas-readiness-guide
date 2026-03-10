@@ -17,6 +17,7 @@ export function AtlasLogo({ variant = 'blue', size = 32, className }: AtlasLogoP
       width={size}
       height={size}
       className={cn('shrink-0', className)}
+      style={{ width: size, height: size }}
       priority
     />
   );
