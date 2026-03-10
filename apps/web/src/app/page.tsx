@@ -285,9 +285,7 @@ export default function HomePage() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-6">
               <Link href="/" className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-neutral-900 rounded flex items-center justify-center">
-                  <span className="text-white font-semibold text-xs">A</span>
-                </div>
+                <AtlasLogo variant="dark" size={24} />
                 <span className="text-sm font-medium text-neutral-600">Atlas by STX Labs</span>
               </Link>
             </div>

@@ -216,7 +216,8 @@ docs/READINESS-REPORT-V2-WIREFRAMES.md
 ## Recent Commits
 
 ```
-b209a24 feat: replace Compass icon with new Atlas logos throughout app
+54a1d89 fix: replace remaining A-text logos with AtlasLogo on how-it-works and homepage footer
+0faf136 feat: replace Compass icon with new Atlas logos throughout app
 3c71d32 feat: update confidence badge icons — empty circle (low), half circle (medium), star (high)
 8ed334e fix: drive In Progress badge from capturingTopicId alone, not isLoading
 a157eb5 fix: set capturingTopicId immediately on every send via heuristic
@@ -225,6 +226,5 @@ f745599 fix: remove domain-sync effect that was clearing selectedCategory
 1492516 fix: set capturingTopicId from topicHint immediately on submit
 baec771 fix: don't clear capturingTopicId in complete handler
 d19f30f fix: set capturingTopicId from input event as reliable fallback
-cce537f fix: persist capturing indicator through wave 2; show in-progress on re-discussions
 ```
 <!-- /AUTO:RECENT_CHANGES -->
