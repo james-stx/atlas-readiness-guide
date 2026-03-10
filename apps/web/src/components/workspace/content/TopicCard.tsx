@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import {
   ChevronDown,
   ChevronRight,
@@ -42,6 +42,19 @@ interface TopicCardProps {
 }
 
 // ============================================
+// Confidence Icons
+// ============================================
+
+function HalfCircleIcon({ className }: { className?: string }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" fill="none" />
+      <path d="M12 3 A9 9 0 0 0 12 21 Z" fill="currentColor" />
+    </svg>
+  );
+}
+
+// ============================================
 // Confidence Config (Rating - filled semantic colors)
 // ============================================
 
@@ -51,6 +64,7 @@ const confidenceConfig: Record<ConfidenceLevel, {
   bgColor: string;
   iconColor: string;
   description: string;
+  renderIcon: (className: string) => React.ReactNode;
 }> = {
   high: {
     label: 'High Confidence',
@@ -58,6 +72,7 @@ const confidenceConfig: Record<ConfidenceLevel, {
     bgColor: 'bg-[#DBEDDB]',
     iconColor: 'text-[#0F7B6C]',
     description: 'Clear, specific, data-backed response',
+    renderIcon: (cls) => <Star className={cls} fill="currentColor" />,
   },
   medium: {
     label: 'Medium Confidence',
@@ -65,6 +80,7 @@ const confidenceConfig: Record<ConfidenceLevel, {
     bgColor: 'bg-[#FBF3DB]',
     iconColor: 'text-[#9A6700]',
     description: 'Good foundation, could be more specific',
+    renderIcon: (cls) => <HalfCircleIcon className={cls} />,
   },
   low: {
     label: 'Low Confidence',
@@ -72,6 +88,7 @@ const confidenceConfig: Record<ConfidenceLevel, {
     bgColor: 'bg-[#FFE2DD]',
     iconColor: 'text-[#E03E3E]',
     description: 'Consider adding more detail',
+    renderIcon: (cls) => <Circle className={cls} />,
   },
 };
 
@@ -259,7 +276,7 @@ export function TopicCard({
               confidenceCfg.bgColor,
               confidenceCfg.color
             )}>
-              <Star className={cn('h-3 w-3', confidenceCfg.iconColor)} fill="currentColor" />
+              {confidenceCfg.renderIcon(cn('h-3 w-3', confidenceCfg.iconColor))}
               {confidenceCfg.label}
             </span>
           )}
@@ -299,7 +316,7 @@ export function TopicCard({
                 confidenceCfg.bgColor,
                 confidenceCfg.color
               )}>
-                <Star className={cn('h-3 w-3', confidenceCfg.iconColor)} fill="currentColor" />
+                {confidenceCfg.renderIcon(cn('h-3 w-3', confidenceCfg.iconColor))}
                 {confidenceCfg.label}
               </span>
             )}
