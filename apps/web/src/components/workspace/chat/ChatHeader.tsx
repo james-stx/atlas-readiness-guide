@@ -15,7 +15,7 @@ export function ChatHeader({ domain, onClose }: ChatHeaderProps) {
   return (
     <div className="flex h-12 items-center justify-between border-b border-warm-200 bg-white px-4">
       <span className="text-ws-body font-medium text-warm-900">
-        Chat — {label}
+        {domain ? `Chat — ${label}` : 'Chat'}
       </span>
       <button
         onClick={onClose}

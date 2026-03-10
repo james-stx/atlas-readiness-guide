@@ -216,7 +216,8 @@ docs/READINESS-REPORT-V2-WIREFRAMES.md
 ## Recent Commits
 
 ```
-4c71fe9 fix: enforce exact width/height on AtlasLogo to prevent flex-stretch distortion
+4822b08 fix: show 'Chat' instead of 'Chat — Chat' when no domain is selected
+dc95857 fix: enforce exact width/height on AtlasLogo to prevent flex-stretch distortion
 28bd7eb fix: replace remaining A-text logos with AtlasLogo on how-it-works and homepage footer
 0faf136 feat: replace Compass icon with new Atlas logos throughout app
 3c71d32 feat: update confidence badge icons — empty circle (low), half circle (medium), star (high)
@@ -225,6 +226,5 @@ a157eb5 fix: set capturingTopicId immediately on every send via heuristic
 f745599 fix: remove domain-sync effect that was clearing selectedCategory
 1d13503 fix: use selectedCategory directly for in-progress — no SSE events needed
 1492516 fix: set capturingTopicId from topicHint immediately on submit
-baec771 fix: don't clear capturingTopicId in complete handler
 ```
 <!-- /AUTO:RECENT_CHANGES -->
