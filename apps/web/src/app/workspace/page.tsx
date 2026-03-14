@@ -18,24 +18,24 @@ function WorkspaceContent() {
     isLoading,
     initChat,
     recoverSession,
-    hasStoredSession,
   } = useAssessment();
   const { switchToReport } = useWorkspace();
 
-  console.log('[Atlas] WorkspacePage render - session:', !!session, 'hasStoredSession:', hasStoredSession, 'status:', session?.status);
+  console.log('[Atlas] WorkspacePage render - session:', !!session, 'status:', session?.status);
 
-  // Redirect if no session
+  // Redirect if no session. Always call recoverSession() rather than relying on
+  // hasStoredSession from context — that value can be stale if auth/callback just
+  // wrote to localStorage without triggering a provider re-render. recoverSession()
+  // reads localStorage directly and returns false immediately if no token exists.
   useEffect(() => {
-    if (!session && !hasStoredSession) {
-      router.push('/start');
-    } else if (!session && hasStoredSession) {
+    if (!session) {
       recoverSession().then((recovered) => {
         if (!recovered) {
           router.push('/start');
         }
       });
     }
-  }, [session, hasStoredSession, router, recoverSession]);
+  }, [session, router, recoverSession]);
 
   // Initialize chat when session is ready
   useEffect(() => {

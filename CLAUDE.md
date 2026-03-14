@@ -123,6 +123,7 @@ apps/web/vercel.json
 CLAUDE.md
 docs
 docs/ARCHITECTURE.md
+docs/BRAND-STYLE-GUIDE.md
 docs/CONTENT-PANEL-V3-SPEC.md
 docs/DESIGN-Auth-Guest-Flow-Wireframes.md
 docs/DESIGN-OVERHAUL-BRIEF.md
@@ -136,7 +137,6 @@ docs/product
 docs/product/central-console-feedback-v1.md
 docs/READINESS-REPORT-UX-OVERHAUL.md
 docs/READINESS-REPORT-V2-SPEC.md
-docs/READINESS-REPORT-V2-WIREFRAMES.md
 ```
 <!-- /AUTO:STRUCTURE -->
 
@@ -145,6 +145,7 @@ docs/READINESS-REPORT-V2-WIREFRAMES.md
 ## App Routes (Web)
 
 - /auth/callback — apps/web/src/app/auth/callback/page.tsx
+- /brand — apps/web/src/app/brand/page.tsx
 - /chat — apps/web/src/app/chat/page.tsx
 - /how-it-works — apps/web/src/app/how-it-works/page.tsx
 - / — apps/web/src/app/page.tsx
@@ -216,7 +217,8 @@ docs/READINESS-REPORT-V2-WIREFRAMES.md
 ## Recent Commits
 
 ```
-a89b960 feat: add spotlight onboarding tour for first-time users
+f94e9aa fix: resolve magic link auth redirect to /start instead of /workspace
+882ee6b feat: add spotlight onboarding tour for first-time users
 27b91f4 fix: show 'Chat' instead of 'Chat — Chat' when no domain is selected
 dc95857 fix: enforce exact width/height on AtlasLogo to prevent flex-stretch distortion
 28bd7eb fix: replace remaining A-text logos with AtlasLogo on how-it-works and homepage footer
@@ -225,6 +227,5 @@ dc95857 fix: enforce exact width/height on AtlasLogo to prevent flex-stretch dis
 8ed334e fix: drive In Progress badge from capturingTopicId alone, not isLoading
 a157eb5 fix: set capturingTopicId immediately on every send via heuristic
 f745599 fix: remove domain-sync effect that was clearing selectedCategory
-1d13503 fix: use selectedCategory directly for in-progress — no SSE events needed
 ```
 <!-- /AUTO:RECENT_CHANGES -->
