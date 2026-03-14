@@ -217,7 +217,8 @@ docs/READINESS-REPORT-V2-SPEC.md
 ## Recent Commits
 
 ```
-f94e9aa fix: resolve magic link auth redirect to /start instead of /workspace
+e2ca27e fix: use window.location.origin for magic link redirect URL
+e70eaad fix: resolve magic link auth redirect to /start instead of /workspace
 882ee6b feat: add spotlight onboarding tour for first-time users
 27b91f4 fix: show 'Chat' instead of 'Chat — Chat' when no domain is selected
 dc95857 fix: enforce exact width/height on AtlasLogo to prevent flex-stretch distortion
@@ -226,6 +227,5 @@ dc95857 fix: enforce exact width/height on AtlasLogo to prevent flex-stretch dis
 3c71d32 feat: update confidence badge icons — empty circle (low), half circle (medium), star (high)
 8ed334e fix: drive In Progress badge from capturingTopicId alone, not isLoading
 a157eb5 fix: set capturingTopicId immediately on every send via heuristic
-f745599 fix: remove domain-sync effect that was clearing selectedCategory
 ```
 <!-- /AUTO:RECENT_CHANGES -->
