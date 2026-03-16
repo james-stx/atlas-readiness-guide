@@ -14,6 +14,23 @@ export default function AuthCallbackPage() {
   useEffect(() => {
     const handleCallback = async () => {
       try {
+        // Check for error params in the URL hash before doing anything else.
+        // When a magic link is expired/invalid, Supabase redirects here with
+        // #error=access_denied&error_code=otp_expired — getSession() returns
+        // null without throwing, so the page would spin forever without this.
+        const hashParams = new URLSearchParams(window.location.hash.slice(1));
+        const urlError = hashParams.get('error');
+        const urlErrorCode = hashParams.get('error_code');
+        if (urlError) {
+          if (urlErrorCode === 'otp_expired') {
+            setError('This magic link has expired. Please request a new one.');
+          } else {
+            const desc = hashParams.get('error_description')?.replace(/\+/g, ' ');
+            setError(desc || 'Sign-in failed. Please try again.');
+          }
+          return;
+        }
+
         // Supabase detects the token from the URL hash automatically when
         // detectSessionInUrl: true (set in supabase.ts). We wait for the
         // auth state to resolve before proceeding.
