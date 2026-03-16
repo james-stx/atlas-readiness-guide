@@ -4,23 +4,26 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AtlasLogo } from '@/components/AtlasLogo';
-import { ArrowLeft, ArrowRight, Loader2, RotateCcw, Mail, CheckCircle2, UserX } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Loader2, RotateCcw, Mail, UserX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAssessment } from '@/lib/context/assessment-context';
 import { supabase } from '@/lib/supabase';
 
-type View = 'choice' | 'signin' | 'sent';
+type View = 'choice' | 'signin' | 'code';
 
 export default function StartPage() {
   const router = useRouter();
-  const { startGuestSession, recoverSession, hasStoredSession, session } = useAssessment();
+  const { startSession, startGuestSession, recoverSession, hasStoredSession, session } = useAssessment();
 
   const [view, setView] = useState<View>('choice');
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [sendError, setSendError] = useState('');
+  const [otpCode, setOtpCode] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [verifyError, setVerifyError] = useState('');
   const [isStartingGuest, setIsStartingGuest] = useState(false);
   const [showRecovery, setShowRecovery] = useState(false);
   const [isRecovering, setIsRecovering] = useState(false);
@@ -43,7 +46,7 @@ export default function StartPage() {
     return true;
   };
 
-  const handleSendMagicLink = async (e: React.FormEvent) => {
+  const handleSendCode = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateEmail(email)) return;
 
@@ -51,19 +54,43 @@ export default function StartPage() {
     setSendError('');
 
     try {
+      // Omitting emailRedirectTo sends a 6-digit OTP code instead of a magic link.
+      // This is immune to email security scanners that pre-click links.
       const { error } = await supabase.auth.signInWithOtp({
         email,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-          shouldCreateUser: true,
-        },
+        options: { shouldCreateUser: true },
       });
       if (error) throw error;
-      setView('sent');
+      setView('code');
     } catch (err) {
-      setSendError(err instanceof Error ? err.message : 'Failed to send link. Please try again.');
+      setSendError(err instanceof Error ? err.message : 'Failed to send code. Please try again.');
     } finally {
       setIsSending(false);
+    }
+  };
+
+  const handleVerifyCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!otpCode.trim()) return;
+
+    setIsVerifying(true);
+    setVerifyError('');
+
+    try {
+      const { data, error } = await supabase.auth.verifyOtp({
+        email,
+        token: otpCode.trim(),
+        type: 'email',
+      });
+      if (error) throw error;
+      if (!data.user?.email) throw new Error('Sign-in succeeded but no email returned.');
+
+      // Create Atlas session — saves to localStorage + sets context session state.
+      // The session state update triggers the useEffect above → router.push('/workspace').
+      await startSession(data.user.email);
+    } catch (err) {
+      setVerifyError(err instanceof Error ? err.message : 'Invalid code. Please try again.');
+      setIsVerifying(false);
     }
   };
 
@@ -71,7 +98,6 @@ export default function StartPage() {
     setIsStartingGuest(true);
     try {
       await startGuestSession();
-      // session state update triggers the useEffect above → router.push('/workspace')
     } catch {
       setIsStartingGuest(false);
     }
@@ -107,7 +133,7 @@ export default function StartPage() {
           <div className="text-center mb-8">
             <AtlasLogo variant="dark" size={48} className="mx-auto mb-6" />
             <h1 className="text-2xl font-semibold text-neutral-900 tracking-tight">
-              {view === 'sent' ? 'Check your inbox' : "Let's understand your readiness"}
+              {view === 'code' ? 'Check your inbox' : "Let's understand your readiness"}
             </h1>
             {view === 'choice' && (
               <p className="text-neutral-500 mt-2">
@@ -156,7 +182,6 @@ export default function StartPage() {
           {/* Choice view */}
           {view === 'choice' && (
             <div className="space-y-3">
-              {/* Sign In card */}
               <button
                 onClick={() => setView('signin')}
                 className="w-full flex items-start gap-4 p-5 rounded-xl border-2 border-[#2383E2] bg-[#F7FBFF] hover:bg-[#EBF5FF] transition-colors text-left"
@@ -170,12 +195,11 @@ export default function StartPage() {
                     <span className="text-[11px] font-medium text-[#2383E2] bg-[#2383E2]/10 px-2 py-0.5 rounded-full">Recommended</span>
                   </div>
                   <p className="text-[13px] text-neutral-500 leading-relaxed">
-                    Keep your progress across devices and receive your PDF report by email. Magic link — no password needed.
+                    Keep your progress across devices and receive your PDF report by email. We'll send a 6-digit code — no password needed.
                   </p>
                 </div>
               </button>
 
-              {/* Guest card */}
               <button
                 onClick={handleContinueAsGuest}
                 disabled={isStartingGuest}
@@ -207,7 +231,7 @@ export default function StartPage() {
             </div>
           )}
 
-          {/* Sign In view — magic link form */}
+          {/* Sign in — email entry */}
           {view === 'signin' && (
             <div>
               <button
@@ -218,12 +242,9 @@ export default function StartPage() {
                 Back
               </button>
 
-              <form onSubmit={handleSendMagicLink} className="space-y-4">
+              <form onSubmit={handleSendCode} className="space-y-4">
                 <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-medium text-neutral-700 mb-2"
-                  >
+                  <label htmlFor="email" className="block text-sm font-medium text-neutral-700 mb-2">
                     Work email
                   </label>
                   <Input
@@ -249,54 +270,76 @@ export default function StartPage() {
                   </div>
                 )}
 
-                <Button
-                  type="submit"
-                  disabled={isSending || !email}
-                  className="w-full"
-                  size="lg"
-                >
-                  {isSending ? (
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  ) : (
-                    <ArrowRight className="w-4 h-4 mr-2" />
-                  )}
-                  {isSending ? 'Sending…' : 'Send magic link'}
+                <Button type="submit" disabled={isSending || !email} className="w-full" size="lg">
+                  {isSending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <ArrowRight className="w-4 h-4 mr-2" />}
+                  {isSending ? 'Sending…' : 'Send verification code'}
                 </Button>
 
                 <p className="text-xs text-neutral-400 text-center">
-                  No password needed. Link expires in 1 hour.
+                  No password needed. Code expires in 1 hour.
                 </p>
               </form>
             </div>
           )}
 
-          {/* Sent view — confirmation */}
-          {view === 'sent' && (
-            <div className="text-center">
-              <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-green-50">
-                <CheckCircle2 className="h-7 w-7 text-green-500" />
-              </div>
-              <p className="text-neutral-600 mb-1">
-                We sent a sign-in link to
+          {/* Code entry */}
+          {view === 'code' && (
+            <div>
+              <p className="text-neutral-600 mb-1 text-center">
+                We sent a 6-digit code to
               </p>
-              <p className="font-semibold text-neutral-900 mb-6">{email}</p>
-              <p className="text-sm text-neutral-500 mb-8 leading-relaxed">
-                Click the link in that email to continue. The link expires in 1 hour.
-              </p>
-              <div className="flex items-center justify-center gap-4 text-sm">
+              <p className="font-semibold text-neutral-900 mb-6 text-center">{email}</p>
+
+              <form onSubmit={handleVerifyCode} className="space-y-4">
+                <div>
+                  <label htmlFor="otp" className="block text-sm font-medium text-neutral-700 mb-2">
+                    Verification code
+                  </label>
+                  <Input
+                    id="otp"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="123456"
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    className="h-12 text-center text-xl tracking-widest font-mono"
+                    disabled={isVerifying}
+                    autoFocus
+                    autoComplete="one-time-code"
+                  />
+                </div>
+
+                {verifyError && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                    <p className="text-sm text-red-700">{verifyError}</p>
+                  </div>
+                )}
+
+                <Button
+                  type="submit"
+                  disabled={isVerifying || otpCode.length < 6}
+                  className="w-full"
+                  size="lg"
+                >
+                  {isVerifying ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <ArrowRight className="w-4 h-4 mr-2" />}
+                  {isVerifying ? 'Verifying…' : 'Continue'}
+                </Button>
+              </form>
+
+              <div className="flex items-center justify-center gap-4 text-sm mt-6">
                 <button
-                  onClick={() => { setView('signin'); setSendError(''); }}
-                  className="text-[#2383E2] hover:underline"
+                  onClick={() => { setView('signin'); setOtpCode(''); setVerifyError(''); }}
+                  className="text-neutral-500 hover:text-neutral-800"
                 >
                   Wrong email?
                 </button>
                 <span className="text-neutral-300">·</span>
                 <button
-                  onClick={handleSendMagicLink}
+                  onClick={handleSendCode as unknown as React.MouseEventHandler}
                   disabled={isSending}
-                  className="text-neutral-500 hover:text-neutral-800"
+                  className="text-[#2383E2] hover:underline disabled:opacity-50"
                 >
-                  {isSending ? 'Sending…' : 'Resend'}
+                  {isSending ? 'Sending…' : 'Resend code'}
                 </button>
               </div>
             </div>

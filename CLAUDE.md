@@ -217,7 +217,8 @@ docs/READINESS-REPORT-V2-SPEC.md
 ## Recent Commits
 
 ```
-4c0adf3 fix: handle expired/invalid magic link error in auth callback
+8830dc9 fix: replace magic link with 6-digit OTP code for email sign-in
+6982408 fix: handle expired/invalid magic link error in auth callback
 4c7d443 fix: use window.location.origin for magic link redirect URL
 e70eaad fix: resolve magic link auth redirect to /start instead of /workspace
 882ee6b feat: add spotlight onboarding tour for first-time users
@@ -226,6 +227,5 @@ dc95857 fix: enforce exact width/height on AtlasLogo to prevent flex-stretch dis
 28bd7eb fix: replace remaining A-text logos with AtlasLogo on how-it-works and homepage footer
 0faf136 feat: replace Compass icon with new Atlas logos throughout app
 3c71d32 feat: update confidence badge icons — empty circle (low), half circle (medium), star (high)
-8ed334e fix: drive In Progress badge from capturingTopicId alone, not isLoading
 ```
 <!-- /AUTO:RECENT_CHANGES -->
