@@ -15,5 +15,9 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
+    // Use implicit flow for email OTP. The default 'pkce' flow sends a
+    // code_challenge with signInWithOtp but verifyOtp does not send the
+    // matching code_verifier, causing "Token has expired or is invalid".
+    flowType: 'implicit',
   },
 });
