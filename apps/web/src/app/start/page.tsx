@@ -8,7 +8,7 @@ import { ArrowLeft, ArrowRight, Loader2, RotateCcw, Mail, UserX } from 'lucide-r
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAssessment } from '@/lib/context/assessment-context';
-import { supabase } from '@/lib/supabase';
+import * as api from '@/lib/api-client';
 
 type View = 'choice' | 'signin' | 'code';
 
@@ -54,13 +54,7 @@ export default function StartPage() {
     setSendError('');
 
     try {
-      // Omitting emailRedirectTo sends a 6-digit OTP code instead of a magic link.
-      // This is immune to email security scanners that pre-click links.
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: { shouldCreateUser: true },
-      });
-      if (error) throw error;
+      await api.sendOtp(email);
       setView('code');
     } catch (err) {
       setSendError(err instanceof Error ? err.message : 'Failed to send code. Please try again.');
@@ -77,21 +71,10 @@ export default function StartPage() {
     setVerifyError('');
 
     try {
-      // Supabase assigns different token types depending on whether this is a
-      // new signup or an existing-user sign-in. Try both to cover all cases.
-      const token = otpCode.trim();
-      let result = await supabase.auth.verifyOtp({ email, token, type: 'email' });
-      if (result.error) {
-        result = await supabase.auth.verifyOtp({ email, token, type: 'magiclink' });
-      }
-
-      const { data, error } = result;
-      if (error) throw error;
-      if (!data.user?.email) throw new Error('Sign-in succeeded but no email returned.');
-
+      const { email: verifiedEmail } = await api.verifyOtp(email, otpCode.trim());
       // Create Atlas session — saves to localStorage + sets context session state.
       // The session state update triggers the useEffect above → router.push('/workspace').
-      await startSession(data.user.email);
+      await startSession(verifiedEmail);
     } catch (err) {
       setVerifyError(err instanceof Error ? err.message : 'Invalid code. Please try again.');
       setIsVerifying(false);

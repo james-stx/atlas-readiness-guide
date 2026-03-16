@@ -175,6 +175,8 @@ docs/READINESS-REPORT-V2-SPEC.md
 
 ## API Routes
 
+- /api/auth/send-otp — apps/api/src/app/api/auth/send-otp/route.ts
+- /api/auth/verify-otp — apps/api/src/app/api/auth/verify-otp/route.ts
 - /api/chat/init — apps/api/src/app/api/chat/init/route.ts
 - /api/chat — apps/api/src/app/api/chat/route.ts
 - /api/domain/insight — apps/api/src/app/api/domain/insight/route.ts
@@ -217,7 +219,8 @@ docs/READINESS-REPORT-V2-SPEC.md
 ## Recent Commits
 
 ```
-1140ffd fix: try both 'email' and 'magiclink' OTP types on verification
+1dc39bd fix: replace Supabase OTP with custom server-side OTP via Resend
+5772ac0 fix: try both 'email' and 'magiclink' OTP types on verification
 bb391cd fix: disable PKCE flow to fix email OTP verification
 a7a2598 fix: replace magic link with 6-digit OTP code for email sign-in
 6982408 fix: handle expired/invalid magic link error in auth callback
@@ -226,6 +229,5 @@ e70eaad fix: resolve magic link auth redirect to /start instead of /workspace
 882ee6b feat: add spotlight onboarding tour for first-time users
 27b91f4 fix: show 'Chat' instead of 'Chat — Chat' when no domain is selected
 dc95857 fix: enforce exact width/height on AtlasLogo to prevent flex-stretch distortion
-28bd7eb fix: replace remaining A-text logos with AtlasLogo on how-it-works and homepage footer
 ```
 <!-- /AUTO:RECENT_CHANGES -->
