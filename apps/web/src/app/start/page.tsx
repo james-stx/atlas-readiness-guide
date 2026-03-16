@@ -77,11 +77,15 @@ export default function StartPage() {
     setVerifyError('');
 
     try {
-      const { data, error } = await supabase.auth.verifyOtp({
-        email,
-        token: otpCode.trim(),
-        type: 'email',
-      });
+      // Supabase assigns different token types depending on whether this is a
+      // new signup or an existing-user sign-in. Try both to cover all cases.
+      const token = otpCode.trim();
+      let result = await supabase.auth.verifyOtp({ email, token, type: 'email' });
+      if (result.error) {
+        result = await supabase.auth.verifyOtp({ email, token, type: 'magiclink' });
+      }
+
+      const { data, error } = result;
       if (error) throw error;
       if (!data.user?.email) throw new Error('Sign-in succeeded but no email returned.');
 

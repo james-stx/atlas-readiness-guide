@@ -217,7 +217,8 @@ docs/READINESS-REPORT-V2-SPEC.md
 ## Recent Commits
 
 ```
-9812e84 fix: disable PKCE flow to fix email OTP verification
+1140ffd fix: try both 'email' and 'magiclink' OTP types on verification
+bb391cd fix: disable PKCE flow to fix email OTP verification
 a7a2598 fix: replace magic link with 6-digit OTP code for email sign-in
 6982408 fix: handle expired/invalid magic link error in auth callback
 4c7d443 fix: use window.location.origin for magic link redirect URL
@@ -226,6 +227,5 @@ e70eaad fix: resolve magic link auth redirect to /start instead of /workspace
 27b91f4 fix: show 'Chat' instead of 'Chat — Chat' when no domain is selected
 dc95857 fix: enforce exact width/height on AtlasLogo to prevent flex-stretch distortion
 28bd7eb fix: replace remaining A-text logos with AtlasLogo on how-it-works and homepage footer
-0faf136 feat: replace Compass icon with new Atlas logos throughout app
 ```
 <!-- /AUTO:RECENT_CHANGES -->
