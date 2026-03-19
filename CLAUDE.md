@@ -219,7 +219,8 @@ docs/READINESS-REPORT-V2-SPEC.md
 ## Recent Commits
 
 ```
-1dc39bd fix: replace Supabase OTP with custom server-side OTP via Resend
+d5b9674 fix: replace missing Compass import with AtlasLogo in ChatPanel
+d7357a0 fix: replace Supabase OTP with custom server-side OTP via Resend
 5772ac0 fix: try both 'email' and 'magiclink' OTP types on verification
 bb391cd fix: disable PKCE flow to fix email OTP verification
 a7a2598 fix: replace magic link with 6-digit OTP code for email sign-in
@@ -228,6 +229,5 @@ a7a2598 fix: replace magic link with 6-digit OTP code for email sign-in
 e70eaad fix: resolve magic link auth redirect to /start instead of /workspace
 882ee6b feat: add spotlight onboarding tour for first-time users
 27b91f4 fix: show 'Chat' instead of 'Chat — Chat' when no domain is selected
-dc95857 fix: enforce exact width/height on AtlasLogo to prevent flex-stretch distortion
 ```
 <!-- /AUTO:RECENT_CHANGES -->

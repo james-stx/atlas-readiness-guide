@@ -299,7 +299,7 @@ function TypingDots() {
   return (
     <div className="flex gap-2.5 justify-start">
       <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent">
-        <Compass className="h-3 w-3 text-white" />
+        <AtlasLogo variant="light" size={12} />
       </div>
       <div className="rounded-xl rounded-tl-sm bg-warm-50 px-4 py-3">
         <div className="flex gap-1">
@@ -320,7 +320,7 @@ function CapturingIndicator() {
   return (
     <div className="flex gap-2.5 justify-start">
       <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent">
-        <Compass className="h-3 w-3 text-white" />
+        <AtlasLogo variant="light" size={12} />
       </div>
       <div className="rounded-xl rounded-tl-sm bg-warm-50 px-4 py-2.5 flex items-center gap-2">
         <div className="flex gap-1">
