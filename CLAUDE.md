@@ -219,7 +219,8 @@ docs/READINESS-REPORT-V2-SPEC.md
 ## Recent Commits
 
 ```
-d5b9674 fix: replace missing Compass import with AtlasLogo in ChatPanel
+d22dd4f feat: add 'Start next chapter' button in chat when domain is completed
+8756062 fix: replace missing Compass import with AtlasLogo in ChatPanel
 d7357a0 fix: replace Supabase OTP with custom server-side OTP via Resend
 5772ac0 fix: try both 'email' and 'magiclink' OTP types on verification
 bb391cd fix: disable PKCE flow to fix email OTP verification
@@ -228,6 +229,5 @@ a7a2598 fix: replace magic link with 6-digit OTP code for email sign-in
 4c7d443 fix: use window.location.origin for magic link redirect URL
 e70eaad fix: resolve magic link auth redirect to /start instead of /workspace
 882ee6b feat: add spotlight onboarding tour for first-time users
-27b91f4 fix: show 'Chat' instead of 'Chat — Chat' when no domain is selected
 ```
 <!-- /AUTO:RECENT_CHANGES -->

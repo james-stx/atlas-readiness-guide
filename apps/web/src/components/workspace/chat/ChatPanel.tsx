@@ -7,17 +7,17 @@ import { useAssessment } from '@/lib/context/assessment-context';
 import { ChatHeader } from './ChatHeader';
 import { InputCapturedIndicator } from './InputCapturedIndicator';
 import { TopicTransitionBanner } from './TopicTransitionBanner';
-import { Send, Loader2 } from 'lucide-react';
+import { Send, Loader2, ChevronRight } from 'lucide-react';
 import { AtlasLogo } from '@/components/AtlasLogo';
 import type { ChatMessage, Input } from '@atlas/types';
-import { DOMAINS, getTopicLabel } from '@/lib/progress';
+import { DOMAINS, TOPICS_PER_DOMAIN, getTopicLabel, calculateDomainProgress } from '@/lib/progress';
 
 const isMac =
   typeof navigator !== 'undefined' &&
   /Mac|iPod|iPhone|iPad/.test(navigator.userAgent);
 
 export function ChatPanel() {
-  const { isChatOpen, closeChat, chatDomain, selectedCategory, selectCategory, topicToDiscuss, clearTopicToDiscuss } = useWorkspace();
+  const { isChatOpen, closeChat, chatDomain, selectedCategory, selectCategory, topicToDiscuss, clearTopicToDiscuss, selectDomain } = useWorkspace();
   const {
     messages,
     inputs,
@@ -35,6 +35,27 @@ export function ChatPanel() {
   const [lastKnownDomain, setLastKnownDomain] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Determine if a "Start chapter" prompt should appear.
+  // Condition: chatDomain just transitioned to a domain with 0 inputs, while the
+  // previous domain has all 5 topics covered (i.e. the last chapter was just completed).
+  const currentDomainIndex = chatDomain ? DOMAINS.findIndex(d => d.key === chatDomain) : -1;
+  const prevDomain = currentDomainIndex > 0 ? DOMAINS[currentDomainIndex - 1] : null;
+  const prevDomainComplete = prevDomain
+    ? calculateDomainProgress(inputs, prevDomain.key).coveredTopics.length >= TOPICS_PER_DOMAIN
+    : false;
+  const chatDomainNotStarted = chatDomain
+    ? calculateDomainProgress(inputs, chatDomain).coveredTopics.length === 0
+    : false;
+  const showStartChapterButton =
+    prevDomainComplete && chatDomainNotStarted && messages.length > 0 && !isLoading && !streamingMessage;
+
+  const handleStartChapter = useCallback(() => {
+    if (!chatDomain) return;
+    const domainLabel = DOMAINS.find(d => d.key === chatDomain)?.label ?? chatDomain;
+    selectDomain(chatDomain); // ensure content panel is on this domain
+    sendMessage(`I'm ready to start the ${domainLabel} chapter.`).catch(() => {});
+  }, [chatDomain, selectDomain, sendMessage]);
 
   // Track domain changes to show transition banners
   useEffect(() => {
@@ -193,6 +214,14 @@ export function ChatPanel() {
           {/* Typing indicator */}
           {isLoading && !streamingMessage && <TypingDots />}
 
+          {/* Start next chapter prompt */}
+          {showStartChapterButton && chatDomain && (
+            <StartChapterPrompt
+              domainLabel={DOMAINS.find(d => d.key === chatDomain)?.label ?? ''}
+              onStart={handleStartChapter}
+            />
+          )}
+
           <div ref={bottomRef} />
         </div>
       </div>
@@ -333,6 +362,40 @@ function CapturingIndicator() {
           ))}
         </div>
         <span className="text-ws-caption text-warm-500">Saving your answer to workspace…</span>
+      </div>
+    </div>
+  );
+}
+
+function StartChapterPrompt({
+  domainLabel,
+  onStart,
+}: {
+  domainLabel: string;
+  onStart: () => void;
+}) {
+  return (
+    <div className="mt-3 rounded-xl border border-accent/20 bg-accent/5 p-4 animate-slide-up">
+      <div className="flex items-start gap-2.5">
+        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent mt-0.5">
+          <AtlasLogo variant="blue" size={12} />
+        </div>
+        <div className="flex-1">
+          <p className="text-ws-body text-warm-800 mb-3">
+            Ready to explore <strong>{domainLabel}</strong>? I'll walk you through the key topics for this chapter when you are.
+          </p>
+          <button
+            onClick={onStart}
+            className={cn(
+              'flex items-center gap-2 rounded-lg bg-accent px-4 py-2',
+              'text-ws-body font-medium text-white',
+              'hover:bg-accent-700 transition-colors duration-fast'
+            )}
+          >
+            Start {domainLabel} chapter
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
       </div>
     </div>
   );
