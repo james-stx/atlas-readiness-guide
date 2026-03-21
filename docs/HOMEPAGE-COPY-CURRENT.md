@@ -21,10 +21,13 @@ AI-powered expansion readiness
 
 **Subheadline:**
 > Atlas surfaces your validated knowledge from your assumptions across every critical dimension of U.S. market entry. In 25 minutes.
+['validated knowledge' is either unclear or presumptive. This needs to be crytstal clear on what the value prop of this tool is and does. Maybe something like separates insights from assumptions.]
+[It is also not feasible that this can be compeleted in 25 minutes. It takes longer than that. Instead we should focus on it being much faster than any other method of research (do not use these words, we need something much more suited for homepage copy)]
 
 **CTA button:** Start your assessment
 
 **Microcopy below CTA:** No account needed · Takes 25 minutes
+[Again, can't say 'Takes 25 minutes', we need a different approach]
 
 **Domain pills:** Market · Product · Go-to-Market · Operations · Financials
 
@@ -36,14 +39,17 @@ AI-powered expansion readiness
 
 **Heading:**
 > Expansion decisions made on incomplete information don't fail slowly.
+[This is woefully unclear. We need a much better problem statement]
+[the problem is founders/companies try and enter the US market with incomplete information and that the barries to getting these insights are too high, so they enter the market anyway and the time it takes to get the feedback/insights they need to know whether they are ready, it is already too late. We need to capture this, and any other way of expressing the problem, in a much clearer way]
 
 **Body:**
-> Assumptions get dressed up as market validation. "Readiness" becomes a feeling, not a position. By the time gaps surface, momentum and capital are already gone.
+> Assumptions get dressed up as market validation. "Readiness" becomes a feeling, not a position. By the time gaps surface, momentum and capital are already gone. [Again, woefully unclear. Make this clearer, do not try to be clever.]
 
 **Stats:**
-- 25 min — to complete a full expansion readiness assessment
+- 25 min — to complete a full expansion readiness assessment [Can't say this (see above)]
 - 5 domains — of market entry mapped across 25 critical topics
-- 3 confidence levels — classifying every input as fact, research, or assumption
+- 3 confidence levels — classifying every input as fact, research, or assumption [this is the wrong stat to share here, we need something more valueable than the fact that we give 3 different confidence levels]
+[there is a lot of repetition of the 5 domains/25 topics. Make this covered in one place ie. under 'coverage'. Everywhere else should be specific to that area and not go over the domains/topics again]
 
 ---
 
@@ -53,17 +59,17 @@ AI-powered expansion readiness
 
 **Heading:**
 > Conversation.
-> Classification.
+> Classification. [This isn't the right word. We need to properly capture the essence of what the tool does by taking the users inputs and provides an evaluation of their readiness in each specific topic/domain]
 > Clarity.
 
 **Step 01 — Have an honest conversation**
 > Atlas asks the hard questions about your market, product, GTM, operations, and finances. You answer in plain English. No forms. No checklists.
 
 **Step 02 — See facts vs. assumptions**
-> Every response is classified: High confidence (validated with data), Medium (researched but unproven), Low (assumed). The first tool that makes this distinction explicit.
+> Every response is classified: High confidence (validated with data), Medium (researched but unproven), Low (assumed). The first tool that makes this distinction explicit. [Do not explicitly outline how each response is given a confidence level. Instead focus on how each response is evaluated and used to provide insights on what they are doing well / still need to consider]
 
 **Step 03 — Walk away with a position**
-> Your Readiness Report summarises your strengths, gaps, and a 90-day action plan built to withstand investor scrutiny.
+> Your Readiness Report summarises your strengths, gaps, and a 90-day action plan built to withstand investor scrutiny. [not just investor scrutiny, but more about likelihood of success. Do not use these words verbatim]
 
 ---
 
@@ -74,7 +80,8 @@ AI-powered expansion readiness
 **Heading:**
 > 5 domains.
 > 25 topics.
-> Zero fluff.
+> Zero fluff. [remove]
+[It was not clear to users what the 5 domains/25 topics are. We need to be more clear on these]
 
 **Subtext:**
 > Every domain covers the 5 topics that matter most for U.S. market entry. Conversation-driven, not checkbox-driven.
@@ -99,12 +106,12 @@ AI-powered expansion readiness
 **Label:** YOUR OUTPUT
 
 **Heading:**
-> A Readiness Report that holds up in the boardroom.
+> A Readiness Report that holds up in the boardroom. [this is too much of a bold claim and can turn customers away. Make it more genera]
 
 **Output cards:**
 
 **Confidence classification**
-> Every input categorised as High, Medium, or Low confidence. See exactly what is validated and what is assumed across all 25 topics.
+> Every input categorised as High, Medium, or Low confidence. See exactly what is validated and what is assumed across all 25 topics. [don't state 'High, Medium, or Low confidence' explicitly]
 
 **Domain readiness profile**
 > Your standing across all 5 domains with full progress visibility. Know your strengths, your gaps, and what needs urgent attention before you land.
