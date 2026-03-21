@@ -129,6 +129,7 @@ docs/DESIGN-Auth-Guest-Flow-Wireframes.md
 docs/DESIGN-OVERHAUL-BRIEF.md
 docs/DESIGN-SYSTEM-V3.md
 docs/FOUNDER-FEEDBACK-V3-PLAN.md
+docs/HOMEPAGE-COPY-CURRENT.md
 docs/MVP-BUILD-DOCUMENTATION.md
 docs/POST-MORTEM-V3-REPORT.md
 docs/PRD-Auth-Guest-Flow-and-Data-Capture.md
@@ -136,7 +137,6 @@ docs/PRD-Progress-Visibility-Feature.md
 docs/product
 docs/product/central-console-feedback-v1.md
 docs/READINESS-REPORT-UX-OVERHAUL.md
-docs/READINESS-REPORT-V2-SPEC.md
 ```
 <!-- /AUTO:STRUCTURE -->
 
@@ -219,7 +219,8 @@ docs/READINESS-REPORT-V2-SPEC.md
 ## Recent Commits
 
 ```
-d22dd4f feat: add 'Start next chapter' button in chat when domain is completed
+981ece6 docs: capture current homepage copy for review and revision
+7272e96 feat: add 'Start next chapter' button in chat when domain is completed
 8756062 fix: replace missing Compass import with AtlasLogo in ChatPanel
 d7357a0 fix: replace Supabase OTP with custom server-side OTP via Resend
 5772ac0 fix: try both 'email' and 'magiclink' OTP types on verification
@@ -228,6 +229,5 @@ a7a2598 fix: replace magic link with 6-digit OTP code for email sign-in
 6982408 fix: handle expired/invalid magic link error in auth callback
 4c7d443 fix: use window.location.origin for magic link redirect URL
 e70eaad fix: resolve magic link auth redirect to /start instead of /workspace
-882ee6b feat: add spotlight onboarding tour for first-time users
 ```
 <!-- /AUTO:RECENT_CHANGES -->
