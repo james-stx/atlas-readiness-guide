@@ -24,6 +24,14 @@ import { UnlockPreview } from '@/components/snapshot/UnlockPreview';
 import type { Snapshot, SnapshotV3 } from '@atlas/types';
 import { ReportGateOverlay } from './ReportGateOverlay';
 
+const GENERATION_PHASES = [
+  'Reading your responses across all 5 domains…',
+  'Identifying key strengths and gaps…',
+  'Building your personalised roadmap…',
+  'Almost there — finalising your report…',
+];
+const PHASE_PROGRESS = [12, 38, 65, 88];
+
 export function ReportPanel() {
   const {
     progressState,
@@ -46,6 +54,15 @@ export function ReportPanel() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoadingSnapshot, setIsLoadingSnapshot] = useState(true);
+  const [phaseIdx, setPhaseIdx] = useState(0);
+
+  // Cycle through generation phases while report is being generated
+  useEffect(() => {
+    if (!isGenerating) { setPhaseIdx(0); return; }
+    if (phaseIdx >= GENERATION_PHASES.length - 1) return;
+    const t = setTimeout(() => setPhaseIdx((p) => p + 1), 9000);
+    return () => clearTimeout(t);
+  }, [isGenerating, phaseIdx]);
 
   const totalTopics = 25;
   const coveredTopics = Object.values(progressState.domainProgress).reduce(
@@ -100,15 +117,27 @@ export function ReportPanel() {
   if (isLoadingSnapshot || isGenerating || isLoading) {
     return (
       <div className="overflow-y-auto bg-white workspace-panel">
-        <div className="max-w-[720px] mx-auto px-8 py-12 text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-[#37352F] mx-auto mb-4" />
+        <div className="max-w-[480px] mx-auto px-8 py-16 text-center">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#F0F7FF] mx-auto mb-5">
+            <Loader2 className="w-6 h-6 animate-spin text-[#2383E2]" />
+          </div>
           <h2 className="text-[18px] font-semibold text-[#37352F] mb-2">
             {isGenerating ? 'Generating Your Report…' : 'Loading…'}
           </h2>
           {isGenerating && (
-            <p className="text-[14px] text-[#5C5A56]">
-              Analysing your responses and building your personalised report
-            </p>
+            <>
+              <p className="text-[14px] text-[#5C5A56] mb-6 min-h-[20px] transition-all duration-500">
+                {GENERATION_PHASES[phaseIdx]}
+              </p>
+              {/* Progress bar */}
+              <div className="h-1.5 w-full rounded-full bg-[#E8E6E1] overflow-hidden mb-2">
+                <div
+                  className="h-full rounded-full bg-[#2383E2] transition-all duration-[2000ms] ease-out"
+                  style={{ width: `${PHASE_PROGRESS[phaseIdx]}%` }}
+                />
+              </div>
+              <p className="text-[12px] text-[#9B9A97]">Usually takes 30–60 seconds</p>
+            </>
           )}
         </div>
       </div>

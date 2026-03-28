@@ -60,6 +60,43 @@ All agents, hooks, and automations are documented in **`AGENTS.md`** at the proj
 .
 .claude
 .claude/settings.local.json
+.claude/worktrees
+.claude/worktrees/elated-hawking
+.claude/worktrees/elated-hawking/.claude
+.claude/worktrees/elated-hawking/.git
+.claude/worktrees/elated-hawking/.github
+.claude/worktrees/elated-hawking/.gitignore
+.claude/worktrees/elated-hawking/.prettierrc
+.claude/worktrees/elated-hawking/AGENTS.md
+.claude/worktrees/elated-hawking/apps
+.claude/worktrees/elated-hawking/CLAUDE.md
+.claude/worktrees/elated-hawking/docs
+.claude/worktrees/elated-hawking/package.json
+.claude/worktrees/elated-hawking/packages
+.claude/worktrees/elated-hawking/pnpm-lock.yaml
+.claude/worktrees/elated-hawking/pnpm-workspace.yaml
+.claude/worktrees/elated-hawking/scripts
+.claude/worktrees/elated-hawking/supabase
+.claude/worktrees/elated-hawking/tsconfig.json
+.claude/worktrees/elated-hawking/turbo.json
+.claude/worktrees/great-hodgkin
+.claude/worktrees/great-hodgkin/.claude
+.claude/worktrees/great-hodgkin/.git
+.claude/worktrees/great-hodgkin/.github
+.claude/worktrees/great-hodgkin/.gitignore
+.claude/worktrees/great-hodgkin/.prettierrc
+.claude/worktrees/great-hodgkin/AGENTS.md
+.claude/worktrees/great-hodgkin/apps
+.claude/worktrees/great-hodgkin/CLAUDE.md
+.claude/worktrees/great-hodgkin/docs
+.claude/worktrees/great-hodgkin/package.json
+.claude/worktrees/great-hodgkin/packages
+.claude/worktrees/great-hodgkin/pnpm-lock.yaml
+.claude/worktrees/great-hodgkin/pnpm-workspace.yaml
+.claude/worktrees/great-hodgkin/scripts
+.claude/worktrees/great-hodgkin/supabase
+.claude/worktrees/great-hodgkin/tsconfig.json
+.claude/worktrees/great-hodgkin/turbo.json
 .git
 .github
 .github/workflows
@@ -82,6 +119,7 @@ apps/api/.vercel/project.json
 apps/api/.vercel/README.txt
 apps/api/migrations
 apps/api/migrations/001_add_guest_session_fields.sql
+apps/api/migrations/002_file_upload_tables.sql
 apps/api/next-env.d.ts
 apps/api/next.config.js
 apps/api/node_modules
@@ -99,44 +137,6 @@ apps/web/.env.local
 apps/web/.eslintrc.json
 apps/web/.gitignore
 apps/web/.next
-apps/web/.turbo
-apps/web/.vercel
-apps/web/.vercel/project.json
-apps/web/.vercel/README.txt
-apps/web/next-env.d.ts
-apps/web/next.config.js
-apps/web/node_modules
-apps/web/package.json
-apps/web/postcss.config.js
-apps/web/public
-apps/web/public/logo-blue.png
-apps/web/public/logo-dark.png
-apps/web/src
-apps/web/src/app
-apps/web/src/components
-apps/web/src/hooks
-apps/web/src/lib
-apps/web/tailwind.config.ts
-apps/web/tsconfig.json
-apps/web/tsconfig.tsbuildinfo
-apps/web/vercel.json
-CLAUDE.md
-docs
-docs/ARCHITECTURE.md
-docs/BRAND-STYLE-GUIDE.md
-docs/CONTENT-PANEL-V3-SPEC.md
-docs/DESIGN-Auth-Guest-Flow-Wireframes.md
-docs/DESIGN-OVERHAUL-BRIEF.md
-docs/DESIGN-SYSTEM-V3.md
-docs/FOUNDER-FEEDBACK-V3-PLAN.md
-docs/HOMEPAGE-COPY-CURRENT.md
-docs/MVP-BUILD-DOCUMENTATION.md
-docs/POST-MORTEM-V3-REPORT.md
-docs/PRD-Auth-Guest-Flow-and-Data-Capture.md
-docs/PRD-Progress-Visibility-Feature.md
-docs/product
-docs/product/central-console-feedback-v1.md
-docs/READINESS-REPORT-UX-OVERHAUL.md
 ```
 <!-- /AUTO:STRUCTURE -->
 
@@ -161,7 +161,7 @@ docs/READINESS-REPORT-UX-OVERHAUL.md
 
 ## Component Inventory (Web)
 
-- **components/workspace/** (5): OnboardingTour,SaveProgressPopup,TopBar,WelcomeModal,WorkspaceLayout
+- **components/workspace/** (6): FileUploadModal,OnboardingTour,SaveProgressPopup,TopBar,WelcomeModal,WorkspaceLayout
 - **components/workspace/sidebar/** (4): Sidebar,SidebarDomainItem,SidebarFooter,SidebarTopicItem
 - **components/workspace/content/** (8): CategoryCard,ContentDomainHeader,ContentPanel,EmptyState,InlineSnapshotCTA,InsightCard,NotStartedCard,TopicCard
 - **components/workspace/chat/** (4): ChatHeader,ChatPanel,InputCapturedIndicator,TopicTransitionBanner
@@ -183,8 +183,13 @@ docs/READINESS-REPORT-UX-OVERHAUL.md
 - /api/domain/summary — apps/api/src/app/api/domain/summary/route.ts
 - /api/export/pdf/[sessionId] — apps/api/src/app/api/export/pdf/[sessionId]/route.ts
 - /api/export/send/[sessionId] — apps/api/src/app/api/export/send/[sessionId]/route.ts
+- /api/files/[fileId]/process — apps/api/src/app/api/files/[fileId]/process/route.ts
+- /api/files/[fileId] — apps/api/src/app/api/files/[fileId]/route.ts
+- /api/files/session/[sessionId] — apps/api/src/app/api/files/session/[sessionId]/route.ts
+- /api/files/upload — apps/api/src/app/api/files/upload/route.ts
 - /api/health — apps/api/src/app/api/health/route.ts
 - /api/session/[id]/claim — apps/api/src/app/api/session/[id]/claim/route.ts
+- /api/session/[id]/inputs — apps/api/src/app/api/session/[id]/inputs/route.ts
 - /api/session/[id] — apps/api/src/app/api/session/[id]/route.ts
 - /api/session/recover — apps/api/src/app/api/session/recover/route.ts
 - /api/session — apps/api/src/app/api/session/route.ts
@@ -200,6 +205,7 @@ docs/READINESS-REPORT-UX-OVERHAUL.md
 - lib/ai/prompts/synthesis-v3.ts
 - lib/ai/prompts/synthesis.ts
 - lib/ai/prompts/system.ts
+- lib/db/files.ts
 - lib/db/index.ts
 - lib/db/inputs.ts
 - lib/db/messages.ts
@@ -209,6 +215,8 @@ docs/READINESS-REPORT-UX-OVERHAUL.md
 - lib/email/index.ts
 - lib/email/templates/snapshot-email.ts
 - lib/errors.ts
+- lib/files/extractor.ts
+- lib/files/processor.ts
 - lib/pdf/index.ts
 - lib/pdf/theme.ts
 
@@ -219,7 +227,9 @@ docs/READINESS-REPORT-UX-OVERHAUL.md
 ## Recent Commits
 
 ```
-981ece6 docs: capture current homepage copy for review and revision
+3c6d733 feat: document upload, auto-analysis, and upload discovery UX
+cfb0470 Update HOMEPAGE-COPY-CURRENT.md
+261abab docs: capture current homepage copy for review and revision
 7272e96 feat: add 'Start next chapter' button in chat when domain is completed
 8756062 fix: replace missing Compass import with AtlasLogo in ChatPanel
 d7357a0 fix: replace Supabase OTP with custom server-side OTP via Resend
@@ -227,7 +237,5 @@ d7357a0 fix: replace Supabase OTP with custom server-side OTP via Resend
 bb391cd fix: disable PKCE flow to fix email OTP verification
 a7a2598 fix: replace magic link with 6-digit OTP code for email sign-in
 6982408 fix: handle expired/invalid magic link error in auth callback
-4c7d443 fix: use window.location.origin for magic link redirect URL
-e70eaad fix: resolve magic link auth redirect to /start instead of /workspace
 ```
 <!-- /AUTO:RECENT_CHANGES -->

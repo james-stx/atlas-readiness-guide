@@ -55,6 +55,43 @@ export interface Session {
   is_guest?: boolean;
 }
 
+export type FileStatus = 'pending' | 'processing' | 'complete' | 'failed';
+export type DocumentType =
+  | 'pitch_deck'
+  | 'business_plan'
+  | 'gtm_strategy'
+  | 'financial_model'
+  | 'market_research'
+  | 'competitive_analysis'
+  | 'other';
+
+export interface SessionFile {
+  id: string;
+  session_id: string;
+  filename: string;
+  storage_path: string;
+  mime_type: string;
+  size_bytes: number;
+  detected_type: DocumentType | null;
+  status: FileStatus;
+  topics_found: number;
+  created_at: string;
+  processed_at: string | null;
+}
+
+export interface FileTopicMapping {
+  id: string;
+  file_id: string;
+  session_id: string;
+  domain: DomainType;
+  question_id: string;
+  extracted_content: string;
+  confidence_level: ConfidenceLevel;
+  confidence_rationale: string | null;
+  page_reference: string | null;
+  created_at: string;
+}
+
 export interface Input {
   id: string;
   session_id: string;
@@ -64,6 +101,7 @@ export interface Input {
   extracted_data: Record<string, unknown>;
   confidence_level: ConfidenceLevel;
   confidence_rationale: string | null;
+  source_file_id?: string | null;
   created_at: string;
 }
 
@@ -416,6 +454,35 @@ export interface Database {
         Row: Snapshot;
         Insert: Omit<Snapshot, 'id' | 'created_at'>;
         Update: Partial<Omit<Snapshot, 'id'>>;
+      };
+      session_files: {
+        Row: SessionFile;
+        Insert: {
+          session_id: string;
+          filename: string;
+          storage_path: string;
+          mime_type: string;
+          size_bytes: number;
+          detected_type?: DocumentType | null;
+          status?: FileStatus;
+          topics_found?: number;
+          processed_at?: string | null;
+        };
+        Update: Partial<Omit<SessionFile, 'id' | 'created_at'>>;
+      };
+      file_topic_mappings: {
+        Row: FileTopicMapping;
+        Insert: {
+          file_id: string;
+          session_id: string;
+          domain: string;
+          question_id: string;
+          extracted_content: string;
+          confidence_level: string;
+          confidence_rationale?: string | null;
+          page_reference?: string | null;
+        };
+        Update: Partial<Omit<FileTopicMapping, 'id' | 'created_at'>>;
       };
     };
     Enums: {

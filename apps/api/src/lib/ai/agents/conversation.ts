@@ -7,6 +7,7 @@ import { quickClassify } from '../confidence/classifier';
 import { saveInput, getDomainInputs } from '@/lib/db/inputs';
 import { saveMessage, getRecentMessages, formatMessagesForLLM } from '@/lib/db/messages';
 import { updateSessionDomain, updateSessionStatus } from '@/lib/db/session';
+import { getFileMappingsForSession, getSessionFiles } from '@/lib/db/files';
 import type { DomainType, ChatMessage } from '@atlas/types';
 
 /**
@@ -204,6 +205,14 @@ export async function* streamConversation(
 
     console.log('[Atlas] Domain:', currentDomain, 'Completed:', completedTopicIds.length, '/', totalTopics);
 
+    // Load file mappings for document-aware context
+    const [allMappings, sessionFiles] = await Promise.all([
+      getFileMappingsForSession(sessionId),
+      getSessionFiles(sessionId),
+    ]);
+    const fileMap = Object.fromEntries(sessionFiles.map(f => [f.id, f.filename]));
+    const domainMappings = allMappings.filter(m => m.domain === currentDomain);
+
     // Create tools with session context via closure
     const tools = createConversationTools(sessionId, currentDomain);
 
@@ -232,6 +241,15 @@ ${questionIdList}
 
 DOMAIN PROGRESS: ${completedTopicIds.length}/${totalTopics} topics completed
 ${uncoveredTopics.length > 0 ? `UNCOVERED TOPICS (focus on these): ${uncoveredTopics.join(', ')}` : 'ALL TOPICS COVERED - ready to transition'}
+${domainMappings.length > 0 ? `
+DOCUMENT-SOURCED CONTEXT (from uploaded files):
+The following topics were pre-filled from the user's documents. Do not ask about these from scratch. Instead, acknowledge what was found, confirm the key details with the user, and probe for specifics.
+${domainMappings.map(m => {
+  const filename = (m as unknown as Record<string, unknown>).session_files
+    ? ((m as unknown as Record<string, { filename: string }>).session_files as { filename: string }).filename
+    : fileMap[m.file_id] ?? 'uploaded document';
+  return `- "${m.question_id}" [${filename}, ${m.confidence_level} confidence]: "${m.extracted_content.slice(0, 150)}${m.extracted_content.length > 150 ? '...' : ''}"`;
+}).join('\n')}` : ''}
 
 CRITICAL INSTRUCTIONS:
 1. DO NOT ask about topics marked [COMPLETED]. These have already been answered. Only discuss completed topics if the user explicitly brings them up.

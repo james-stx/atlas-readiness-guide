@@ -1,0 +1,93 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { randomUUID } from 'crypto';
+import { getValidSession } from '@/lib/db/session';
+import { createSessionFile, countSessionFiles } from '@/lib/db/files';
+import { supabase } from '@/lib/db/supabase';
+import { getSupportedMimeTypes } from '@/lib/files/extractor';
+import { handleApiError, ValidationError, GuestAccessError } from '@/lib/errors';
+
+const MAX_FILES_PER_SESSION = 5;
+const MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024; // 20MB
+
+export async function POST(request: NextRequest) {
+  try {
+    const formData = await request.formData();
+    const sessionId = formData.get('sessionId');
+
+    if (!sessionId || typeof sessionId !== 'string') {
+      throw new ValidationError('sessionId is required');
+    }
+
+    // Validate session — guests cannot upload
+    const session = await getValidSession(sessionId);
+    if (session.is_guest) {
+      throw new GuestAccessError('document upload');
+    }
+
+    // Collect uploaded files
+    const fileEntries = formData.getAll('files') as File[];
+    if (!fileEntries.length) {
+      throw new ValidationError('At least one file is required');
+    }
+
+    // Check total file count across session
+    const existingCount = await countSessionFiles(sessionId);
+    if (existingCount + fileEntries.length > MAX_FILES_PER_SESSION) {
+      throw new ValidationError(
+        `You can upload up to ${MAX_FILES_PER_SESSION} files per session. You already have ${existingCount}.`
+      );
+    }
+
+    const supportedTypes = getSupportedMimeTypes();
+    const savedFiles = [];
+
+    for (const file of fileEntries) {
+      // Validate type
+      const mimeType = file.type || 'application/octet-stream';
+      if (!supportedTypes.includes(mimeType.split(';')[0].trim())) {
+        throw new ValidationError(
+          `File "${file.name}" has unsupported type. Accepted: PDF, DOCX, PPTX`
+        );
+      }
+
+      // Validate size
+      if (file.size > MAX_FILE_SIZE_BYTES) {
+        throw new ValidationError(
+          `File "${file.name}" exceeds 20MB limit`
+        );
+      }
+
+      const buffer = Buffer.from(await file.arrayBuffer());
+      const fileId = randomUUID();
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const storagePath = `${sessionId}/${fileId}-${safeName}`;
+
+      // Upload to Supabase Storage
+      const { error: storageError } = await supabase.storage
+        .from('session-documents')
+        .upload(storagePath, buffer, {
+          contentType: mimeType,
+          upsert: false,
+        });
+
+      if (storageError) {
+        throw new Error(`Failed to upload "${file.name}": ${storageError.message}`);
+      }
+
+      // Create DB record
+      const sessionFile = await createSessionFile({
+        sessionId,
+        filename: file.name,
+        storagePath,
+        mimeType,
+        sizeBytes: file.size,
+      });
+
+      savedFiles.push({ id: sessionFile.id, filename: sessionFile.filename, status: sessionFile.status });
+    }
+
+    return NextResponse.json({ files: savedFiles }, { status: 201 });
+  } catch (error) {
+    return handleApiError(error);
+  }
+}

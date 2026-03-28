@@ -34,6 +34,7 @@ type InsightEntry = {
 interface DomainInsightContextValue {
   entries: Partial<Record<DomainType, InsightEntry>>;
   generatingDomain: DomainType | null;
+  insightErrors: Partial<Record<DomainType, boolean>>;
   newlyReadyDomain: DomainType | null;
   isStale: (domain: DomainType) => boolean;
   isNew: (domain: DomainType) => boolean;
@@ -57,6 +58,7 @@ export function DomainInsightProvider({ children }: { children: ReactNode }) {
 
   const [entries, setEntries] = useState<Partial<Record<DomainType, InsightEntry>>>({});
   const [generatingDomain, setGeneratingDomain] = useState<DomainType | null>(null);
+  const [insightErrors, setInsightErrors] = useState<Partial<Record<DomainType, boolean>>>({});
   const [newlyReadyDomain, setNewlyReadyDomain] = useState<DomainType | null>(null);
 
   const prevCountsRef = useRef<Partial<Record<DomainType, number>>>({});
@@ -112,10 +114,12 @@ export function DomainInsightProvider({ children }: { children: ReactNode }) {
     setGeneratingDomain(domain);
     const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
+    setInsightErrors((prev) => ({ ...prev, [domain]: false }));
     fetch(`${apiUrl}/api/domain/insight`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ sessionId: s.id, domain }),
+      signal: AbortSignal.timeout(60_000),
     })
       .then((res) => res.json())
       .then((data: { insight: DomainInsight | null }) => {
@@ -131,6 +135,7 @@ export function DomainInsightProvider({ children }: { children: ReactNode }) {
         setGeneratingDomain(null);
       })
       .catch(() => {
+        setInsightErrors((prev) => ({ ...prev, [domain]: true }));
         setGeneratingDomain(null);
       });
   }, []); // stable — reads session via ref
@@ -212,6 +217,7 @@ export function DomainInsightProvider({ children }: { children: ReactNode }) {
       value={{
         entries,
         generatingDomain,
+        insightErrors,
         newlyReadyDomain,
         isStale,
         isNew,

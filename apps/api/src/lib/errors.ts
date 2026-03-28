@@ -66,9 +66,13 @@ export function handleApiError(error: unknown): NextResponse {
     );
   }
 
-  // Generic error
+  // Generic error — include message in development to aid debugging
+  const isDev = process.env.NODE_ENV !== 'production';
   return NextResponse.json(
-    { error: 'Internal server error', code: 'INTERNAL_ERROR' },
+    {
+      error: isDev && error instanceof Error ? error.message : 'Internal server error',
+      code: 'INTERNAL_ERROR',
+    },
     { status: 500 }
   );
 }

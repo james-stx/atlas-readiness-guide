@@ -12,6 +12,7 @@ export async function saveInput({
   extractedData = {},
   confidenceLevel,
   confidenceRationale,
+  sourceFileId,
 }: {
   sessionId: string;
   domain: DomainType;
@@ -20,6 +21,7 @@ export async function saveInput({
   extractedData?: Record<string, unknown>;
   confidenceLevel: ConfidenceLevel;
   confidenceRationale?: string;
+  sourceFileId?: string;
 }): Promise<Input> {
   // Upsert to handle re-answering the same question
   const { data, error } = await supabase
@@ -33,6 +35,7 @@ export async function saveInput({
         extracted_data: extractedData,
         confidence_level: confidenceLevel,
         confidence_rationale: confidenceRationale,
+        source_file_id: sourceFileId ?? null,
       },
       {
         onConflict: 'session_id,question_id',

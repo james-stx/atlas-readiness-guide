@@ -5,6 +5,8 @@ import type {
   ChatMessage,
   Input,
   Snapshot,
+  SessionFile,
+  FileTopicMapping,
 } from '@atlas/types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
@@ -160,6 +162,7 @@ export async function generateSnapshot(
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ sessionId }),
+    signal: AbortSignal.timeout(120_000), // 2-min ceiling for AI synthesis
   });
   return handleResponse<{ snapshot: Snapshot }>(response);
 }
@@ -238,6 +241,61 @@ export async function verifyOtp(
     body: JSON.stringify({ email, code }),
   });
   return handleResponse<{ verified: boolean; email: string }>(response);
+}
+
+// ============================================
+// Files API
+// ============================================
+
+export async function uploadFiles(
+  sessionId: string,
+  files: File[]
+): Promise<{ files: Pick<SessionFile, 'id' | 'filename' | 'status'>[] }> {
+  const formData = new FormData();
+  formData.append('sessionId', sessionId);
+  for (const file of files) {
+    formData.append('files', file);
+  }
+  const response = await fetch(`${API_URL}/api/files/upload`, {
+    method: 'POST',
+    body: formData,
+  });
+  return handleResponse<{ files: Pick<SessionFile, 'id' | 'filename' | 'status'>[] }>(response);
+}
+
+export async function processFile(
+  fileId: string
+): Promise<{ file: SessionFile; mappings: FileTopicMapping[]; inputs: Input[] }> {
+  const response = await fetch(`${API_URL}/api/files/${fileId}/process`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    signal: AbortSignal.timeout(140_000), // 140s — backend can take up to ~125s total
+  });
+  return handleResponse<{ file: SessionFile; mappings: FileTopicMapping[]; inputs: Input[] }>(response);
+}
+
+export async function getSessionInputs(
+  sessionId: string
+): Promise<{ inputs: Input[] }> {
+  const response = await fetch(`${API_URL}/api/session/${sessionId}/inputs`);
+  return handleResponse<{ inputs: Input[] }>(response);
+}
+
+export async function getSessionFiles(
+  sessionId: string
+): Promise<{ files: SessionFile[]; mappings: FileTopicMapping[] }> {
+  const response = await fetch(`${API_URL}/api/files/session/${sessionId}`);
+  return handleResponse<{ files: SessionFile[]; mappings: FileTopicMapping[] }>(response);
+}
+
+export async function deleteFile(fileId: string): Promise<void> {
+  const response = await fetch(`${API_URL}/api/files/${fileId}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new ApiError(error.error || 'Failed to delete file', response.status);
+  }
 }
 
 // ============================================

@@ -21,7 +21,7 @@ const SENT_KEY = 'atlas-save-progress-sent';
 
 export function TopBar() {
   const { progressState, toggleChat, isChatOpen } = useWorkspace();
-  const { isGuest, session, clearSession } = useAssessment();
+  const { isGuest, session, clearSession, upgradeGuestSession } = useAssessment();
   const router = useRouter();
 
   const [popupOpen, setPopupOpen] = useState(false);
@@ -191,7 +191,12 @@ export function TopBar() {
       <SaveProgressPopup
         isOpen={popupOpen}
         onClose={() => setPopupOpen(false)}
-        onSent={() => setLinkSent(true)}
+        sessionId={session?.id ?? ''}
+        onClaimed={(email, recoveryToken) => {
+          upgradeGuestSession(session!.id, email, recoveryToken);
+          setPopupOpen(false);
+          setLinkSent(false);
+        }}
       />
     </header>
   );

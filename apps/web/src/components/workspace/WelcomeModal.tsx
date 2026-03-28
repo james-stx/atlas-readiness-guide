@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Map, LayoutGrid, Clock, Cloud, X, Check, Circle, Play, Loader2 } from 'lucide-react';
+import { Map, LayoutGrid, Clock, Cloud, Upload, X, Check, Circle, Play, Loader2 } from 'lucide-react';
 import { AtlasLogo } from '@/components/AtlasLogo';
 import { cn } from '@/lib/utils';
 import type { DomainType } from '@atlas/types';
@@ -215,7 +215,7 @@ export function WelcomeModal({
 
         {/* Info badges */}
         <div className="px-6 py-4 border-b border-[#F1F0EC]">
-          <div className="flex justify-center gap-4">
+          <div className="flex justify-center gap-4 mb-3">
             <div className="flex items-center gap-1.5 text-[12px] text-[#787774]">
               <Clock className="h-3.5 w-3.5" />
               <span>{isReturningUser ? `~${remainingMinutes} min left` : '5 chapters · ~20 min each'}</span>
@@ -225,6 +225,15 @@ export function WelcomeModal({
               <span>Auto-saved</span>
             </div>
           </div>
+          {!isReturningUser && (
+            <div className="flex items-center gap-2 bg-[#F0F7FF] rounded-lg px-3 py-2">
+              <Upload className="h-3.5 w-3.5 text-[#2563EB] shrink-0" />
+              <p className="text-[12px] text-[#5C5A56]">
+                <span className="font-medium text-[#2563EB]">Got a pitch deck or business plan?</span>{' '}
+                Upload it and Atlas will pre-fill what's already covered.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Options */}

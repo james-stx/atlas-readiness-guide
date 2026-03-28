@@ -4,6 +4,7 @@ import { Suspense, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAssessment } from '@/lib/context/assessment-context';
 import { useWorkspace } from '@/lib/context/workspace-context';
+import { FilesProvider, useFiles } from '@/lib/context/files-context';
 import { WorkspaceLayout } from '@/components/workspace/WorkspaceLayout';
 import { Loader2 } from 'lucide-react';
 
@@ -37,6 +38,8 @@ function WorkspaceContent() {
     }
   }, [session, router, recoverSession]);
 
+  const { loadFiles } = useFiles();
+
   // Initialize chat when session is ready
   useEffect(() => {
     if (session && !initRef.current && messages.length === 0) {
@@ -44,6 +47,13 @@ function WorkspaceContent() {
       initChat().catch(console.error);
     }
   }, [session, messages.length, initChat]);
+
+  // Load uploaded files when session is available
+  useEffect(() => {
+    if (session && !session.is_guest) {
+      loadFiles(session.id).catch(() => {});
+    }
+  }, [session, loadFiles]);
 
   // Handle URL parameter for view switching (e.g., /workspace?view=report)
   useEffect(() => {
@@ -77,19 +87,21 @@ function WorkspaceContent() {
 
 export default function WorkspacePage() {
   return (
-    <Suspense
-      fallback={
-        <div className="flex h-dvh items-center justify-center bg-white">
-          <div className="text-center">
-            <Loader2 className="mx-auto mb-4 h-8 w-8 animate-spin text-accent-600" />
-            <p className="text-body text-[var(--text-secondary)]">
-              Loading...
-            </p>
+    <FilesProvider>
+      <Suspense
+        fallback={
+          <div className="flex h-dvh items-center justify-center bg-white">
+            <div className="text-center">
+              <Loader2 className="mx-auto mb-4 h-8 w-8 animate-spin text-accent-600" />
+              <p className="text-body text-[var(--text-secondary)]">
+                Loading...
+              </p>
+            </div>
           </div>
-        </div>
-      }
-    >
-      <WorkspaceContent />
-    </Suspense>
+        }
+      >
+        <WorkspaceContent />
+      </Suspense>
+    </FilesProvider>
   );
 }

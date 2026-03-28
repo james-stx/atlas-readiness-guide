@@ -4,10 +4,12 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { useWorkspace } from '@/lib/context/workspace-context';
 import { useAssessment } from '@/lib/context/assessment-context';
+import { useFiles } from '@/lib/context/files-context';
 import { ChatHeader } from './ChatHeader';
 import { InputCapturedIndicator } from './InputCapturedIndicator';
 import { TopicTransitionBanner } from './TopicTransitionBanner';
-import { Send, Loader2, ChevronRight } from 'lucide-react';
+import { FileUploadModal } from '@/components/workspace/FileUploadModal';
+import { Send, Loader2, ChevronRight, Upload } from 'lucide-react';
 import { AtlasLogo } from '@/components/AtlasLogo';
 import type { ChatMessage, Input } from '@atlas/types';
 import { DOMAINS, TOPICS_PER_DOMAIN, getTopicLabel, calculateDomainProgress } from '@/lib/progress';
@@ -30,9 +32,19 @@ export function ChatPanel() {
     error,
   } = useAssessment();
 
+  const { files } = useFiles();
   const [inputValue, setInputValue] = useState('');
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [uploadBannerDismissed, setUploadBannerDismissed] = useState(false);
   const [domainTransitions, setDomainTransitions] = useState<{ messageIndex: number; toDomain: string }[]>([]);
   const [lastKnownDomain, setLastKnownDomain] = useState<string | null>(null);
+
+  const isGuest = session?.is_guest === true;
+  const showUploadBanner =
+    !isGuest &&
+    !uploadBannerDismissed &&
+    messages.length === 0 &&
+    files.filter(f => f.status !== 'failed').length === 0;
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -151,6 +163,41 @@ export function ChatPanel() {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4" role="log" aria-live="polite">
+        {/* Pre-assessment upload prompt — two-path zero state */}
+        {showUploadBanner && (
+          <div className="mb-5 rounded-xl border border-[#2563EB]/25 bg-[#F0F7FF] p-5 animate-slide-up">
+            <div className="flex items-start gap-3 mb-4">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#2563EB]/12">
+                <Upload className="h-4 w-4 text-[#2563EB]" />
+              </div>
+              <div>
+                <p className="text-[14px] font-semibold text-[#0A0A0A] mb-1">
+                  Save time — upload your documents first
+                </p>
+                <p className="text-ws-body text-warm-600 leading-relaxed">
+                  Atlas reads your pitch deck, business plan, or GTM strategy and auto-fills the topics it covers. Most documents address 10–15 topics instantly.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setShowUploadModal(true)}
+                className="flex items-center gap-1.5 rounded-lg bg-[#2563EB] px-3.5 py-2 text-ws-caption font-medium text-white hover:bg-[#1D4ED8] transition-colors"
+              >
+                <Upload className="h-3.5 w-3.5" />
+                Upload documents
+              </button>
+              <button
+                onClick={() => setUploadBannerDismissed(true)}
+                className="flex items-center gap-1 text-ws-caption text-warm-500 hover:text-warm-800 transition-colors"
+              >
+                Start chatting
+                <ChevronRight className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="space-y-3">
           {messages.map((message, index) => {
             const inputsAfterMessage = getInputsAfterMessage(
@@ -233,11 +280,35 @@ export function ChatPanel() {
         </div>
       )}
 
+      {/* Upload modal */}
+      {session && (
+        <FileUploadModal
+          isOpen={showUploadModal}
+          onClose={() => setShowUploadModal(false)}
+          sessionId={session.id}
+        />
+      )}
+
       {/* Input area */}
       <div className="sticky bottom-0 border-t border-warm-200 bg-white px-4 py-3">
         {/* Quick responses could go here */}
 
         <div className="flex items-end gap-2">
+          {/* Upload button — signed-in users only */}
+          {!isGuest && (
+            <button
+              onClick={() => setShowUploadModal(true)}
+              className={cn(
+                'shrink-0 flex h-7 w-7 mb-1.5 items-center justify-center rounded-full',
+                'bg-warm-100 text-warm-500 transition-all duration-fast',
+                'hover:bg-warm-200 hover:text-warm-700'
+              )}
+              aria-label="Upload documents"
+              title="Upload documents"
+            >
+              <Upload className="h-3.5 w-3.5" />
+            </button>
+          )}
           <textarea
             ref={textareaRef}
             value={inputValue}

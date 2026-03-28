@@ -15,10 +15,12 @@ import {
   X,
   Loader2,
   Star,
+  Paperclip,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Input, ConfidenceLevel } from '@atlas/types';
 import { getTopicConfig } from '@/lib/progress';
+import { useFiles } from '@/lib/context/files-context';
 
 // ============================================
 // Types
@@ -155,6 +157,9 @@ export function TopicCard({
   const [editValue, setEditValue] = useState(input?.user_response || '');
   const [showResponse, setShowResponse] = useState(false);
 
+  const { getSourceFile } = useFiles();
+  const sourceFile = input?.source_file_id ? getSourceFile(input.source_file_id) : undefined;
+
   const topicConfig = getTopicConfig(topicId);
 
   // Determine status.
@@ -281,6 +286,14 @@ export function TopicCard({
             </span>
           )}
 
+          {/* Source file badge — shown when input was extracted from a document */}
+          {sourceFile && (
+            <span className="shrink-0 inline-flex items-center gap-1 text-[11px] text-[#9B9A97] max-w-[110px]">
+              <Paperclip className="h-3 w-3 shrink-0" />
+              <span className="truncate">{sourceFile.filename.replace(/\.[^.]+$/, '')}</span>
+            </span>
+          )}
+
           {/* Status indicator - stays in fixed position (outlined with icon) */}
           <span className={cn(
             'shrink-0 inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-medium',
@@ -353,6 +366,14 @@ export function TopicCard({
               </div>
             )}
 
+            {/* Source file attribution */}
+            {sourceFile && (
+              <div className="flex items-center gap-1.5 text-[11px] text-[#9B9A97]">
+                <Paperclip className="w-3 h-3 shrink-0" />
+                <span>Extracted from <span className="font-medium">{sourceFile.filename}</span></span>
+              </div>
+            )}
+
             {/* Key Insight (if input exists) */}
             {keyInsight && (
               <div>
@@ -417,7 +438,7 @@ export function TopicCard({
               </div>
             )}
 
-            {/* Your Response (collapsed by default) */}
+            {/* Response / Extracted content (collapsed by default) */}
             {input?.user_response && (
               <div>
                 <button
@@ -428,7 +449,7 @@ export function TopicCard({
                     'h-3.5 w-3.5 transition-transform',
                     showResponse && 'rotate-90'
                   )} />
-                  Your Response
+                  {sourceFile ? 'Extracted content' : 'Your Response'}
                 </button>
                 {showResponse && (
                   <div className="mt-2 rounded-md bg-[#FAF9F7] border border-[#E8E6E1] px-3 py-2.5">

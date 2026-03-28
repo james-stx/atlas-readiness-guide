@@ -44,6 +44,7 @@ export function ContentDomainHeader({
   const {
     entries,
     generatingDomain,
+    insightErrors,
     newlyReadyDomain,
     isStale,
     isNew,
@@ -79,6 +80,7 @@ export function ContentDomainHeader({
   const insight = entry?.insight;
   const stale = isStale(domain);
   const hasNewInsight = isNew(domain);
+  const hasError = !!insightErrors[domain];
 
   // Next domain navigation helpers
   const domainIdx = DOMAIN_ORDER.indexOf(domain);
@@ -112,9 +114,32 @@ export function ContentDomainHeader({
         </span>
       </div>
 
-      {/* Domain Summary Card — three states */}
+      {/* Domain Summary Card — four states */}
       {generatingDomain === domain ? (
         <LoadingCard count={count} />
+      ) : hasError && !entry ? (
+        <div className="rounded-lg border border-[#FBD5D5] bg-[#FFF5F5] overflow-hidden">
+          <div className="p-4">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#FBD5D5]">
+                <AlertCircle className="h-4 w-4 text-[#E03E3E]" />
+              </div>
+              <p className="text-[14px] text-[#E03E3E] font-medium">
+                Failed to generate summary
+              </p>
+            </div>
+            <div className="pl-11">
+              <button
+                onClick={() => refreshInsight(domain)}
+                className="flex items-center gap-1.5 text-[13px] font-medium text-[#2383E2] hover:text-[#1A6DC0] transition-colors"
+              >
+                <RefreshCw className="h-3.5 w-3.5" />
+                Try again
+              </button>
+            </div>
+          </div>
+          <ChapterProgressBar current={count.current} total={count.total} />
+        </div>
       ) : entry && insight ? (
         <InsightBanner
           insight={insight}

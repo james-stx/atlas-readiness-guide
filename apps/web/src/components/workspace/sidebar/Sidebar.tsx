@@ -1,13 +1,17 @@
 'use client';
 
+import { useState } from 'react';
 import { useWorkspace } from '@/lib/context/workspace-context';
 import { useAssessment } from '@/lib/context/assessment-context';
 import { useDomainInsight } from '@/lib/context/domain-insight-context';
+import { useFiles } from '@/lib/context/files-context';
 import { DOMAINS } from '@/lib/progress';
 import { SidebarDomainItem } from './SidebarDomainItem';
 import { SidebarTopicItem } from './SidebarTopicItem';
 import { SidebarFooter } from './SidebarFooter';
-import { FileText, ChevronRight } from 'lucide-react';
+import { FileUploadModal } from '@/components/workspace/FileUploadModal';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { FileText, ChevronRight, Upload, Paperclip, Trash2 } from 'lucide-react';
 
 export function Sidebar() {
   const {
@@ -27,8 +31,16 @@ export function Sidebar() {
     switchToReport,
   } = useWorkspace();
 
-  const { snapshot } = useAssessment();
+  const { session, refreshInputs } = useAssessment();
   const { isNew: hasNewInsight } = useDomainInsight();
+  const { files, deleteFile } = useFiles();
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; filename: string; topicsFound: number } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const isGuest = session?.is_guest === true;
+  const uploadedFiles = files.filter(f => f.status !== 'failed');
+  const MAX_FILES = 5;
 
   // Calculate overall progress
   const totalTopics = 25;
@@ -140,6 +152,63 @@ export function Sidebar() {
         </div>
       </div>
 
+      {/* ─── DOCUMENTS SECTION (signed-in users only) ─── */}
+      {!isGuest && session && (
+        <div className="border-t border-[#E8E6E1] px-3 py-3" data-tour-id="tour-documents">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[11px] font-medium tracking-[0.02em] uppercase text-[#91918E]">
+              Documents
+            </span>
+            {uploadedFiles.length > 0 && uploadedFiles.length < MAX_FILES && (
+              <button
+                onClick={() => setShowUploadModal(true)}
+                className="text-[11px] text-[#2563EB] hover:underline"
+              >
+                + Add more
+              </button>
+            )}
+          </div>
+          {uploadedFiles.length === 0 ? (
+            <div className="rounded-lg border border-[#E8E6E1] bg-white px-3 py-3">
+              <p className="text-[12px] text-[#787671] leading-relaxed mb-2.5">
+                Upload a pitch deck, business plan, or GTM doc and Atlas auto-fills the relevant topics.
+              </p>
+              <button
+                onClick={() => setShowUploadModal(true)}
+                className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md bg-[#2563EB] text-white text-[12px] font-medium hover:bg-[#1D4ED8] transition-colors"
+              >
+                <Upload className="w-3 h-3 shrink-0" />
+                Upload documents
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-1">
+              {uploadedFiles.map(file => (
+                <div
+                  key={file.id}
+                  className="group flex items-center gap-2 px-2 py-1.5 rounded-md text-[12px] text-[#37352F] hover:bg-[#EBEBEA] transition-colors"
+                >
+                  <Paperclip className="w-3 h-3 text-[#9B9A97] shrink-0" />
+                  <span className="flex-1 truncate">{file.filename}</span>
+                  {file.topics_found > 0 && (
+                    <span className="text-[11px] text-[#9B9A97] shrink-0 group-hover:hidden">
+                      {file.topics_found} topics
+                    </span>
+                  )}
+                  <button
+                    onClick={() => setDeleteTarget({ id: file.id, filename: file.filename, topicsFound: file.topics_found })}
+                    className="hidden group-hover:flex items-center text-[#9B9A97] hover:text-[#E03E3E] transition-colors shrink-0"
+                    aria-label={`Remove ${file.filename}`}
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* ─── READINESS REPORT SECTION ─── */}
       <div className="border-t border-[#E8E6E1]" data-tour-id="tour-report">
         <button
@@ -184,6 +253,41 @@ export function Sidebar() {
 
       {/* Footer */}
       <SidebarFooter />
+
+      {/* Upload modal */}
+      {session && (
+        <FileUploadModal
+          isOpen={showUploadModal}
+          onClose={() => setShowUploadModal(false)}
+          sessionId={session.id}
+        />
+      )}
+
+      {/* Delete confirmation */}
+      <ConfirmDialog
+        isOpen={!!deleteTarget}
+        title="Remove document"
+        message={
+          deleteTarget
+            ? `This will also remove ${deleteTarget.topicsFound > 0 ? `the ${deleteTarget.topicsFound} insight${deleteTarget.topicsFound !== 1 ? 's' : ''} extracted from` : 'all data extracted from'} "${deleteTarget.filename}". This cannot be undone.`
+            : ''
+        }
+        confirmLabel={isDeleting ? 'Removing...' : 'Remove document'}
+        cancelLabel="Keep it"
+        variant="danger"
+        onConfirm={async () => {
+          if (!deleteTarget || !session) return;
+          setIsDeleting(true);
+          try {
+            await deleteFile(deleteTarget.id);
+            await refreshInputs(session.id);
+          } finally {
+            setIsDeleting(false);
+            setDeleteTarget(null);
+          }
+        }}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </nav>
   );
 }

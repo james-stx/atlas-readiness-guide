@@ -6,7 +6,7 @@ const nextConfig = {
   transpilePackages: ['@atlas/types', '@atlas/config'],
   // Prevent webpack from bundling packages with native deps or complex internals
   experimental: {
-    serverComponentsExternalPackages: ['@react-pdf/renderer'],
+    serverComponentsExternalPackages: ['@react-pdf/renderer', 'pdf-parse', 'mammoth', 'adm-zip'],
   },
   // API-only app - no static pages needed
   output: 'standalone',

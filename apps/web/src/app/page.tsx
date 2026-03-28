@@ -61,8 +61,8 @@ export default function HomePage() {
 
           {/* Subhead */}
           <p className="mt-8 text-[#787671] text-[18px] md:text-[20px] max-w-[560px] leading-[1.5]">
-            Atlas surfaces your validated knowledge from your assumptions across
-            every critical dimension of U.S. market entry. In 25 minutes.
+            Somewhere in your U.S. expansion plan, there are gaps you haven&apos;t
+            found yet. Atlas tells you exactly where, before you land.
           </p>
 
           {/* CTA */}
@@ -75,7 +75,7 @@ export default function HomePage() {
               <ArrowRightIcon className="w-5 h-5" />
             </Link>
             <span className="text-[#9B9A97] text-[13px]">
-              No account needed &middot; Takes 25 minutes
+              No commitment. No consultant. No cost.
             </span>
           </div>
 
@@ -101,21 +101,24 @@ export default function HomePage() {
               The problem
             </p>
             <h2 className="text-[36px] md:text-[52px] font-black text-[#0A0A0A] tracking-[-0.03em] leading-[1.05]">
-              Expansion decisions made on incomplete information
-              don&apos;t fail slowly.
+              Going in without a clear picture of your readiness isn&apos;t bold.
+              It&apos;s just expensive.
             </h2>
             <p className="mt-6 text-[#787671] text-[18px] leading-[1.6] max-w-[600px]">
-              Assumptions get dressed up as market validation. &ldquo;Readiness&rdquo; becomes
-              a feeling, not a position. By the time gaps surface, momentum
-              and capital are already gone.
+              The questions that matter: whether your product fits, whether your
+              GTM holds, whether your runway covers the gap. Those questions have answers. Getting
+              to them through consultants or proper research takes months and costs
+              more than most early-stage companies can justify. So teams move
+              anyway. And find out in the market, when the cost of being wrong is
+              highest.
             </p>
           </div>
 
           {/* Stats row */}
           <div className="mt-16 grid md:grid-cols-3 gap-px bg-[#E8E6E1]">
-            <StatBlock value="25 min" label="to complete a full expansion readiness assessment" />
-            <StatBlock value="5 domains" label="of market entry mapped across 25 critical topics" />
-            <StatBlock value="3 confidence levels" label="classifying every input as fact, research, or assumption" />
+            <StatBlock value="$50K+" label="what a consultant-led expansion readiness engagement typically costs" />
+            <StatBlock value="6–12 months" label="before most founders get real market feedback after committing to the U.S." />
+            <StatBlock value="Free" label="what Atlas costs. No consultant, no agency, no wait." />
           </div>
         </div>
       </section>
@@ -127,24 +130,24 @@ export default function HomePage() {
             How it works
           </p>
           <h2 className="text-[36px] md:text-[52px] font-black text-[#0A0A0A] tracking-[-0.03em] leading-[1.0] mb-16 max-w-[600px]">
-            Conversation.<br />Classification.<br />Clarity.
+            Conversation.<br />Evaluation.<br />Clarity.
           </h2>
 
           <div className="grid md:grid-cols-3 gap-8 md:gap-12">
             <HowStep
               number="01"
               title="Have an honest conversation"
-              description="Atlas asks the hard questions about your market, product, GTM, operations, and finances. You answer in plain English. No forms. No checklists."
+              description="Atlas asks the hard questions most founders haven't been asked. You answer in plain English. No scoring rubrics, no trick questions, no forms."
             />
             <HowStep
               number="02"
-              title="See facts vs. assumptions"
-              description="Every response is classified: High confidence (validated with data), Medium (researched but unproven), Low (assumed). The first tool that makes this distinction explicit."
+              title="Get an honest evaluation"
+              description="Your answers are assessed against what U.S. expansion actually requires. Atlas tells you where you're genuinely prepared, where you're working from assumption, and where the gaps are real enough to change your outcome."
             />
             <HowStep
               number="03"
-              title="Walk away with a position"
-              description="Your Readiness Report summarises your strengths, gaps, and a 90-day action plan built to withstand investor scrutiny."
+              title="Leave with a position, not a score"
+              description="Your Readiness Report names what you're ready to move on, what to address before you land, and where to focus your first 90 days. Specific gaps. Concrete next steps. Not a number."
             />
           </div>
         </div>
@@ -159,12 +162,13 @@ export default function HomePage() {
                 Coverage
               </p>
               <h2 className="text-[36px] md:text-[52px] font-black text-[#0A0A0A] tracking-[-0.03em] leading-[1.05]">
-                5 domains.<br />25 topics.<br />Zero fluff.
+                5 domains.<br />25 topics.
               </h2>
             </div>
-            <p className="text-[#787671] text-[16px] max-w-[340px] leading-[1.5]">
-              Every domain covers the 5 topics that matter most for U.S. market entry.
-              Conversation-driven, not checkbox-driven.
+            <p className="text-[#787671] text-[16px] max-w-[380px] leading-[1.5]">
+              Most expansion mistakes happen in one of these five areas. Atlas
+              helps you understand exactly where you sit across all of them,
+              before you discover the gaps in market.
             </p>
           </div>
 
@@ -172,37 +176,38 @@ export default function HomePage() {
             <DomainCard
               number="01"
               name="Market"
-              description="Target customer definition, addressable market size, competitive positioning, buying behaviour, and market timing."
+              topics={['Why expand to the U.S.?', 'Target customer profile', 'Market size estimate', 'Competitive landscape', 'Existing U.S. presence']}
               color={DOMAIN_COLORS[0]}
             />
             <DomainCard
               number="02"
               name="Product"
-              description="U.S. product-market fit, localisation requirements, regulatory compliance, feature differentiation, and pricing strategy."
+              topics={['What you\'re selling', 'Fit for U.S. market', 'Localisation needs', 'Competitive advantage', 'Product-market fit evidence']}
               color={DOMAIN_COLORS[1]}
             />
             <DomainCard
               number="03"
               name="Go-to-Market"
-              description="Sales motion, channel strategy, partnership landscape, demand generation, and customer acquisition economics."
+              topics={['Go-to-market approach', 'U.S. sales presence', 'Pricing strategy', 'Marketing channels', 'Sales cycle expectations']}
               color={DOMAIN_COLORS[2]}
             />
             <DomainCard
               number="04"
               name="Operations"
-              description="U.S. legal structure, hiring strategy, team composition, infrastructure requirements, and operational readiness."
+              topics={['Customer support coverage', 'U.S. legal entity', 'Compliance & security', 'Technical infrastructure', 'U.S. partnerships']}
               color={DOMAIN_COLORS[3]}
             />
             <DomainCard
               number="05"
               name="Financials"
-              description="Funding runway, unit economics, U.S. cost structures, revenue projections, and financial risk exposure."
+              topics={['Expansion budget', 'Runway impact', 'Funding status', 'Revenue expectations', 'Break-even timeline']}
               color={DOMAIN_COLORS[4]}
             />
             <div className="hidden lg:flex flex-col items-start justify-end p-6 bg-[#F5F4EF]">
               <p className="text-[#9B9A97] text-[14px] leading-[1.6]">
-                Atlas synthesises insights across all five domains into a single,
-                investor-grade Readiness Report.
+                Atlas evaluates your responses across all five domains and
+                produces a personalised assessment of where you&apos;re ready
+                to move and where you need to build.
               </p>
             </div>
           </div>
@@ -216,29 +221,29 @@ export default function HomePage() {
             Your output
           </p>
           <h2 className="text-[36px] md:text-[52px] font-black text-white tracking-[-0.03em] leading-[1.05] mb-16 max-w-[600px]">
-            A Readiness Report that holds up in the boardroom.
+            A clear picture of where you stand, and what to do next.
           </h2>
 
           <div className="grid md:grid-cols-2 gap-5">
             <OutputCard
               icon={<StarIcon />}
-              title="Confidence classification"
-              description="Every input categorised as High, Medium, or Low confidence. See exactly what is validated and what is assumed across all 25 topics."
+              title="What you know vs. what you're assuming"
+              description="Every topic across all five domains, assessed. You'll see exactly where your confidence is grounded in evidence, and where you're making assumptions that still need to be tested."
             />
             <OutputCard
               icon={<CircleIcon />}
-              title="Domain readiness profile"
-              description="Your standing across all 5 domains with full progress visibility. Know your strengths, your gaps, and what needs urgent attention before you land."
+              title="Your readiness across every dimension"
+              description="A structured view of where you're ready to move and where you need to build, across market, product, GTM, operations, and financials."
             />
             <OutputCard
               icon={<ArrowRightIcon className="w-5 h-5" />}
-              title="90-day action plan"
-              description="Prioritised actions mapped to your specific gaps. Not generic advice. Steps tailored to your actual readiness profile."
+              title="A 90-day focus plan"
+              description="Your biggest gaps, ranked by urgency. Each one comes with a concrete next step. Not generic advice, but actions specific to what your assessment revealed."
             />
             <OutputCard
               icon={<UploadIcon />}
-              title="Investor-grade PDF report"
-              description="Download or email a professional document to share with your board, investors, or advisors. Built to answer the hard questions before they are asked."
+              title="Shareable PDF report"
+              description="A structured document to share with your team, advisors, or board. Your current position and the gaps you're working to close, clearly laid out."
             />
           </div>
         </div>
@@ -283,11 +288,11 @@ export default function HomePage() {
               </p>
               <ul className="space-y-5">
                 {[
-                  'Conversation shaped by your actual answers',
-                  'Confidence classification, not an arbitrary score',
-                  'Explicitly separates validated facts from assumptions',
-                  'Actionable 90-day plan specific to your gaps',
-                  'Free. 25 minutes. No consultant required.',
+                  'A conversation that adapts to your actual situation',
+                  'A clear evaluation of where you stand, not an arbitrary score',
+                  'Every gap named, with a concrete path forward',
+                  'A 90-day plan built around your specific readiness profile',
+                  'Free to start. No consultant required.',
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-3 text-white text-[15px]">
                     <span className="text-[#93BBFF] text-[20px] leading-[1] shrink-0">✓</span>
@@ -334,7 +339,8 @@ export default function HomePage() {
             Your competition is already moving.
           </h2>
           <p className="text-white/70 text-[18px] max-w-[480px] leading-[1.5] mb-10">
-            Know if you are ready. 25 minutes. No account needed. Completely free.
+            Find out where you stand before the market does. No account needed.
+            Always free.
           </p>
           <Link
             href="/start"
@@ -410,12 +416,12 @@ function HowStep({
 function DomainCard({
   number,
   name,
-  description,
+  topics,
   color,
 }: {
   number: string;
   name: string;
-  description: string;
+  topics: string[];
   color: string;
 }) {
   return (
@@ -426,7 +432,14 @@ function DomainCard({
       <h3 className="text-[22px] font-black text-[#0A0A0A] tracking-[-0.02em] mt-2 mb-3">
         {name}
       </h3>
-      <p className="text-[#787671] text-[14px] leading-[1.5]">{description}</p>
+      <ul className="space-y-1">
+        {topics.map((topic) => (
+          <li key={topic} className="flex items-start gap-2 text-[#787671] text-[13px] leading-[1.4]">
+            <span className="text-[#9B9A97] shrink-0 mt-[2px]">·</span>
+            <span>{topic}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

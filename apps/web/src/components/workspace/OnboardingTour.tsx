@@ -25,6 +25,14 @@ const TOUR_STEPS: TourStep[] = [
     padding: 10,
   },
   {
+    id: 'tour-documents',
+    title: 'Upload Your Documents',
+    description:
+      'Have a pitch deck, business plan, or GTM strategy? Upload it here and Atlas will automatically extract relevant insights — saving you time on topics already covered in your docs.',
+    position: 'right',
+    padding: 10,
+  },
+  {
     id: 'tour-domain-insight',
     title: 'Domain Overview & Insights',
     description:
@@ -76,14 +84,23 @@ export function OnboardingTour({ onComplete }: OnboardingTourProps) {
     const el = document.querySelector<HTMLElement>(
       `[data-tour-id="${TOUR_STEPS[stepIndex].id}"]`
     );
-    if (!el) return;
+    if (!el) {
+      // Element not present (e.g. documents section hidden for guests) — skip this step
+      const next = stepIndex + 1;
+      if (next < TOUR_STEPS.length) {
+        setStep(next);
+      } else {
+        onComplete();
+      }
+      return;
+    }
 
     el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     // Wait for scroll + re-layout before measuring
     setTimeout(() => {
       setRect(el.getBoundingClientRect());
     }, 350);
-  }, []);
+  }, [onComplete]);
 
   useEffect(() => {
     measureStep(step);

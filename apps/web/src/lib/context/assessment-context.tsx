@@ -128,6 +128,7 @@ interface AssessmentContextValue extends AssessmentState {
   startGuestSession: () => Promise<void>;
   recoverSession: () => Promise<boolean>;
   clearSession: () => void;
+  upgradeGuestSession: (sessionId: string, email: string, recoveryToken: string) => void;
   isGuest: boolean;
 
   // Chat actions
@@ -137,6 +138,7 @@ interface AssessmentContextValue extends AssessmentState {
 
   // Input actions
   addInput: (input: Input) => void;
+  refreshInputs: (sessionId: string) => Promise<void>;
 
   // Snapshot actions
   generateSnapshot: () => Promise<void>;
@@ -571,6 +573,16 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'ADD_INPUT', payload: input });
   }, []);
 
+  // Refresh all inputs from the server (called after file processing)
+  const refreshInputs = useCallback(async (sessionId: string) => {
+    try {
+      const { inputs } = await api.getSessionInputs(sessionId);
+      dispatch({ type: 'SET_INPUTS', payload: inputs });
+    } catch {
+      // Non-fatal — workspace will stay consistent with DB on next full load
+    }
+  }, []);
+
   // Generate snapshot
   const generateSnapshotAction = useCallback(async () => {
     if (!state.session) {
@@ -603,6 +615,22 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
     }
   }, [state.session]);
 
+  // Upgrade a guest session to a real account after OTP verification + claim
+  const upgradeGuestSession = useCallback((sessionId: string, email: string, recoveryToken: string) => {
+    saveSessionToStorage({ sessionId, recoveryToken, email });
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('atlas_guest_session_id');
+    }
+    dispatch({
+      type: 'SET_SESSION',
+      payload: {
+        ...state.session!,
+        email,
+        is_guest: false,
+      } as Session,
+    });
+  }, [state.session]);
+
   // Update domain
   const updateDomain = useCallback((domain: DomainType) => {
     dispatch({ type: 'UPDATE_DOMAIN', payload: domain });
@@ -619,11 +647,13 @@ export function AssessmentProvider({ children }: { children: ReactNode }) {
     startGuestSession,
     recoverSession: recoverSessionAction,
     clearSession,
+    upgradeGuestSession,
     isGuest: state.session?.is_guest === true,
     initChat: initChatAction,
     sendMessage: sendMessageAction,
     addMessage,
     addInput,
+    refreshInputs,
     generateSnapshot: generateSnapshotAction,
     updateDomain,
     updateStatus,

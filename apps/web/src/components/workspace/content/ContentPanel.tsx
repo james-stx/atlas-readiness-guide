@@ -2,13 +2,16 @@
 
 import { useWorkspace } from '@/lib/context/workspace-context';
 import { useAssessment } from '@/lib/context/assessment-context';
+import { useFiles } from '@/lib/context/files-context';
 import { DOMAIN_TOPICS } from '@/lib/progress';
 import { EmptyState } from './EmptyState';
 import { ContentDomainHeader } from './ContentDomainHeader';
 import { TopicCard } from './TopicCard';
 import { ReportPanel } from '../report/ReportPanel';
-import { useEffect, useRef, useCallback } from 'react';
+import { FileUploadModal } from '@/components/workspace/FileUploadModal';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { useSkippedTopics } from '@/lib/hooks/use-skipped-topics';
+import { Upload, X } from 'lucide-react';
 import type { Input } from '@atlas/types';
 
 export function ContentPanel() {
@@ -22,8 +25,11 @@ export function ContentPanel() {
     activeView,
   } = useWorkspace();
   const { inputs, addInput, session, capturingTopicId } = useAssessment();
+  const { files } = useFiles();
   const { isSkipped, skipTopic, unskipTopic } = useSkippedTopics();
   const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const [nudgeDismissed, setNudgeDismissed] = useState(false);
+  const [showUploadModal, setShowUploadModal] = useState(false);
 
   // Scroll to selected category
   useEffect(() => {
@@ -47,6 +53,14 @@ export function ContentPanel() {
   const domainInputs = inputs.filter((i) => i.domain === selectedDomain);
   const count = getDomainInputCount(selectedDomain);
   const dp = progressState.domainProgress[selectedDomain];
+
+  const hasFiles = files.filter(f => f.status !== 'failed').length > 0;
+  const showUploadNudge =
+    !nudgeDismissed &&
+    !hasFiles &&
+    domainInputs.length === 0 &&
+    session &&
+    session.is_guest !== true;
 
   // Open chat and start discussing a topic - explicit user action via "Talk to Atlas" button
   const handleDiscussTopic = useCallback((topicId: string) => {
@@ -109,6 +123,31 @@ export function ContentPanel() {
 
       {/* Scrollable topic cards */}
       <div className="mx-auto max-w-[720px] px-8 pt-4 pb-8" data-tour-id="tour-topic-cards">
+
+        {/* Upload nudge — shown when domain is empty and no files uploaded */}
+        {showUploadNudge && (
+          <div className="mb-4 flex items-center gap-3 rounded-lg border border-[#2563EB]/20 bg-[#F7FBFF] px-4 py-3">
+            <Upload className="h-4 w-4 text-[#2563EB] shrink-0" />
+            <p className="flex-1 text-[13px] text-[#787671]">
+              Have documents covering this area?{' '}
+              <button
+                onClick={() => setShowUploadModal(true)}
+                className="font-medium text-[#2563EB] hover:underline"
+              >
+                Upload them
+              </button>{' '}
+              and Atlas will auto-fill these topics.
+            </p>
+            <button
+              onClick={() => setNudgeDismissed(true)}
+              className="shrink-0 text-[#C2C0BC] hover:text-[#787671] transition-colors"
+              aria-label="Dismiss"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        )}
+
         <div className="space-y-3">
           {topics.map((topic) => {
             const input = domainInputs.find((i) => i.question_id === topic.id);
@@ -139,6 +178,15 @@ export function ContentPanel() {
           })}
         </div>
       </div>
+
+      {/* Upload modal — triggered from nudge banner */}
+      {session && (
+        <FileUploadModal
+          isOpen={showUploadModal}
+          onClose={() => setShowUploadModal(false)}
+          sessionId={session.id}
+        />
+      )}
     </div>
   );
 }
