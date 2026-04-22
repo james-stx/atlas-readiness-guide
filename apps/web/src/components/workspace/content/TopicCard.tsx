@@ -16,9 +16,11 @@ import {
   Loader2,
   Star,
   Paperclip,
+  Trash2,
+  Plus,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { Input, ConfidenceLevel } from '@atlas/types';
+import type { Input, ConfidenceLevel, FileTopicMapping } from '@atlas/types';
 import { getTopicConfig } from '@/lib/progress';
 import { useFiles } from '@/lib/context/files-context';
 
@@ -38,6 +40,7 @@ interface TopicCardProps {
   isCapturingInput?: boolean;
   onWriteResponse: (response: string) => void;
   onEditResponse?: (response: string) => void;
+  onDeleteMapping?: (mappingId: string) => void;
   onTalkToAtlas: () => void;
   onSkip: () => void;
   onUnskip: () => void;
@@ -148,6 +151,7 @@ export function TopicCard({
   isCapturingInput = false,
   onWriteResponse,
   onEditResponse,
+  onDeleteMapping,
   onTalkToAtlas,
   onSkip,
   onUnskip,
@@ -155,10 +159,17 @@ export function TopicCard({
   const [cardState, setCardState] = useState<CardState>('collapsed');
   const [writeValue, setWriteValue] = useState('');
   const [editValue, setEditValue] = useState(input?.user_response || '');
-  const [showResponse, setShowResponse] = useState(false);
 
-  const { getSourceFile } = useFiles();
+  const { getSourceFile, mappings } = useFiles();
   const sourceFile = input?.source_file_id ? getSourceFile(input.source_file_id) : undefined;
+
+  // All document mappings for this specific topic (may come from multiple files)
+  const topicMappings = mappings.filter((m: FileTopicMapping) => m.question_id === topicId);
+
+  // Source type determination
+  const isManual = input?.confidence_rationale === 'Direct user input without AI analysis';
+  const isDocumentSourced = !!input?.source_file_id;
+  const isConversation = !!input && !isManual && !isDocumentSourced;
 
   const topicConfig = getTopicConfig(topicId);
 
@@ -286,11 +297,27 @@ export function TopicCard({
             </span>
           )}
 
-          {/* Source file badge — shown when input was extracted from a document */}
-          {sourceFile && (
-            <span className="shrink-0 inline-flex items-center gap-1 text-[11px] text-[#9B9A97] max-w-[110px]">
-              <Paperclip className="h-3 w-3 shrink-0" />
-              <span className="truncate">{sourceFile.filename.replace(/\.[^.]+$/, '')}</span>
+          {/* Source badge — indicates where the input came from */}
+          {input && (
+            <span className="shrink-0 inline-flex items-center gap-1 text-[11px] text-[#9B9A97] max-w-[120px]">
+              {isDocumentSourced || topicMappings.length > 0 ? (
+                <>
+                  <Paperclip className="h-3 w-3 shrink-0" />
+                  <span className="truncate">
+                    {(sourceFile?.filename ?? (topicMappings.length > 0 ? getSourceFile(topicMappings[0].file_id)?.filename : undefined) ?? 'Document').replace(/\.[^.]+$/, '')}
+                  </span>
+                </>
+              ) : isManual ? (
+                <>
+                  <PenLine className="h-3 w-3 shrink-0" />
+                  <span>You entered</span>
+                </>
+              ) : (
+                <>
+                  <MessageSquare className="h-3 w-3 shrink-0" />
+                  <span>Atlas</span>
+                </>
+              )}
             </span>
           )}
 
@@ -366,14 +393,6 @@ export function TopicCard({
               </div>
             )}
 
-            {/* Source file attribution */}
-            {sourceFile && (
-              <div className="flex items-center gap-1.5 text-[11px] text-[#9B9A97]">
-                <Paperclip className="w-3 h-3 shrink-0" />
-                <span>Extracted from <span className="font-medium">{sourceFile.filename}</span></span>
-              </div>
-            )}
-
             {/* Key Insight (if input exists) */}
             {keyInsight && (
               <div>
@@ -438,26 +457,56 @@ export function TopicCard({
               </div>
             )}
 
-            {/* Response / Extracted content (collapsed by default) */}
-            {input?.user_response && (
+            {/* Sources — labelled by origin */}
+            {input && (topicMappings.length > 0 || input.user_response) && (
               <div>
-                <button
-                  onClick={() => setShowResponse(!showResponse)}
-                  className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-[#9B9A97] hover:text-[#5C5A56] transition-colors"
-                >
-                  <ChevronRight className={cn(
-                    'h-3.5 w-3.5 transition-transform',
-                    showResponse && 'rotate-90'
-                  )} />
-                  {sourceFile ? 'Extracted content' : 'Your Response'}
-                </button>
-                {showResponse && (
-                  <div className="mt-2 rounded-md bg-[#FAF9F7] border border-[#E8E6E1] px-3 py-2.5">
-                    <p className="text-[13px] leading-relaxed text-[#5C5A56] whitespace-pre-wrap">
-                      {input.user_response}
-                    </p>
-                  </div>
-                )}
+                <h4 className="text-[11px] font-medium uppercase tracking-wide text-[#9B9A97] mb-2">
+                  Sources
+                </h4>
+                <div className="space-y-1.5">
+                  {/* Document sources from file_topic_mappings — read-only with delete */}
+                  {topicMappings.map((mapping) => {
+                    const mappingFile = getSourceFile(mapping.file_id);
+                    return (
+                      <SourceRow
+                        key={mapping.id}
+                        icon={<Paperclip className="h-3.5 w-3.5 shrink-0 text-[#9B9A97]" />}
+                        label={mappingFile?.filename ?? 'Document'}
+                        content={mapping.extracted_content}
+                        isReadOnly
+                        onDelete={onDeleteMapping ? () => onDeleteMapping(mapping.id) : undefined}
+                      />
+                    );
+                  })}
+
+                  {/* Fallback: doc-sourced input but mappings not yet loaded */}
+                  {isDocumentSourced && topicMappings.length === 0 && sourceFile && input.user_response && (
+                    <SourceRow
+                      icon={<Paperclip className="h-3.5 w-3.5 shrink-0 text-[#9B9A97]" />}
+                      label={sourceFile.filename}
+                      content={input.user_response}
+                      isReadOnly
+                    />
+                  )}
+
+                  {/* Atlas conversation source */}
+                  {isConversation && input.user_response && (
+                    <SourceRow
+                      icon={<MessageSquare className="h-3.5 w-3.5 shrink-0 text-[#9B9A97]" />}
+                      label="Atlas conversation"
+                      content={input.user_response}
+                    />
+                  )}
+
+                  {/* Manual entry source */}
+                  {isManual && input.user_response && (
+                    <SourceRow
+                      icon={<PenLine className="h-3.5 w-3.5 shrink-0 text-[#9B9A97]" />}
+                      label="You entered"
+                      content={input.user_response}
+                    />
+                  )}
+                </div>
               </div>
             )}
 
@@ -470,15 +519,25 @@ export function TopicCard({
                 {input ? formatTimestamp(input.created_at) : 'How would you like to proceed?'}
               </span>
               <div className="flex items-center gap-2">
-                {/* Edit button (if has input) */}
+                {/* Edit / Add context button */}
                 {input && (
-                  <button
-                    onClick={handleEditClick}
-                    className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[13px] text-[#5C5A56] hover:bg-[#E8E6E1] transition-colors"
-                  >
-                    <Pencil className="h-3.5 w-3.5" />
-                    Edit
-                  </button>
+                  isDocumentSourced ? (
+                    <button
+                      onClick={handleWriteClick}
+                      className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[13px] text-[#5C5A56] hover:bg-[#E8E6E1] transition-colors"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      Add context
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleEditClick}
+                      className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[13px] text-[#5C5A56] hover:bg-[#E8E6E1] transition-colors"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                      Edit
+                    </button>
+                  )
                 )}
 
                 {/* Write button (if no input) */}
@@ -548,7 +607,9 @@ export function TopicCard({
               value={writeValue}
               onChange={(e) => setWriteValue(e.target.value)}
               className="w-full min-h-[120px] rounded-md border border-[#D4D1CB] bg-white px-3 py-2.5 text-[14px] text-[#37352F] placeholder:text-[#9B9A97] focus:outline-none focus:ring-2 focus:ring-[#2383E2]/30 focus:border-[#2383E2] resize-none"
-              placeholder="Share your thoughts on this topic..."
+              placeholder={isDocumentSourced
+                ? "Add your own context or additional details not covered in the document..."
+                : "Share your thoughts on this topic..."}
               autoFocus
             />
           </div>
@@ -656,6 +717,59 @@ function StatusIcon({ status, className }: { status: TopicStatus; className?: st
   };
   const Icon = icons[status];
   return <Icon className={cn(className, status === 'in_progress' && 'animate-spin')} />;
+}
+
+function SourceRow({
+  icon,
+  label,
+  content,
+  isReadOnly = false,
+  onDelete,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  content: string;
+  isReadOnly?: boolean;
+  onDelete?: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div>
+      <div className="flex items-center gap-1">
+        <button
+          onClick={() => setOpen(!open)}
+          className="flex flex-1 items-center gap-1.5 text-[11px] font-medium text-[#9B9A97] hover:text-[#5C5A56] transition-colors min-w-0"
+        >
+          <ChevronRight className={cn('h-3.5 w-3.5 shrink-0 transition-transform', open && 'rotate-90')} />
+          {icon}
+          <span className="truncate text-left">{label}</span>
+          {isReadOnly && (
+            <span className="ml-1 shrink-0 text-[10px] text-[#C2C0BC] italic">read-only</span>
+          )}
+        </button>
+        {onDelete && (
+          <button
+            onClick={onDelete}
+            className="shrink-0 p-0.5 text-[#C2C0BC] hover:text-[#E03E3E] transition-colors"
+            aria-label="Remove this source"
+            title="Remove this source from topic"
+          >
+            <Trash2 className="h-3 w-3" />
+          </button>
+        )}
+      </div>
+      {open && (
+        <div className="mt-1.5 ml-5 rounded-md bg-[#F7F6F3] border border-[#E8E6E1] px-3 py-2.5">
+          <p className={cn(
+            'text-[13px] leading-relaxed whitespace-pre-wrap',
+            isReadOnly ? 'text-[#9B9A97] italic' : 'text-[#5C5A56]'
+          )}>
+            {content}
+          </p>
+        </div>
+      )}
+    </div>
+  );
 }
 
 function formatTimestamp(dateString: string): string {

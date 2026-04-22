@@ -298,6 +298,16 @@ export async function deleteFile(fileId: string): Promise<void> {
   }
 }
 
+export async function deleteFileMapping(mappingId: string): Promise<void> {
+  const response = await fetch(`${API_URL}/api/files/mappings/${mappingId}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new ApiError(error.error || 'Failed to delete mapping', response.status);
+  }
+}
+
 // ============================================
 // Utilities
 // ============================================

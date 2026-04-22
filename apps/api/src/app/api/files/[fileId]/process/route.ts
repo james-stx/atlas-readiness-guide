@@ -59,15 +59,17 @@ export async function POST(
     const existingInputs = await getSessionInputs(sessionFile.session_id);
     const existingQuestionIds = existingInputs.map(i => i.question_id);
 
-    // Extract topic mappings
-    const mappings = await extractTopicMappings(text, detectedType, existingQuestionIds);
+    // Extract topic mappings (all topics — input creation is gated on existingQuestionIds below)
+    const mappings = await extractTopicMappings(text, detectedType);
     console.log(`[Atlas Files] Topic mappings found: ${mappings.length}`);
 
-    // Save each mapping and create inputs for uncovered topics
+    // Save each mapping and always upsert the input.
+    // Documents enrich every topic they touch — even topics already answered via
+    // conversation or a previous upload. Conflicts are surfaced in considerations.
     const savedMappings = [];
     const savedInputs: Input[] = [];
     for (const mapping of mappings) {
-      // Save to file_topic_mappings
+      // Save to file_topic_mappings (always — one row per file per topic)
       const saved = await createFileTopicMapping({
         fileId,
         sessionId: sessionFile.session_id,
@@ -80,25 +82,41 @@ export async function POST(
       });
       savedMappings.push(saved);
 
-      // Create input only for topics not yet answered manually
-      if (!existingQuestionIds.includes(mapping.question_id)) {
-        const input = await saveInput({
-          sessionId: sessionFile.session_id,
-          domain: mapping.domain as DomainType,
-          questionId: mapping.question_id,
-          userResponse: mapping.extracted_content,
-          extractedData: {
-            summary: mapping.extracted_content,
-            keyInsight: mapping.extracted_content,
-            strengths: mapping.strengths ?? [],
-            considerations: mapping.considerations ?? [],
-          },
-          confidenceLevel: mapping.confidence_level,
-          confidenceRationale: mapping.confidence_rationale || 'Extracted from uploaded document',
-          sourceFileId: fileId,
-        });
-        savedInputs.push(input);
+      // Check if topic was previously answered and from what source
+      const existingInput = existingInputs.find(i => i.question_id === mapping.question_id);
+      const considerations = [...(mapping.considerations ?? [])];
+
+      if (existingInput) {
+        if (!existingInput.source_file_id) {
+          // Was answered via conversation or manual entry — flag potential conflict/overlap
+          considerations.unshift(
+            'This topic was previously addressed in a conversation with Atlas. Review both the document and conversation insights for a complete picture — they may complement or conflict with each other.'
+          );
+        } else {
+          // Was answered by a different document upload
+          considerations.unshift(
+            'Additional document source found for this topic. Compare with other uploaded documents for consistency.'
+          );
+        }
       }
+
+      // Always upsert input with document content
+      const input = await saveInput({
+        sessionId: sessionFile.session_id,
+        domain: mapping.domain as DomainType,
+        questionId: mapping.question_id,
+        userResponse: mapping.extracted_content,
+        extractedData: {
+          summary: mapping.extracted_content,
+          keyInsight: mapping.extracted_content,
+          strengths: mapping.strengths ?? [],
+          considerations,
+        },
+        confidenceLevel: mapping.confidence_level,
+        confidenceRationale: mapping.confidence_rationale || 'Extracted from uploaded document',
+        sourceFileId: fileId,
+      });
+      savedInputs.push(input);
     }
 
     // Update file record to complete

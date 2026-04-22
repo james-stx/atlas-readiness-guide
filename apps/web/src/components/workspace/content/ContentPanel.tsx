@@ -24,8 +24,8 @@ export function ContentPanel() {
     progressState,
     activeView,
   } = useWorkspace();
-  const { inputs, addInput, session, capturingTopicId } = useAssessment();
-  const { files } = useFiles();
+  const { inputs, addInput, session, capturingTopicId, refreshInputs } = useAssessment();
+  const { files, deleteMapping } = useFiles();
   const { isSkipped, skipTopic, unskipTopic } = useSkippedTopics();
   const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const [nudgeDismissed, setNudgeDismissed] = useState(false);
@@ -72,6 +72,33 @@ export function ContentPanel() {
     selectCategory(selectedDomain, topicId);
     // Don't auto-open chat - let user choose
   }, [selectedDomain, selectCategory]);
+
+  // Handle editing an existing response (non-doc-sourced inputs)
+  const handleEditResponse = useCallback((topicId: string, response: string) => {
+    if (!session || !selectedDomain) return;
+    const existingInput = inputs.find(i => i.question_id === topicId && i.domain === selectedDomain);
+    if (!existingInput) return;
+
+    addInput({
+      ...existingInput,
+      user_response: response,
+      confidence_level: 'medium',
+      confidence_rationale: 'Direct user input without AI analysis',
+      source_file_id: null,
+      extracted_data: {
+        keyInsight: response.slice(0, 200),
+        summary: response.slice(0, 150) + (response.length > 150 ? '...' : ''),
+        strengths: [],
+        considerations: ['Consider discussing with Atlas to develop this further.'],
+      },
+    });
+  }, [session, selectedDomain, inputs, addInput]);
+
+  // Handle deleting a single file mapping from a topic
+  const handleDeleteMapping = useCallback(async (mappingId: string) => {
+    await deleteMapping(mappingId);
+    if (session) await refreshInputs(session.id);
+  }, [deleteMapping, session, refreshInputs]);
 
   // Handle direct write response from NotStartedCard
   const handleWriteResponse = useCallback((topicId: string, response: string) => {
@@ -169,6 +196,8 @@ export function ContentPanel() {
                   isHighlighted={selectedCategory === topic.id}
                   isCapturingInput={showInProgress}
                   onWriteResponse={(response) => handleWriteResponse(topic.id, response)}
+                  onEditResponse={(response) => handleEditResponse(topic.id, response)}
+                  onDeleteMapping={(mappingId) => handleDeleteMapping(mappingId)}
                   onTalkToAtlas={() => handleDiscussTopic(topic.id)}
                   onSkip={() => skipTopic(topic.id)}
                   onUnskip={() => unskipTopic(topic.id)}

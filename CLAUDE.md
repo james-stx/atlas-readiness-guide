@@ -97,46 +97,46 @@ All agents, hooks, and automations are documented in **`AGENTS.md`** at the proj
 .claude/worktrees/great-hodgkin/supabase
 .claude/worktrees/great-hodgkin/tsconfig.json
 .claude/worktrees/great-hodgkin/turbo.json
+.claude/worktrees/pensive-mahavira
+.claude/worktrees/pensive-mahavira/.claude
+.claude/worktrees/pensive-mahavira/.git
+.claude/worktrees/pensive-mahavira/.github
+.claude/worktrees/pensive-mahavira/.gitignore
+.claude/worktrees/pensive-mahavira/.prettierrc
+.claude/worktrees/pensive-mahavira/AGENTS.md
+.claude/worktrees/pensive-mahavira/apps
+.claude/worktrees/pensive-mahavira/CLAUDE.md
+.claude/worktrees/pensive-mahavira/docs
+.claude/worktrees/pensive-mahavira/package.json
+.claude/worktrees/pensive-mahavira/packages
+.claude/worktrees/pensive-mahavira/pnpm-lock.yaml
+.claude/worktrees/pensive-mahavira/pnpm-workspace.yaml
+.claude/worktrees/pensive-mahavira/scripts
+.claude/worktrees/pensive-mahavira/supabase
+.claude/worktrees/pensive-mahavira/tsconfig.json
+.claude/worktrees/pensive-mahavira/turbo.json
+.claude/worktrees/stupefied-murdock
+.claude/worktrees/stupefied-murdock/.claude
+.claude/worktrees/stupefied-murdock/.git
+.claude/worktrees/stupefied-murdock/.github
+.claude/worktrees/stupefied-murdock/.gitignore
+.claude/worktrees/stupefied-murdock/.prettierrc
+.claude/worktrees/stupefied-murdock/AGENTS.md
+.claude/worktrees/stupefied-murdock/apps
+.claude/worktrees/stupefied-murdock/CLAUDE.md
+.claude/worktrees/stupefied-murdock/docs
+.claude/worktrees/stupefied-murdock/package.json
+.claude/worktrees/stupefied-murdock/packages
+.claude/worktrees/stupefied-murdock/pnpm-lock.yaml
+.claude/worktrees/stupefied-murdock/pnpm-workspace.yaml
+.claude/worktrees/stupefied-murdock/scripts
+.claude/worktrees/stupefied-murdock/supabase
+.claude/worktrees/stupefied-murdock/tsconfig.json
+.claude/worktrees/stupefied-murdock/turbo.json
 .git
 .github
 .github/workflows
 .github/workflows/update-docs.yml
-.github/workflows/update-models.yml
-.gitignore
-.prettierrc
-.turbo
-AGENTS.md
-apps
-apps/api
-apps/api/.env.example
-apps/api/.env.local
-apps/api/.eslintrc.json
-apps/api/.gitignore
-apps/api/.next
-apps/api/.turbo
-apps/api/.vercel
-apps/api/.vercel/project.json
-apps/api/.vercel/README.txt
-apps/api/migrations
-apps/api/migrations/001_add_guest_session_fields.sql
-apps/api/migrations/002_file_upload_tables.sql
-apps/api/next-env.d.ts
-apps/api/next.config.js
-apps/api/node_modules
-apps/api/package.json
-apps/api/src
-apps/api/src/app
-apps/api/src/lib
-apps/api/src/middleware.ts
-apps/api/tsconfig.json
-apps/api/tsconfig.tsbuildinfo
-apps/api/vercel.json
-apps/web
-apps/web/.env.example
-apps/web/.env.local
-apps/web/.eslintrc.json
-apps/web/.gitignore
-apps/web/.next
 ```
 <!-- /AUTO:STRUCTURE -->
 
@@ -185,6 +185,7 @@ apps/web/.next
 - /api/export/send/[sessionId] — apps/api/src/app/api/export/send/[sessionId]/route.ts
 - /api/files/[fileId]/process — apps/api/src/app/api/files/[fileId]/process/route.ts
 - /api/files/[fileId] — apps/api/src/app/api/files/[fileId]/route.ts
+- /api/files/mappings/[mappingId] — apps/api/src/app/api/files/mappings/[mappingId]/route.ts
 - /api/files/session/[sessionId] — apps/api/src/app/api/files/session/[sessionId]/route.ts
 - /api/files/upload — apps/api/src/app/api/files/upload/route.ts
 - /api/health — apps/api/src/app/api/health/route.ts
@@ -227,7 +228,8 @@ apps/web/.next
 ## Recent Commits
 
 ```
-3c6d733 feat: document upload, auto-analysis, and upload discovery UX
+490a7e9 fix: topic source attribution, edit wiring, and doc upload improvements
+a5ad6f7 feat: document upload, auto-analysis, and upload discovery UX
 cfb0470 Update HOMEPAGE-COPY-CURRENT.md
 261abab docs: capture current homepage copy for review and revision
 7272e96 feat: add 'Start next chapter' button in chat when domain is completed
@@ -236,6 +238,5 @@ d7357a0 fix: replace Supabase OTP with custom server-side OTP via Resend
 5772ac0 fix: try both 'email' and 'magiclink' OTP types on verification
 bb391cd fix: disable PKCE flow to fix email OTP verification
 a7a2598 fix: replace magic link with 6-digit OTP code for email sign-in
-6982408 fix: handle expired/invalid magic link error in auth callback
 ```
 <!-- /AUTO:RECENT_CHANGES -->

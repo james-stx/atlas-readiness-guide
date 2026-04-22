@@ -58,12 +58,15 @@ ${preview}`,
 
 /**
  * Build the full topic list for injection into the extraction prompt.
+ * Always includes all 25 topics — topic-level de-duplication happens at the
+ * input-creation step in the process route, NOT here. Excluding topics from
+ * the prompt causes "0 topics found" when a re-upload happens on a session
+ * that already has answers from a previous upload.
  */
-function buildTopicList(skipQuestionIds: string[]): string {
+function buildTopicList(): string {
   const lines: string[] = [];
   for (const [domain, config] of Object.entries(DOMAIN_CONFIGS)) {
     for (const q of config.keyQuestions) {
-      if (skipQuestionIds.includes(q.id)) continue;
       lines.push(`- domain: "${domain}" | question_id: "${q.id}" | question: "${q.question}"`);
     }
   }
@@ -72,16 +75,14 @@ function buildTopicList(skipQuestionIds: string[]): string {
 
 /**
  * Extract topic mappings from document text using Claude Sonnet.
- * Skips question IDs already answered by the user.
+ * Returns all topics found in the document — the caller decides which ones
+ * to convert into inputs based on what's already answered.
  */
 export async function extractTopicMappings(
   text: string,
   documentType: DocumentType,
-  existingQuestionIds: string[]
 ): Promise<TopicExtractionResult[]> {
-  const topicList = buildTopicList(existingQuestionIds);
-
-  if (!topicList.trim()) return [];
+  const topicList = buildTopicList();
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { text: result } = await generateText({
@@ -149,7 +150,6 @@ Return ONLY a valid JSON array:
       item.confidence_level &&
       validDomains.includes(item.domain as DomainType) &&
       allQuestionIds.includes(item.question_id) &&
-      !existingQuestionIds.includes(item.question_id) &&
       ['high', 'medium', 'low'].includes(item.confidence_level)
     );
     console.log(`[Atlas Files] Parsed ${parsed.length} items, ${filtered.length} passed validation`);

@@ -16,6 +16,7 @@ interface FilesContextValue extends FilesState {
   loadFiles: (sessionId: string) => Promise<void>;
   uploadAndProcess: (sessionId: string, files: File[]) => Promise<string[]>;
   deleteFile: (fileId: string) => Promise<void>;
+  deleteMapping: (mappingId: string) => Promise<void>;
   getFilesForDomain: (domain: DomainType) => FileTopicMapping[];
   getSourceFile: (fileId: string) => SessionFile | undefined;
   clearError: () => void;
@@ -126,6 +127,14 @@ export function FilesProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
+  const deleteMapping = useCallback(async (mappingId: string): Promise<void> => {
+    await api.deleteFileMapping(mappingId);
+    setState(s => ({
+      ...s,
+      mappings: s.mappings.filter(m => m.id !== mappingId),
+    }));
+  }, []);
+
   const clearError = useCallback(() => {
     setState(s => ({ ...s, uploadError: null }));
   }, []);
@@ -136,6 +145,7 @@ export function FilesProvider({ children }: { children: ReactNode }) {
       loadFiles,
       uploadAndProcess,
       deleteFile,
+      deleteMapping,
       getFilesForDomain,
       getSourceFile,
       clearError,
