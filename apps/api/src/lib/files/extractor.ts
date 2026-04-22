@@ -7,6 +7,12 @@ const SUPPORTED_TYPES: Record<string, string> = {
   'application/pdf': 'PDF',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'DOCX',
   'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'PPTX',
+  'text/plain': 'TXT',
+  'text/markdown': 'MD',
+  'text/x-markdown': 'MD',
+  'text/csv': 'CSV',
+  'text/html': 'HTML',
+  'application/json': 'JSON',
 };
 
 /**
@@ -51,7 +57,7 @@ export async function extractText(buffer: Buffer, mimeType: string): Promise<str
   const normalizedType = mimeType.split(';')[0].trim().toLowerCase();
 
   if (!SUPPORTED_TYPES[normalizedType]) {
-    throw new Error(`Unsupported file type: ${mimeType}. Supported: PDF, DOCX, PPTX`);
+    throw new Error(`Unsupported file type: ${mimeType}. Supported: PDF, DOCX, PPTX, TXT, MD, CSV, HTML, JSON`);
   }
 
   let text: string;
@@ -61,8 +67,11 @@ export async function extractText(buffer: Buffer, mimeType: string): Promise<str
   } else if (normalizedType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
     const result = await mammoth.extractRawText({ buffer });
     text = result.value;
-  } else {
+  } else if (normalizedType === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') {
     text = extractPptxText(buffer);
+  } else {
+    // Plain text formats (txt, md, csv, html, json) — decode directly
+    text = buffer.toString('utf-8');
   }
 
   const cleaned = text.replace(/\s+/g, ' ').trim();

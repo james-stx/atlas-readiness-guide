@@ -8,11 +8,17 @@ import { useAssessment } from '@/lib/context/assessment-context';
 import type { SessionFile, DocumentType } from '@atlas/types';
 import { DOMAINS, DOMAIN_TOPICS } from '@/lib/progress';
 
-const ACCEPTED_TYPES = '.pdf,.docx,.pptx';
+const ACCEPTED_TYPES = '.pdf,.docx,.pptx,.txt,.md,.csv,.html,.json';
 const ACCEPTED_MIME = [
   'application/pdf',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  'text/plain',
+  'text/markdown',
+  'text/x-markdown',
+  'text/csv',
+  'text/html',
+  'application/json',
 ];
 
 const DOC_TYPE_LABELS: Record<DocumentType, string> = {
@@ -270,7 +276,7 @@ export function FileUploadModal({ isOpen, onClose, sessionId }: Props) {
                     Great for
                   </p>
                   <p className="text-[13px] text-[#787671]">
-                    Pitch decks · Business plans · GTM strategies · Financial models · Market research · Board presentations
+                    Pitch decks · Business plans · GTM strategies · Financial models · Market research · Board presentations · Text files · Markdown docs · CSVs
                   </p>
                 </div>
 

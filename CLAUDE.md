@@ -228,7 +228,8 @@ All agents, hooks, and automations are documented in **`AGENTS.md`** at the proj
 ## Recent Commits
 
 ```
-490a7e9 fix: topic source attribution, edit wiring, and doc upload improvements
+69d0cd4 feat: accept text-based file formats (txt, md, csv, html, json)
+72dd23c fix: topic source attribution, edit wiring, and doc upload improvements
 a5ad6f7 feat: document upload, auto-analysis, and upload discovery UX
 cfb0470 Update HOMEPAGE-COPY-CURRENT.md
 261abab docs: capture current homepage copy for review and revision
@@ -237,6 +238,5 @@ cfb0470 Update HOMEPAGE-COPY-CURRENT.md
 d7357a0 fix: replace Supabase OTP with custom server-side OTP via Resend
 5772ac0 fix: try both 'email' and 'magiclink' OTP types on verification
 bb391cd fix: disable PKCE flow to fix email OTP verification
-a7a2598 fix: replace magic link with 6-digit OTP code for email sign-in
 ```
 <!-- /AUTO:RECENT_CHANGES -->

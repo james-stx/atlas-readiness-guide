@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
       const mimeType = file.type || 'application/octet-stream';
       if (!supportedTypes.includes(mimeType.split(';')[0].trim())) {
         throw new ValidationError(
-          `File "${file.name}" has unsupported type. Accepted: PDF, DOCX, PPTX`
+          `File "${file.name}" has unsupported type. Accepted: PDF, DOCX, PPTX, TXT, MD, CSV, HTML, JSON`
         );
       }
 
