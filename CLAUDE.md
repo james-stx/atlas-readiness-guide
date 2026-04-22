@@ -228,7 +228,8 @@ All agents, hooks, and automations are documented in **`AGENTS.md`** at the proj
 ## Recent Commits
 
 ```
-69d0cd4 feat: accept text-based file formats (txt, md, csv, html, json)
+3a2d7ee fix: add TXT, MD, CSV to dropzone format label
+2b2608c feat: accept text-based file formats (txt, md, csv, html, json)
 72dd23c fix: topic source attribution, edit wiring, and doc upload improvements
 a5ad6f7 feat: document upload, auto-analysis, and upload discovery UX
 cfb0470 Update HOMEPAGE-COPY-CURRENT.md
@@ -237,6 +238,5 @@ cfb0470 Update HOMEPAGE-COPY-CURRENT.md
 8756062 fix: replace missing Compass import with AtlasLogo in ChatPanel
 d7357a0 fix: replace Supabase OTP with custom server-side OTP via Resend
 5772ac0 fix: try both 'email' and 'magiclink' OTP types on verification
-bb391cd fix: disable PKCE flow to fix email OTP verification
 ```
 <!-- /AUTO:RECENT_CHANGES -->

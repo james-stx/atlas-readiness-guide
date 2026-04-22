@@ -213,7 +213,7 @@ export function FileUploadModal({ isOpen, onClose, sessionId }: Props) {
                 Drag files here, or click to browse
               </p>
               <p className="text-[12px] text-[#9B9A97]">
-                PDF · DOCX · PPTX · up to 20MB per file
+                PDF · DOCX · PPTX · TXT · MD · CSV · up to 20MB per file
               </p>
               <input
                 ref={fileInputRef}
