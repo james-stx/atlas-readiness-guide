@@ -228,7 +228,8 @@ All agents, hooks, and automations are documented in **`AGENTS.md`** at the proj
 ## Recent Commits
 
 ```
-a5bbeff fix: add explicit CORS headers to upload route for multipart/form-data preflight
+6ade2d8 fix: bypass Vercel 4.5MB body limit with direct-to-Supabase upload
+e0dfc16 fix: add explicit CORS headers to upload route for multipart/form-data preflight
 c90a73f fix: add TXT, MD, CSV to dropzone format label
 2b2608c feat: accept text-based file formats (txt, md, csv, html, json)
 72dd23c fix: topic source attribution, edit wiring, and doc upload improvements
@@ -237,6 +238,5 @@ cfb0470 Update HOMEPAGE-COPY-CURRENT.md
 261abab docs: capture current homepage copy for review and revision
 7272e96 feat: add 'Start next chapter' button in chat when domain is completed
 8756062 fix: replace missing Compass import with AtlasLogo in ChatPanel
-d7357a0 fix: replace Supabase OTP with custom server-side OTP via Resend
 ```
 <!-- /AUTO:RECENT_CHANGES -->

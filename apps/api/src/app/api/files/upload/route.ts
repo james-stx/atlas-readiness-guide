@@ -9,106 +9,79 @@ import { handleApiError, ValidationError, GuestAccessError } from '@/lib/errors'
 const MAX_FILES_PER_SESSION = 5;
 const MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024; // 20MB
 
-function getCorsHeaders(request: NextRequest): Record<string, string> {
-  const origin = request.headers.get('origin') || '';
-  const allowed = [
-    'https://atlas-readiness-guide-web.vercel.app',
-    'http://localhost:3000',
-  ];
-  return {
-    'Access-Control-Allow-Origin': allowed.includes(origin) ? origin : allowed[0],
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  };
-}
-
-// Explicit preflight handler — multipart/form-data triggers a CORS preflight
-// that Vercel's edge can intercept before middleware runs.
-export async function OPTIONS(request: NextRequest) {
-  return new NextResponse(null, { status: 200, headers: getCorsHeaders(request) });
+// Accept JSON metadata only — file bytes are uploaded directly from the browser
+// to Supabase Storage via a signed URL, bypassing Vercel's 4.5MB body limit.
+interface FileMetadata {
+  filename: string;
+  mimeType: string;
+  sizeBytes: number;
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const formData = await request.formData();
-    const sessionId = formData.get('sessionId');
+    const body = await request.json() as { sessionId: string; files: FileMetadata[] };
+    const { sessionId, files: fileMetas } = body;
 
-    if (!sessionId || typeof sessionId !== 'string') {
-      throw new ValidationError('sessionId is required');
-    }
+    if (!sessionId) throw new ValidationError('sessionId is required');
+    if (!fileMetas?.length) throw new ValidationError('At least one file is required');
 
-    // Validate session — guests cannot upload
     const session = await getValidSession(sessionId);
-    if (session.is_guest) {
-      throw new GuestAccessError('document upload');
-    }
+    if (session.is_guest) throw new GuestAccessError('document upload');
 
-    // Collect uploaded files
-    const fileEntries = formData.getAll('files') as File[];
-    if (!fileEntries.length) {
-      throw new ValidationError('At least one file is required');
-    }
-
-    // Check total file count across session
     const existingCount = await countSessionFiles(sessionId);
-    if (existingCount + fileEntries.length > MAX_FILES_PER_SESSION) {
+    if (existingCount + fileMetas.length > MAX_FILES_PER_SESSION) {
       throw new ValidationError(
         `You can upload up to ${MAX_FILES_PER_SESSION} files per session. You already have ${existingCount}.`
       );
     }
 
     const supportedTypes = getSupportedMimeTypes();
-    const savedFiles = [];
+    const results = [];
 
-    for (const file of fileEntries) {
-      // Validate type
-      const mimeType = file.type || 'application/octet-stream';
-      if (!supportedTypes.includes(mimeType.split(';')[0].trim())) {
+    for (const meta of fileMetas) {
+      const mimeType = (meta.mimeType || 'application/octet-stream').split(';')[0].trim();
+
+      if (!supportedTypes.includes(mimeType)) {
         throw new ValidationError(
-          `File "${file.name}" has unsupported type. Accepted: PDF, DOCX, PPTX, TXT, MD, CSV, HTML, JSON`
+          `"${meta.filename}" has unsupported type. Accepted: PDF, DOCX, PPTX, TXT, MD, CSV, HTML, JSON`
         );
       }
-
-      // Validate size
-      if (file.size > MAX_FILE_SIZE_BYTES) {
-        throw new ValidationError(
-          `File "${file.name}" exceeds 20MB limit`
-        );
+      if (meta.sizeBytes > MAX_FILE_SIZE_BYTES) {
+        throw new ValidationError(`"${meta.filename}" exceeds 20MB limit`);
       }
 
-      const buffer = Buffer.from(await file.arrayBuffer());
       const fileId = randomUUID();
-      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const safeName = meta.filename.replace(/[^a-zA-Z0-9._-]/g, '_');
       const storagePath = `${sessionId}/${fileId}-${safeName}`;
 
-      // Upload to Supabase Storage
-      const { error: storageError } = await supabase.storage
+      // Generate a signed URL so the browser can PUT the file directly to Supabase
+      const { data: signedData, error: signedError } = await supabase.storage
         .from('session-documents')
-        .upload(storagePath, buffer, {
-          contentType: mimeType,
-          upsert: false,
-        });
+        .createSignedUploadUrl(storagePath);
 
-      if (storageError) {
-        throw new Error(`Failed to upload "${file.name}": ${storageError.message}`);
+      if (signedError || !signedData) {
+        throw new Error(`Failed to create upload URL for "${meta.filename}": ${signedError?.message}`);
       }
 
-      // Create DB record
+      // Create the DB record immediately (status = pending, file arrives shortly)
       const sessionFile = await createSessionFile({
         sessionId,
-        filename: file.name,
+        filename: meta.filename,
         storagePath,
         mimeType,
-        sizeBytes: file.size,
+        sizeBytes: meta.sizeBytes,
       });
 
-      savedFiles.push({ id: sessionFile.id, filename: sessionFile.filename, status: sessionFile.status });
+      results.push({
+        id: sessionFile.id,
+        filename: sessionFile.filename,
+        status: sessionFile.status,
+        signedUrl: signedData.signedUrl,
+      });
     }
 
-    return NextResponse.json({ files: savedFiles }, { status: 201, headers: getCorsHeaders(request) });
+    return NextResponse.json({ files: results }, { status: 201 });
   } catch (error) {
-    const errResponse = handleApiError(error);
-    Object.entries(getCorsHeaders(request)).forEach(([k, v]) => errResponse.headers.set(k, v));
-    return errResponse;
+    return handleApiError(error);
   }
 }

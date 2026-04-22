@@ -251,16 +251,33 @@ export async function uploadFiles(
   sessionId: string,
   files: File[]
 ): Promise<{ files: Pick<SessionFile, 'id' | 'filename' | 'status'>[] }> {
-  const formData = new FormData();
-  formData.append('sessionId', sessionId);
-  for (const file of files) {
-    formData.append('files', file);
-  }
-  const response = await fetch(`${API_URL}/api/files/upload`, {
+  // Step 1: send metadata to API to get signed upload URLs (no file bytes — avoids Vercel's 4.5MB limit)
+  const metaResponse = await fetch(`${API_URL}/api/files/upload`, {
     method: 'POST',
-    body: formData,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      sessionId,
+      files: files.map(f => ({ filename: f.name, mimeType: f.type, sizeBytes: f.size })),
+    }),
   });
-  return handleResponse<{ files: Pick<SessionFile, 'id' | 'filename' | 'status'>[] }>(response);
+  const { files: registered } = await handleResponse<{
+    files: (Pick<SessionFile, 'id' | 'filename' | 'status'> & { signedUrl: string })[]
+  }>(metaResponse);
+
+  // Step 2: PUT each file directly to Supabase Storage (bypasses Vercel entirely)
+  await Promise.all(
+    registered.map((reg, i) =>
+      fetch(reg.signedUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': files[i].type || 'application/octet-stream' },
+        body: files[i],
+      }).then(r => {
+        if (!r.ok) throw new ApiError(`Failed to upload "${reg.filename}" to storage`, r.status);
+      })
+    )
+  );
+
+  return { files: registered.map(({ id, filename, status }) => ({ id, filename, status })) };
 }
 
 export async function processFile(
