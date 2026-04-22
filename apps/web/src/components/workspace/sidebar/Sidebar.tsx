@@ -11,7 +11,7 @@ import { SidebarTopicItem } from './SidebarTopicItem';
 import { SidebarFooter } from './SidebarFooter';
 import { FileUploadModal } from '@/components/workspace/FileUploadModal';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
-import { FileText, ChevronRight, Upload, Paperclip, Trash2 } from 'lucide-react';
+import { FileText, ChevronRight, Upload, Paperclip, Trash2, Loader2 } from 'lucide-react';
 
 export function Sidebar() {
   const {
@@ -183,27 +183,37 @@ export function Sidebar() {
             </div>
           ) : (
             <div className="space-y-1">
-              {uploadedFiles.map(file => (
-                <div
-                  key={file.id}
-                  className="group flex items-center gap-2 px-2 py-1.5 rounded-md text-[12px] text-[#37352F] hover:bg-[#EBEBEA] transition-colors"
-                >
-                  <Paperclip className="w-3 h-3 text-[#9B9A97] shrink-0" />
-                  <span className="flex-1 truncate">{file.filename}</span>
-                  {file.topics_found > 0 && (
-                    <span className="text-[11px] text-[#9B9A97] shrink-0 group-hover:hidden">
-                      {file.topics_found} topics
-                    </span>
-                  )}
-                  <button
-                    onClick={() => setDeleteTarget({ id: file.id, filename: file.filename, topicsFound: file.topics_found })}
-                    className="hidden group-hover:flex items-center text-[#9B9A97] hover:text-[#E03E3E] transition-colors shrink-0"
-                    aria-label={`Remove ${file.filename}`}
+              {uploadedFiles.map(file => {
+                const isProcessing = file.status === 'pending' || file.status === 'processing';
+                return (
+                  <div
+                    key={file.id}
+                    className="group flex items-center gap-2 px-2 py-1.5 rounded-md text-[12px] text-[#37352F] hover:bg-[#EBEBEA] transition-colors"
                   >
-                    <Trash2 className="w-3 h-3" />
-                  </button>
-                </div>
-              ))}
+                    {isProcessing
+                      ? <Loader2 className="w-3 h-3 text-[#2563EB] shrink-0 animate-spin" />
+                      : <Paperclip className="w-3 h-3 text-[#9B9A97] shrink-0" />
+                    }
+                    <span className="flex-1 truncate">{file.filename}</span>
+                    {isProcessing ? (
+                      <span className="text-[11px] text-[#787671] shrink-0">Analysing…</span>
+                    ) : file.topics_found > 0 ? (
+                      <span className="text-[11px] text-[#9B9A97] shrink-0 group-hover:hidden">
+                        {file.topics_found} topics
+                      </span>
+                    ) : null}
+                    {!isProcessing && (
+                      <button
+                        onClick={() => setDeleteTarget({ id: file.id, filename: file.filename, topicsFound: file.topics_found })}
+                        className="hidden group-hover:flex items-center text-[#9B9A97] hover:text-[#E03E3E] transition-colors shrink-0"
+                        aria-label={`Remove ${file.filename}`}
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

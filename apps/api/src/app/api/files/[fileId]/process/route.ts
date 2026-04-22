@@ -8,6 +8,9 @@ import { classifyDocument, extractTopicMappings } from '@/lib/files/processor';
 import { handleApiError, ValidationError } from '@/lib/errors';
 import type { DomainType, Input } from '@atlas/types';
 
+// Allow up to 2 minutes — Claude Sonnet topic extraction can take 60–90s on large documents
+export const maxDuration = 120;
+
 export async function POST(
   request: NextRequest,
   { params }: { params: { fileId: string } }
